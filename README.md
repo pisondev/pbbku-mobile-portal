@@ -29,6 +29,7 @@ Status saat ini:
 - Tahap 14, yaitu UI polish dan usability, sudah dieksekusi sampai Beranda operasional, glosarium istilah PBB, status pembayaran konsisten, penekanan nominal/jatuh tempo, empty/error state pencarian, build debug, dan lint debug berhasil.
 - Tahap 15, yaitu pengujian fungsional, sudah dieksekusi dalam bentuk unit-level functional test suite terstruktur sampai 36 unit test lulus, build debug, dan lint debug berhasil.
 - Tahap 16, yaitu pengujian non-fungsional, sudah dieksekusi dalam bentuk unit test dan inspeksi konfigurasi sampai 45 unit test lulus, build debug, dan lint debug berhasil.
+- Tahap 17, yaitu dokumentasi, demo, dan finalisasi, sudah dieksekusi pada bagian yang bisa dilakukan tanpa emulator: README final, skenario demo end-to-end, catatan pengujian manual/runtime, acceptance criteria akhir, build debug, unit test, dan lint debug.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
 - Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `BUDI`, hasil objek pajak tampil, dan hasil pertama membuka Detail Objek Pajak.
@@ -90,8 +91,14 @@ pbbku-mobile-portal/
 |   |   `-- v1-mvp_contract.md
 |   +-- diagram/
 |   |   `-- 2-1_arsitektur-sistem-pbbku.png
-|   `-- srs/
-|       `-- SRS_PBBKu.md
+|   +-- demo/
+|   |   `-- end_to_end_demo.md
+|   +-- srs/
+|   |   `-- SRS_PBBKu.md
+|   `-- testing/
+|       +-- functional_unit_test_notes.md
+|       +-- manual_test_notes.md
+|       `-- nonfunctional_unit_test_notes.md
 +-- .env
 +-- .gitignore
 `-- README.md
@@ -106,6 +113,10 @@ Dokumen utama proyek:
 - `docs/api/SIMPBB_OP_API.postman_collection.json`: Postman Collection untuk eksplorasi endpoint.
 - `docs/api/SIMPBB_OP_API.postman_environment.json`: Postman Environment berisi variable base URL dan contoh parameter.
 - `docs/contract/v1-mvp_contract.md`: kontrak kerja MVP, tahapan todo, acceptance criteria, dan advanced feature.
+- `docs/demo/end_to_end_demo.md`: skenario demo end-to-end yang aman untuk reviewer.
+- `docs/testing/functional_unit_test_notes.md`: catatan pengujian fungsional berbasis unit test.
+- `docs/testing/nonfunctional_unit_test_notes.md`: catatan pengujian non-fungsional berbasis unit test dan inspeksi konfigurasi.
+- `docs/testing/manual_test_notes.md`: ringkasan runtime test/manual test yang pernah berhasil dan sisa risiko manual.
 
 ## SIMPBB OP API
 
@@ -117,6 +128,14 @@ Protocol     : oRPC over HTTP POST
 Content-Type : application/json
 Auth         : PUBLIC untuk router terdokumentasi
 ```
+
+Di source Android, base URL terpusat di:
+
+```text
+apps/android/app/src/main/java/id/pbbku/mobileportal/data/api/SimpbbApiConfig.kt
+```
+
+Untuk mengganti environment API, ubah `SimpbbApiConfig.BASE_URL` atau gunakan overload `SimpbbApiClient.create(baseUrl = ...)` pada wiring aplikasi/test.
 
 Semua request menggunakan method `POST` dan body JSON dengan wrapper:
 
@@ -131,6 +150,7 @@ Semua request menggunakan method `POST` dan body JSON dengan wrapper:
 Endpoint prioritas untuk aplikasi:
 
 - `objekPajak/search`
+- `objekPajak/listDetails`
 - `objekPajak/getByNop`
 - `objekPajak/getSpptHistory`
 - `objekPajak/getTunggakan`
@@ -139,6 +159,7 @@ Endpoint prioritas untuk aplikasi:
 - `lspop/listFasilitas`
 - `sppt/listByNop`
 - `sppt/get`
+- `sppt/list`
 - `wilayah/listPropinsi`
 - `wilayah/listDati2`
 - `wilayah/listKecamatan`
@@ -239,3 +260,7 @@ Untuk eksplorasi API, import file berikut ke Postman:
 - File `.env` disiapkan untuk konfigurasi lokal dan sudah masuk `.gitignore`.
 - NIK pada UI harus disamarkan setelah login.
 - Log debug tidak boleh memuat NIK penuh atau data sensitif.
+- NIK demo aman untuk alur login simulatif: `3404123456789012`.
+- OTP demo tetap: `123456`.
+- Query demo yang pernah berhasil untuk runtime test: `BUDI`.
+- Skenario demo lengkap tersedia di `docs/demo/end_to_end_demo.md`.

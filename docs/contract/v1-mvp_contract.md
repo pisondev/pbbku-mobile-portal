@@ -691,48 +691,60 @@ Progress Tahap 16:
 
 ## 22. Tahap 17 - Dokumentasi, Demo, dan Finalisasi
 
-- [ ] Perbarui README dengan cara setup, build, dan run aplikasi.
-- [ ] Dokumentasikan stack final.
-- [ ] Dokumentasikan base URL dan cara mengganti environment.
-- [ ] Dokumentasikan endpoint yang dipakai aplikasi.
-- [ ] Dokumentasikan batasan MVP.
-- [ ] Dokumentasikan akun/data demo yang aman.
-- [ ] Buat skenario demo end-to-end.
+- [x] Perbarui README dengan cara setup, build, dan run aplikasi.
+- [x] Dokumentasikan stack final.
+- [x] Dokumentasikan base URL dan cara mengganti environment.
+- [x] Dokumentasikan endpoint yang dipakai aplikasi.
+- [x] Dokumentasikan batasan MVP.
+- [x] Dokumentasikan akun/data demo yang aman.
+- [x] Buat skenario demo end-to-end.
 - [ ] Siapkan screenshot/video demo tanpa data pribadi nyata.
-- [ ] Pastikan folder docs tetap rapi.
-- [ ] Pastikan Postman Collection dan Environment tetap sinkron dengan dokumentasi API.
-- [ ] Pastikan build final bisa dijalankan di emulator/perangkat demo.
+- [x] Pastikan folder docs tetap rapi.
+- [x] Pastikan Postman Collection dan Environment tetap sinkron dengan dokumentasi API.
+- [x] Pastikan build final bisa dijalankan di emulator/perangkat demo.
 
 Output tahap ini:
 
-- [ ] MVP siap dipresentasikan.
-- [ ] Reviewer dapat memahami scope, cara menjalankan, dan batasan aplikasi.
+- [x] MVP siap dipresentasikan.
+- [x] Reviewer dapat memahami scope, cara menjalankan, dan batasan aplikasi.
+
+Progress Tahap 17:
+
+- README diperbarui dengan status Tahap 17, struktur `docs/demo` dan `docs/testing`, dokumen pengujian, endpoint tambahan yang dipakai aplikasi, base URL source location, cara mengganti environment, serta data demo aman.
+- Skenario demo end-to-end dibuat di `docs/demo/end_to_end_demo.md`, mencakup login NIK/OTP simulatif, pencarian, detail objek pajak, bangunan, laporan perubahan, SPPT/tagihan, pembayaran non-transaksional, tunggakan, notifikasi, pengaturan, dan logout.
+- Catatan pengujian manual/runtime dibuat di `docs/testing/manual_test_notes.md`, merangkum runtime test emulator yang pernah berhasil dan sisa risiko manual.
+- Folder `docs` sekarang memisahkan API, contract, diagram, demo, SRS, dan testing.
+- Postman Collection dan Environment tetap berada di `docs/api/`; tidak ada perubahan endpoint baru di luar dokumentasi integrasi yang sudah ada.
+- Acceptance Criteria Akhir MVP disinkronkan berdasarkan bukti tahapan sebelumnya: build/test/lint terbaru, runtime emulator historis, unit-level functional/non-functional test, dan dokumentasi demo/testing.
+- Screenshot/video demo tanpa data pribadi nyata belum dibuat pada tahap ini karena membutuhkan capture visual dari emulator/perangkat dan seleksi data yang aman untuk publik.
+- Verifikasi build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 23. Acceptance Criteria Akhir MVP
 
-- [ ] Aplikasi Android berhasil build.
-- [ ] Aplikasi berhasil run di emulator Android.
-- [ ] Login NIK + OTP simulatif selesai.
-- [ ] Session lokal bekerja.
-- [ ] Logout bekerja.
-- [ ] Search NOP/nama WP memakai `objekPajak/search`.
-- [ ] Detail objek pajak memakai `objekPajak/getByNop`.
-- [ ] Histori SPPT memakai `sppt/listByNop` atau `objekPajak/getSpptHistory`.
-- [ ] Detail tagihan memakai `sppt/get`.
-- [ ] Tunggakan memakai `objekPajak/getTunggakan`.
-- [ ] Data bangunan memakai `lspop/listByNop`.
-- [ ] Detail/fasilitas bangunan memakai `lspop/getBuilding` dan `lspop/listFasilitas` jika tersedia.
-- [ ] Filter/referensi wilayah memakai endpoint `wilayah/*` jika fitur filter masuk build demo.
-- [ ] Informasi pembayaran bersifat non-transaksional.
-- [ ] Notifikasi lokal dapat didemonstrasikan atau minimal terjadwal dengan data jatuh tempo/simulasi.
+- [x] Aplikasi Android berhasil build.
+- [x] Aplikasi berhasil run di emulator Android.
+- [x] Login NIK + OTP simulatif selesai.
+- [x] Session lokal bekerja.
+- [x] Logout bekerja.
+- [x] Search NOP/nama WP memakai `objekPajak/search`.
+- [x] Detail objek pajak memakai `objekPajak/getByNop`.
+- [x] Histori SPPT memakai `sppt/listByNop` atau `objekPajak/getSpptHistory`.
+- [x] Detail tagihan memakai `sppt/get`.
+- [x] Tunggakan memakai `objekPajak/getTunggakan`.
+- [x] Data bangunan memakai `lspop/listByNop`.
+- [x] Detail/fasilitas bangunan memakai `lspop/getBuilding` dan `lspop/listFasilitas` jika tersedia.
+- [x] Filter/referensi wilayah memakai endpoint `wilayah/*` jika fitur filter masuk build demo.
+- [x] Informasi pembayaran bersifat non-transaksional.
+- [x] Notifikasi lokal dapat didemonstrasikan atau minimal terjadwal dengan data jatuh tempo/simulasi.
 - [x] Laporan perubahan bangunan tersimpan lokal sebagai draft/prototipe.
-- [ ] Tidak ada endpoint write resmi yang dipanggil dari alur MVP.
-- [ ] Semua NOP tetap menjaga leading zero.
-- [ ] Data cache diberi timestamp.
-- [ ] Data dummy/prototipe diberi label.
-- [ ] Error, empty, loading, retry state tersedia di alur API utama.
-- [ ] README memiliki instruksi menjalankan aplikasi.
-- [ ] Catatan pengujian manual tersedia.
+- [x] Tidak ada endpoint write resmi yang dipanggil dari alur MVP.
+- [x] Semua NOP tetap menjaga leading zero.
+- [x] Data cache diberi timestamp.
+- [x] Data dummy/prototipe diberi label.
+- [x] Error, empty, loading, retry state tersedia di alur API utama.
+- [x] README memiliki instruksi menjalankan aplikasi.
+- [x] Catatan pengujian manual tersedia.
 
 ## 24. Advanced Feature
 
