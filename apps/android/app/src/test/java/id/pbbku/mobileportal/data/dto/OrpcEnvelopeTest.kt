@@ -28,4 +28,14 @@ class OrpcEnvelopeTest {
 
         assertEquals("{\"json\":{}}", encoded)
     }
+
+    @Test
+    fun buildingRequest_serializesNoBngAsNumber() {
+        val nop = requireNotNull(Nop.parseOrNull("32.04.010.001.001.0001.0"))
+        val request = OrpcRequest(BuildingRequest.fromDomain(nop, noBng = "1"))
+
+        val encoded = SimpbbApiClient.json.encodeToString(request)
+
+        assertTrue(encoded.contains("\"noBng\":1"))
+    }
 }

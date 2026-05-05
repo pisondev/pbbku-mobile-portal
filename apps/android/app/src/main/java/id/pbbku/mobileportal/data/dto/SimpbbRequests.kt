@@ -27,7 +27,7 @@ data class BuildingRequest(
     val kdBlok: String,
     val noUrut: String,
     val kdJnsOp: String,
-    val noBng: String,
+    val noBng: Int,
 ) {
     companion object {
         fun fromDomain(nop: Nop, noBng: String): BuildingRequest {
@@ -39,7 +39,7 @@ data class BuildingRequest(
                 kdBlok = nop.kdBlok,
                 noUrut = nop.noUrut,
                 kdJnsOp = nop.kdJnsOp,
-                noBng = noBng,
+                noBng = noBng.toIntOrNull() ?: 0,
             )
         }
     }

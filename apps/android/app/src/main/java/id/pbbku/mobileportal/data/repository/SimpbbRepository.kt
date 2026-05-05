@@ -85,12 +85,14 @@ class SimpbbRepository(
     }
 
     suspend fun getBuilding(nop: Nop, noBng: String): AppResult<ApiPayload> {
+        if (noBng.toIntOrNull() == null) return AppResult.Error("Nomor bangunan tidak valid.")
         return execute(SimpbbApiConfig.Endpoint.LSPOP_GET_BUILDING) {
             apiService.getBuilding(OrpcRequest(BuildingRequest.fromDomain(nop, noBng)))
         }
     }
 
     suspend fun listFasilitas(nop: Nop, noBng: String): AppResult<ApiPayload> {
+        if (noBng.toIntOrNull() == null) return AppResult.Error("Nomor bangunan tidak valid.")
         return execute(SimpbbApiConfig.Endpoint.LSPOP_LIST_FASILITAS) {
             apiService.listFasilitas(OrpcRequest(BuildingRequest.fromDomain(nop, noBng)))
         }

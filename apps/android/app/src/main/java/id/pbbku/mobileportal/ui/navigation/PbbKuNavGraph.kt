@@ -25,6 +25,8 @@ import id.pbbku.mobileportal.feature.auth.LoginScreen
 import id.pbbku.mobileportal.feature.auth.OnboardingScreen
 import id.pbbku.mobileportal.feature.auth.OtpScreen
 import id.pbbku.mobileportal.feature.auth.SplashScreen
+import id.pbbku.mobileportal.feature.building.BuildingDetailScreen
+import id.pbbku.mobileportal.feature.building.BuildingListScreen
 import id.pbbku.mobileportal.feature.home.HomeScreen
 import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
 import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailScreen
@@ -50,6 +52,7 @@ private object MainRoute {
     const val SEARCH = "search"
     const val OBJECT_DETAIL = "object_detail"
     const val BUILDINGS = "buildings"
+    const val BUILDING_DETAIL = "building_detail"
     const val SPPT_HISTORY = "sppt_history"
     const val TUNGGAKAN = "tunggakan"
     const val REPORT = "report"
@@ -183,9 +186,24 @@ private fun MainScaffold(
                 )
             }
             composable("${MainRoute.BUILDINGS}/{nopDisplay}") { backStackEntry ->
-                RelatedPlaceholderScreen(
-                    title = "Bangunan",
+                BuildingListScreen(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onOpenDetail = { nopDisplay, noBng ->
+                        navController.navigate("${MainRoute.BUILDING_DETAIL}/$nopDisplay/$noBng")
+                    },
+                )
+            }
+            composable("${MainRoute.BUILDING_DETAIL}/{nopDisplay}/{noBng}") { backStackEntry ->
+                val nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty()
+                val noBng = backStackEntry.arguments?.getString("noBng").orEmpty()
+                BuildingDetailScreen(
+                    nopDisplay = nopDisplay,
+                    noBng = noBng,
+                    onBack = { navController.popBackStack() },
+                    onOpenReport = { reportNopDisplay, reportNoBng ->
+                        navController.navigate("${MainRoute.REPORT}/$reportNopDisplay/$reportNoBng")
+                    },
                 )
             }
             composable("${MainRoute.SPPT_HISTORY}/{nopDisplay}") { backStackEntry ->
@@ -206,6 +224,13 @@ private fun MainScaffold(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
                 )
             }
+            composable("${MainRoute.REPORT}/{nopDisplay}/{noBng}") { backStackEntry ->
+                RelatedPlaceholderScreen(
+                    title = "Laporan Perubahan Bangunan",
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    noBng = backStackEntry.arguments?.getString("noBng").orEmpty(),
+                )
+            }
             composable(MainRoute.NOTIFICATIONS) { NotificationsScreen() }
             composable(MainRoute.SETTINGS) {
                 SettingsScreen(
@@ -221,13 +246,16 @@ private fun MainScaffold(
 private fun RelatedPlaceholderScreen(
     title: String,
     nopDisplay: String,
+    noBng: String? = null,
 ) {
+    val items = buildList {
+        add("NOP: ${Nop.parseOrNull(nopDisplay)?.asGroupedText() ?: nopDisplay}")
+        noBng?.takeIf { it.isNotBlank() }?.let { add("Bangunan: $it") }
+        add("Fitur ini akan dilanjutkan pada tahap kontrak berikutnya.")
+    }
     PlaceholderScreen(
         title = title,
-        items = listOf(
-            "NOP: ${Nop.parseOrNull(nopDisplay)?.asGroupedText() ?: nopDisplay}",
-            "Fitur ini akan dilanjutkan pada tahap kontrak berikutnya.",
-        ),
+        items = items,
     )
 }
 

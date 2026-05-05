@@ -335,23 +335,38 @@ Progress Tahap 6:
 
 ## 12. Tahap 7 - Data Bangunan dan Fasilitas LSPOP
 
-- [ ] Buat halaman Daftar Bangunan.
-- [ ] Panggil `lspop/listByNop`.
-- [ ] Tampilkan nomor bangunan, luas bangunan, jumlah lantai, jenis bangunan, dan informasi JPB jika tersedia.
-- [ ] Buat empty state jika NOP tidak memiliki bangunan.
-- [ ] Buat halaman Detail Bangunan.
-- [ ] Panggil `lspop/getBuilding` dengan `noBng`.
-- [ ] Tampilkan detail bangunan utama.
-- [ ] Panggil `lspop/listFasilitas` dengan `noBng`.
-- [ ] Tampilkan fasilitas seperti AC, lift, kolam renang, atau fasilitas lain jika tersedia.
-- [ ] Tampilkan fallback jika fasilitas kosong.
-- [ ] Hubungkan data lama bangunan ke form laporan perubahan bangunan.
+- [x] Buat halaman Daftar Bangunan.
+- [x] Panggil `lspop/listByNop`.
+- [x] Tampilkan nomor bangunan, luas bangunan, jumlah lantai, jenis bangunan, dan informasi JPB jika tersedia.
+- [x] Buat empty state jika NOP tidak memiliki bangunan.
+- [x] Buat halaman Detail Bangunan.
+- [x] Panggil `lspop/getBuilding` dengan `noBng`.
+- [x] Tampilkan detail bangunan utama.
+- [x] Panggil `lspop/listFasilitas` dengan `noBng`.
+- [x] Tampilkan fasilitas seperti AC, lift, kolam renang, atau fasilitas lain jika tersedia.
+- [x] Tampilkan fallback jika fasilitas kosong.
+- [x] Hubungkan data lama bangunan ke form laporan perubahan bangunan.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat melihat daftar dan detail bangunan.
-- [ ] Fasilitas bangunan tampil bila tersedia.
-- [ ] Data bangunan dapat menjadi referensi laporan mandiri.
+- [x] Pengguna dapat melihat daftar dan detail bangunan.
+- [x] Fasilitas bangunan tampil bila tersedia.
+- [x] Data bangunan dapat menjadi referensi laporan mandiri.
+
+Progress Tahap 7:
+
+- Route Bangunan dari Detail Objek Pajak sekarang membuka `BuildingListScreen`, bukan placeholder.
+- `BuildingListViewModel` memanggil `lspop/listByNop` dan menampilkan loading, empty, error, retry, dan success state.
+- `BuildingDetailScreen` dan `BuildingDetailViewModel` memanggil `lspop/getBuilding` dan `lspop/listFasilitas` untuk nomor bangunan yang dipilih.
+- Request `noBng` dikirim sebagai number karena live check menunjukkan `noBng` string menghasilkan HTTP 400, sedangkan numeric diterima API.
+- Mapper `LspopMapper` dibuat fleksibel untuk membaca array langsung, `rows`, atau `data`, serta beberapa alias field LSPOP umum.
+- UI daftar bangunan menampilkan nomor bangunan, luas bangunan, jumlah lantai, jenis bangunan, JPB, dan NJOP bangunan bila tersedia.
+- UI detail bangunan menampilkan luas, lantai, JPB, tahun dibangun/renovasi, kondisi, konstruksi, atap, dinding, lantai, langit-langit, dan NJOP bangunan bila tersedia.
+- UI fasilitas menampilkan daftar fasilitas dan fallback `Fasilitas bangunan tidak tersedia` bila kosong.
+- Tombol `Buat Laporan Perubahan` dari detail bangunan membawa NOP dan nomor bangunan ke placeholder laporan mandiri tahap berikutnya.
+- Unit test mapper LSPOP dan serialisasi request `noBng` ditambahkan.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil, total 16 unit test lulus.
+- Verifikasi lint: `./gradlew :app:lintDebug` dari MSYS2 zsh berhasil setelah atribut `android:windowLightNavigationBar` dipindahkan ke resource `values-v27` agar aman untuk minSdk 26.
 
 ## 13. Tahap 8 - Histori SPPT, Detail Tagihan, dan Tunggakan
 
