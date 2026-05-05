@@ -568,30 +568,44 @@ Progress Tahap 13:
 - Tombol `Hapus Draft Laporan` memanggil `ReportDraftRepository.clearAll()` untuk menghapus semua draft laporan perubahan bangunan lokal.
 - Logout tetap menghapus session melalui flow autentikasi yang sudah ada.
 - Kartu informasi aplikasi menampilkan nama aplikasi dan versi dari `BuildConfig.VERSION_NAME`/`VERSION_CODE`.
-- Kartu `Mode Developer` hanya tampil pada build debug dan berisi ringkasan aman: build debug, base URL API, logging jaringan level `BASIC`, dan catatan bahwa NIK penuh tidak disimpan/ditampilkan.
+- Kartu `Mode Pengembang` hanya tampil pada build debug dan berisi ringkasan aman: build debug, base URL API, logging jaringan level `BASIC`, dan catatan bahwa NIK penuh tidak disimpan/ditampilkan.
 - Tidak ada penambahan log yang memuat NIK penuh, nomor telepon, alamat lengkap, atau body request/response API.
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
 - Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 19. Tahap 14 - UI Polish dan Usability
 
-- [ ] Pastikan semua teks berbahasa Indonesia.
-- [ ] Tambahkan penjelasan singkat untuk istilah NOP, NJOP, SPPT, SSPD, dan tunggakan.
-- [ ] Pastikan alur utama singkat: login, cari NOP, lihat tagihan, lihat detail.
-- [ ] Tonjolkan nominal, status, dan jatuh tempo di tampilan tagihan.
-- [ ] Gunakan warna status konsisten, misalnya hijau untuk lunas dan merah/oranye untuk belum lunas/jatuh tempo.
-- [ ] Pastikan ukuran teks nyaman di layar smartphone.
-- [ ] Pastikan UI portrait rapi.
-- [ ] Pastikan loading state tidak membuat layout melompat terlalu banyak.
-- [ ] Pastikan empty state informatif.
-- [ ] Pastikan error state memberi aksi retry.
-- [ ] Pastikan konten panjang dapat di-scroll.
-- [ ] Pastikan data dummy/prototipe punya label jelas.
+- [x] Pastikan semua teks berbahasa Indonesia.
+- [x] Tambahkan penjelasan singkat untuk istilah NOP, NJOP, SPPT, SSPD, dan tunggakan.
+- [x] Pastikan alur utama singkat: login, cari NOP, lihat tagihan, lihat detail.
+- [x] Tonjolkan nominal, status, dan jatuh tempo di tampilan tagihan.
+- [x] Gunakan warna status konsisten, misalnya hijau untuk lunas dan merah/oranye untuk belum lunas/jatuh tempo.
+- [x] Pastikan ukuran teks nyaman di layar smartphone.
+- [x] Pastikan UI portrait rapi.
+- [x] Pastikan loading state tidak membuat layout melompat terlalu banyak.
+- [x] Pastikan empty state informatif.
+- [x] Pastikan error state memberi aksi retry.
+- [x] Pastikan konten panjang dapat di-scroll.
+- [x] Pastikan data dummy/prototipe punya label jelas.
 
 Output tahap ini:
 
-- [ ] Aplikasi layak didemonstrasikan ke reviewer/pengguna uji.
-- [ ] Alur utama dapat dipahami tanpa penjelasan teknis panjang.
+- [x] Aplikasi layak didemonstrasikan ke reviewer/pengguna uji.
+- [x] Alur utama dapat dipahami tanpa penjelasan teknis panjang.
+
+Progress Tahap 14:
+
+- Beranda tidak lagi berupa placeholder; sekarang menampilkan session masked, shortcut `Cari Objek Pajak`, shortcut `Lihat Notifikasi`, dan glosarium ringkas istilah PBB.
+- Glosarium Beranda menjelaskan NOP, NJOP, SPPT, SSPD, dan tunggakan dengan bahasa Indonesia non-teknis.
+- Alur utama dipersingkat dari Beranda ke pencarian objek pajak, lalu detail objek pajak, histori SPPT/detail tagihan, tunggakan, bangunan, atau laporan perubahan.
+- Komponen `PaymentStatusLabel` dan helper warna status dibuat di `ui/component` agar status `Lunas`, `Belum Lunas`, `Jatuh Tempo`, dan `Tidak Diketahui` memakai warna konsisten di halaman tagihan dan pembayaran.
+- Tampilan histori/detail tagihan kini lebih menonjolkan nominal, status, dan jatuh tempo; tagihan yang masih perlu dibayar memakai penekanan warna error pada nominal dan jatuh tempo.
+- Empty dan error state pencarian diperbaiki menjadi kartu informatif; error state menyediakan tombol `Coba Lagi` dekat pesan error.
+- Beranda, pencarian, tagihan, pembayaran, notifikasi, pengaturan, dan laporan tetap memakai layout scroll vertikal (`LazyColumn`) agar konten panjang aman pada portrait smartphone.
+- Label prototipe/dummy yang sudah ada pada pembayaran, notifikasi demo, laporan perubahan, dan mode developer dipertahankan agar data resmi API tidak tercampur dengan data simulatif.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
+- Catatan: verifikasi visual langsung di emulator belum dilakukan pada tahap ini.
 
 ## 20. Tahap 15 - Pengujian Fungsional
 

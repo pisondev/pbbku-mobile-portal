@@ -251,7 +251,7 @@ private fun DescriptionForm(
 
 @Composable
 private fun ReportSummaryCard(uiState: ReportDraftUiState) {
-    DetailCard(title = "Ringkasan Sebelum Submit") {
+    DetailCard(title = "Ringkasan Sebelum Pengajuan Simulasi") {
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Bangunan", uiState.noBng.takeIf { it.isNotBlank() })
         DetailRow("Jenis perubahan", uiState.changeType)

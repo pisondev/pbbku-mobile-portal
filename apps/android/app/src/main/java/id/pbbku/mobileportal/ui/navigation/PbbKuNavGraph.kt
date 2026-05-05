@@ -171,7 +171,13 @@ private fun MainScaffold(
             startDestination = MainRoute.HOME,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable(MainRoute.HOME) { HomeScreen(session = session) }
+            composable(MainRoute.HOME) {
+                HomeScreen(
+                    session = session,
+                    onOpenSearch = { navController.navigate(MainRoute.SEARCH) },
+                    onOpenNotifications = { navController.navigate(MainRoute.NOTIFICATIONS) },
+                )
+            }
             composable(MainRoute.SEARCH) {
                 SearchScreen(
                     onOpenDetail = { nopDisplay ->

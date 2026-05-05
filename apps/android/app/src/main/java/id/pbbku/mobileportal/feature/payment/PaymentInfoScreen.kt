@@ -21,13 +21,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
-import id.pbbku.mobileportal.core.format.toPaymentStatusText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.PaymentStatus
+import id.pbbku.mobileportal.ui.component.PaymentStatusLabel
+import id.pbbku.mobileportal.ui.component.statusColor
 
 @Composable
 fun PaymentInfoScreen(
@@ -135,9 +135,9 @@ private fun PaymentStatusCard(uiState: PaymentInfoUiState) {
     val fine = detail?.fine ?: summary?.fine
 
     DetailCard(title = "Status Tagihan") {
-        DetailRow("Status", status.toPaymentStatusText(), status.statusColor())
-        DetailRow("Nominal tagihan", amount?.toRupiahText())
-        DetailRow("Jatuh tempo", dueDate?.toIndonesianDateText())
+        PaymentStatusLabel(status = status)
+        DetailRow("Nominal tagihan", amount?.toRupiahText(), status.statusColor())
+        DetailRow("Jatuh tempo", dueDate?.toIndonesianDateText(), status.statusColor())
         DetailRow("Denda", fine?.toRupiahText())
         DetailRow("Tanggal pembayaran", detail?.paymentDate?.toIndonesianDateText())
         if (!uiState.hasBillData) {
@@ -191,7 +191,7 @@ private fun SspdPrototypeCard(uiState: PaymentInfoUiState) {
         DetailRow("Tahun pajak", detail.taxYear.toString())
         DetailRow("Nominal dibayar", detail.amount?.toRupiahText())
         DetailRow("Tanggal pembayaran", detail.paymentDate?.toIndonesianDateText())
-        DetailRow("Status", detail.status.toPaymentStatusText(), detail.status.statusColor())
+        PaymentStatusLabel(status = detail.status)
         Text(
             text = "Tidak ada QR pembayaran, nomor virtual account, atau bukti resmi yang dibuat oleh aplikasi.",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -226,7 +226,7 @@ private fun DetailCard(
 private fun DetailRow(
     label: String,
     value: String?,
-    color: Color = MaterialTheme.colorScheme.onSurface,
+    color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
@@ -259,17 +259,7 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
             style = MaterialTheme.typography.bodyMedium,
         )
         OutlinedButton(onClick = onRetry) {
-            Text("Retry")
+            Text("Coba Lagi")
         }
-    }
-}
-
-@Composable
-private fun PaymentStatus.statusColor(): Color {
-    return when (this) {
-        PaymentStatus.PAID -> Color(0xFF047857)
-        PaymentStatus.UNPAID -> MaterialTheme.colorScheme.tertiary
-        PaymentStatus.OVERDUE -> MaterialTheme.colorScheme.error
-        PaymentStatus.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 }

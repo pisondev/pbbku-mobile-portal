@@ -130,7 +130,7 @@ private fun BuildingDetailStatus(
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 OutlinedButton(onClick = onRetry) {
-                    Text("Retry")
+                    Text("Coba Lagi")
                 }
             }
         }

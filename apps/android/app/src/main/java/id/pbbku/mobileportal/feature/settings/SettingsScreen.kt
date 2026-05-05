@@ -116,7 +116,7 @@ fun SettingsScreen(
                 onClick = onLogout,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Logout")
+                Text("Keluar")
             }
         }
     }
@@ -248,7 +248,7 @@ private fun DebugInfoCard(items: List<String>) {
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text(
-                text = "Mode Developer",
+                text = "Mode Pengembang",
                 style = MaterialTheme.typography.bodyLarge,
             )
             items.forEach { item ->

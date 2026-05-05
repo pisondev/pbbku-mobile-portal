@@ -85,7 +85,7 @@ fun SearchScreen(
                         enabled = uiState.errorMessage != null,
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Retry")
+                        Text("Coba Lagi")
                     }
                 }
             }
@@ -104,7 +104,10 @@ fun SearchScreen(
         }
 
         item {
-            SearchStatus(uiState)
+            SearchStatus(
+                uiState = uiState,
+                onRetry = viewModel::retry,
+            )
         }
 
         items(
@@ -262,7 +265,10 @@ private fun WilayahDropdown(
 }
 
 @Composable
-private fun SearchStatus(uiState: SearchUiState) {
+private fun SearchStatus(
+    uiState: SearchUiState,
+    onRetry: () -> Unit,
+) {
     when {
         uiState.isLoading -> {
             Row(
@@ -275,18 +281,18 @@ private fun SearchStatus(uiState: SearchUiState) {
         }
 
         uiState.errorMessage != null -> {
-            Text(
-                text = uiState.errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium,
+            MessageCard(
+                title = "Data belum dapat dimuat",
+                message = uiState.errorMessage,
+                actionText = "Coba Lagi",
+                onAction = onRetry,
             )
         }
 
         uiState.emptyMessage != null -> {
-            Text(
-                text = uiState.emptyMessage,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+            MessageCard(
+                title = "Hasil tidak ditemukan",
+                message = uiState.emptyMessage,
             )
         }
 
@@ -297,6 +303,42 @@ private fun SearchStatus(uiState: SearchUiState) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
+        }
+    }
+}
+
+@Composable
+private fun MessageCard(
+    title: String,
+    message: String,
+    actionText: String? = null,
+    onAction: (() -> Unit)? = null,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            if (actionText != null && onAction != null) {
+                OutlinedButton(
+                    onClick = onAction,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(actionText)
+                }
+            }
         }
     }
 }

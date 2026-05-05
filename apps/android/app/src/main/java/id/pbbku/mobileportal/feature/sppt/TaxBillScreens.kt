@@ -24,15 +24,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
-import id.pbbku.mobileportal.core.format.toPaymentStatusText
 import id.pbbku.mobileportal.core.format.toRupiahText
-import id.pbbku.mobileportal.domain.model.PaymentStatus
 import id.pbbku.mobileportal.domain.model.TaxBillDetail
 import id.pbbku.mobileportal.domain.model.TaxBillSummary
+import id.pbbku.mobileportal.ui.component.PaymentStatusLabel
 
 @Composable
 fun SpptHistoryScreen(
@@ -258,17 +256,26 @@ private fun BillSummaryCard(
                     text = "Tahun ${bill.taxYear}",
                     style = MaterialTheme.typography.titleMedium,
                 )
-                Text(
-                    text = bill.status.toPaymentStatusText(),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = bill.status.statusColor(),
-                )
+                PaymentStatusLabel(status = bill.status)
             }
             Text(
                 text = bill.amount?.toRupiahText() ?: "Nominal tidak tersedia",
                 style = MaterialTheme.typography.headlineSmall,
+                color = if (bill.isPayable) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
             )
-            DetailRow("Jatuh tempo", bill.dueDate?.toIndonesianDateText())
+            DetailRow(
+                label = "Jatuh tempo",
+                value = bill.dueDate?.toIndonesianDateText(),
+                valueColor = if (bill.isPayable) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+            )
             DetailRow("Denda", bill.fine?.toRupiahText())
             if (bill.isPayable) {
                 OutlinedButton(
@@ -288,9 +295,25 @@ private fun DetailBillCard(
     onOpenPayment: (String, Int) -> Unit,
 ) {
     DetailCard(title = "Tagihan Tahun ${detail.taxYear}") {
-        DetailRow("Status", detail.status.toPaymentStatusText())
-        DetailRow("Nominal tagihan", detail.amount?.toRupiahText())
-        DetailRow("Jatuh tempo", detail.dueDate?.toIndonesianDateText())
+        PaymentStatusLabel(status = detail.status)
+        DetailRow(
+            label = "Nominal tagihan",
+            value = detail.amount?.toRupiahText(),
+            valueColor = if (detail.isPayable) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+        )
+        DetailRow(
+            label = "Jatuh tempo",
+            value = detail.dueDate?.toIndonesianDateText(),
+            valueColor = if (detail.isPayable) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+        )
         DetailRow("Denda", detail.fine?.toRupiahText())
         DetailRow("Tanggal pembayaran", detail.paymentDate?.toIndonesianDateText())
         DetailRow("NJOP tanah", detail.njopBumi?.toRupiahText())
@@ -338,6 +361,7 @@ private fun DetailCard(
 private fun DetailRow(
     label: String,
     value: String?,
+    valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
@@ -348,6 +372,7 @@ private fun DetailRow(
         Text(
             text = value?.takeIf { it.isNotBlank() } ?: "Data tidak tersedia",
             style = MaterialTheme.typography.bodyLarge,
+            color = valueColor,
         )
     }
 }
@@ -372,7 +397,7 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
             style = MaterialTheme.typography.bodyMedium,
         )
         OutlinedButton(onClick = onRetry) {
-            Text("Retry")
+            Text("Coba Lagi")
         }
     }
 }
@@ -384,14 +409,4 @@ private fun EmptyText(message: String) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = MaterialTheme.typography.bodyMedium,
     )
-}
-
-@Composable
-private fun PaymentStatus.statusColor(): Color {
-    return when (this) {
-        PaymentStatus.PAID -> Color(0xFF047857)
-        PaymentStatus.UNPAID -> MaterialTheme.colorScheme.tertiary
-        PaymentStatus.OVERDUE -> MaterialTheme.colorScheme.error
-        PaymentStatus.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
 }
