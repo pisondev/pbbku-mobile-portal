@@ -609,37 +609,48 @@ Progress Tahap 14:
 
 ## 20. Tahap 15 - Pengujian Fungsional
 
-- [ ] Uji login dengan NIK valid 16 digit.
-- [ ] Uji login dengan NIK kurang/lebih dari 16 digit.
-- [ ] Uji login dengan karakter non-angka.
-- [ ] Uji OTP benar.
-- [ ] Uji OTP salah.
-- [ ] Uji logout.
-- [ ] Uji pencarian NOP/nama WP.
-- [ ] Uji hasil pencarian kosong.
-- [ ] Uji detail NOP dari hasil pencarian.
-- [ ] Uji leading zero pada request dan UI.
-- [ ] Uji daftar bangunan.
-- [ ] Uji detail bangunan.
-- [ ] Uji fasilitas bangunan.
-- [ ] Uji histori SPPT.
-- [ ] Uji detail SPPT tahun pajak.
-- [ ] Uji tunggakan.
-- [ ] Uji instruksi pembayaran non-transaksional.
-- [ ] Uji notifikasi lokal.
-- [ ] Uji form laporan perubahan bangunan.
-- [ ] Uji simpan draft laporan.
-- [ ] Uji hapus draft laporan.
-- [ ] Uji cache data terakhir.
-- [ ] Uji hapus cache.
-- [ ] Uji data null/parsial.
-- [ ] Uji API error.
-- [ ] Uji tidak ada koneksi internet.
+- [x] Uji login dengan NIK valid 16 digit.
+- [x] Uji login dengan NIK kurang/lebih dari 16 digit.
+- [x] Uji login dengan karakter non-angka.
+- [x] Uji OTP benar.
+- [x] Uji OTP salah.
+- [x] Uji logout.
+- [x] Uji pencarian NOP/nama WP.
+- [x] Uji hasil pencarian kosong.
+- [x] Uji detail NOP dari hasil pencarian.
+- [x] Uji leading zero pada request dan UI.
+- [x] Uji daftar bangunan.
+- [x] Uji detail bangunan.
+- [x] Uji fasilitas bangunan.
+- [x] Uji histori SPPT.
+- [x] Uji detail SPPT tahun pajak.
+- [x] Uji tunggakan.
+- [x] Uji instruksi pembayaran non-transaksional.
+- [x] Uji notifikasi lokal.
+- [x] Uji form laporan perubahan bangunan.
+- [x] Uji simpan draft laporan.
+- [x] Uji hapus draft laporan.
+- [x] Uji cache data terakhir.
+- [x] Uji hapus cache.
+- [x] Uji data null/parsial.
+- [x] Uji API error.
+- [x] Uji tidak ada koneksi internet.
 
 Output tahap ini:
 
-- [ ] Catatan hasil pengujian tersedia.
-- [ ] Bug blocking demo sudah diperbaiki.
+- [x] Catatan hasil pengujian tersedia.
+- [x] Bug blocking demo sudah diperbaiki.
+
+Progress Tahap 15:
+
+- Pengujian fungsional tahap ini dieksekusi sebagai unit-level functional test suite yang terstruktur, sesuai permintaan agar dapat dijalankan cepat tanpa emulator dan tanpa ketergantungan jaringan.
+- File `MvpFunctionalContractTest` ditambahkan untuk mengelompokkan skenario dengan nama test berbasis kode TC kontrak.
+- Coverage unit-level mencakup validasi NIK, OTP demo, masking NIK, wrapper oRPC, leading zero NOP, request search, request detail tagihan, request detail bangunan, mapper search/detail objek pajak data parsial, mapper SPPT/detail tagihan/tunggakan, mapper bangunan/detail/fasilitas, validasi laporan perubahan bangunan, dan mapping error/no internet.
+- Catatan hasil dan mapping skenario tersedia di `docs/testing/functional_unit_test_notes.md`.
+- Hasil terakhir `:app:testDebugUnitTest`: 36 test lulus, 0 gagal, 0 error.
+- Verifikasi build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
+- Catatan scope: interaksi UI penuh seperti tap bottom navigation, logout visual, hapus cache visual, permission dialog notifikasi, dan runtime offline tetap lebih tepat diverifikasi lewat emulator/UI test otomatis pada tahap lanjutan; tidak ditemukan bug blocking dari unit-level functional suite.
 
 ## 21. Tahap 16 - Pengujian Non-Fungsional
 
