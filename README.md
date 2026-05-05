@@ -23,6 +23,7 @@ Status saat ini:
 - Tahap 8, yaitu histori SPPT, detail tagihan, dan tunggakan, sudah dieksekusi sampai unit test dan build debug berhasil.
 - Tahap 9, yaitu referensi wilayah dan filter, sudah dieksekusi sampai repository wilayah, filter bertingkat, unit test, lint debug, dan build debug berhasil.
 - Tahap 10, yaitu informasi pembayaran non-transaksional dan SSPD prototipe, sudah dieksekusi sampai build debug dan lint debug berhasil.
+- Tahap 11, yaitu notifikasi lokal pengingat jatuh tempo, sudah dieksekusi sampai toggle reminder, WorkManager, halaman notifikasi, build debug, dan lint debug berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
 - Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `BUDI`, hasil objek pajak tampil, dan hasil pertama membuka Detail Objek Pajak.

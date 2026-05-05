@@ -472,21 +472,37 @@ Progress Tahap 10:
 
 ## 16. Tahap 11 - Notifikasi Lokal Pengingat Jatuh Tempo
 
-- [ ] Buat pengaturan aktif/nonaktif reminder.
-- [ ] Ambil tanggal jatuh tempo dari data SPPT jika tersedia.
-- [ ] Jadwalkan reminder lokal untuk tagihan belum lunas.
-- [ ] Dukung skenario reminder 30 hari, 7 hari, dan 1 hari sebelum jatuh tempo.
-- [ ] Batalkan reminder untuk tagihan yang sudah lunas.
-- [ ] Buat halaman Notifikasi berisi daftar reminder.
-- [ ] Tampilkan status reminder aktif, terjadwal, atau tidak tersedia karena tanggal jatuh tempo kosong.
-- [ ] Buat fallback demo jika data jatuh tempo tidak tersedia, dengan label simulatif.
-- [ ] Pastikan notifikasi tidak memuat NIK penuh atau data sensitif.
+- [x] Buat pengaturan aktif/nonaktif reminder.
+- [x] Ambil tanggal jatuh tempo dari data SPPT jika tersedia.
+- [x] Jadwalkan reminder lokal untuk tagihan belum lunas.
+- [x] Dukung skenario reminder 30 hari, 7 hari, dan 1 hari sebelum jatuh tempo.
+- [x] Batalkan reminder untuk tagihan yang sudah lunas.
+- [x] Buat halaman Notifikasi berisi daftar reminder.
+- [x] Tampilkan status reminder aktif, terjadwal, atau tidak tersedia karena tanggal jatuh tempo kosong.
+- [x] Buat fallback demo jika data jatuh tempo tidak tersedia, dengan label simulatif.
+- [x] Pastikan notifikasi tidak memuat NIK penuh atau data sensitif.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat mengatur reminder.
-- [ ] Reminder lokal dapat didemonstrasikan.
-- [ ] Reminder tidak mengklaim berasal dari server Bapenda.
+- [x] Pengguna dapat mengatur reminder.
+- [x] Reminder lokal dapat didemonstrasikan.
+- [x] Reminder tidak mengklaim berasal dari server Bapenda.
+
+Progress Tahap 11:
+
+- `PaymentReminderRepository` ditambahkan untuk menyimpan preferensi reminder dan daftar reminder lokal di DataStore.
+- `PaymentReminderWorker` ditambahkan untuk menampilkan notifikasi lokal melalui WorkManager dan notification channel `Pengingat PBB`.
+- Pengaturan sekarang memiliki toggle `Pengingat jatuh tempo`; pada Android 13+ toggle meminta izin `POST_NOTIFICATIONS` sebelum mengaktifkan reminder.
+- Saat Histori SPPT atau Tunggakan memuat data, aplikasi menjadwalkan reminder untuk tagihan belum lunas/jatuh tempo dengan tanggal jatuh tempo tersedia.
+- Reminder dijadwalkan 30 hari, 7 hari, dan 1 hari sebelum jatuh tempo menggunakan WorkManager.
+- Jika tagihan sudah lunas, work reminder untuk NOP/tahun pajak terkait dibatalkan.
+- Jika tanggal jatuh tempo kosong atau jadwal 30/7/1 hari sudah lewat, reminder ditampilkan sebagai `Tidak Tersedia`.
+- Halaman Notifikasi sekarang menampilkan status reminder, NOP, tahun pajak, jatuh tempo, jadwal, nominal, dan catatan.
+- Fallback demo simulatif tersedia saat belum ada reminder nyata, dengan label simulatif yang jelas.
+- Isi notifikasi tidak memuat NIK, alamat lengkap, atau data sensitif; notifikasi hanya menyebut tagihan PBB dan tahun pajak.
+- Reminder lokal tidak mengklaim berasal dari server Bapenda.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 17. Tahap 12 - Laporan Mandiri Perubahan Bangunan
 

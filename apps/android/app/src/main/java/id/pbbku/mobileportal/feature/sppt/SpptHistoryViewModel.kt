@@ -16,7 +16,9 @@ import kotlinx.coroutines.launch
 class SpptHistoryViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
-    private val simpbbRepository = (application as PbbKuApplication).simpbbRepository
+    private val pbbKuApplication = application as PbbKuApplication
+    private val simpbbRepository = pbbKuApplication.simpbbRepository
+    private val reminderRepository = pbbKuApplication.paymentReminderRepository
     private val _uiState = MutableStateFlow(TaxBillListUiState())
 
     val uiState: StateFlow<TaxBillListUiState> = _uiState.asStateFlow()
@@ -57,6 +59,7 @@ class SpptHistoryViewModel(
                 }
             }
             showBills(finalBills, "Histori SPPT tidak tersedia untuk NOP ini.")
+            reminderRepository.scheduleForBills(finalBills)
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.Application
 import id.pbbku.mobileportal.data.api.SimpbbApiClient
 import id.pbbku.mobileportal.data.api.SimpbbApiService
 import id.pbbku.mobileportal.data.local.PbbKuDatabase
+import id.pbbku.mobileportal.data.reminder.PaymentReminderRepository
 import id.pbbku.mobileportal.data.repository.LocalCacheRepository
 import id.pbbku.mobileportal.data.repository.SimpbbRepository
 import id.pbbku.mobileportal.data.repository.WilayahRepository
@@ -28,6 +29,10 @@ class PbbKuApplication : Application() {
 
     val localCacheRepository: LocalCacheRepository by lazy {
         LocalCacheRepository(database.cacheEntryDao())
+    }
+
+    val paymentReminderRepository: PaymentReminderRepository by lazy {
+        PaymentReminderRepository(this)
     }
 
     val sessionDataStore: SessionDataStore by lazy {
