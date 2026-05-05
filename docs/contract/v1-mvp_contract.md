@@ -99,28 +99,45 @@ Keputusan final Tahap 0:
 
 ## 6. Tahap 1 - Setup Project Android
 
-- [ ] Inisialisasi source Android di `apps/android/app/`.
-- [ ] Konfigurasi Gradle project dan module app.
-- [ ] Tambahkan dependency Compose, Navigation Compose, ViewModel, coroutine, networking, serialization, DataStore/Room, dan notification scheduler.
-- [ ] Buat konfigurasi base URL terpisah dari kode utama.
-- [ ] Buat struktur folder awal:
-  - [ ] `data/api` untuk service SIMPBB.
-  - [ ] `data/dto` untuk request/response API.
-  - [ ] `data/repository` untuk repository data.
-  - [ ] `domain/model` untuk model domain.
-  - [ ] `domain/usecase` jika diperlukan.
-  - [ ] `ui/navigation` untuk routing screen.
-  - [ ] `ui/screen` atau package per fitur.
-  - [ ] `core/format`, `core/result`, `core/error`, dan `core/security` untuk helper umum.
-- [ ] Buat theme dasar, typography, warna status, dan komponen reusable.
-- [ ] Buat navigation graph awal.
-- [ ] Buat screen placeholder untuk seluruh UI MVP.
+- [x] Inisialisasi source Android di `apps/android/app/`.
+- [x] Konfigurasi Gradle project dan module app.
+- [x] Tambahkan dependency Compose, Navigation Compose, ViewModel, coroutine, networking, serialization, DataStore/Room, dan notification scheduler.
+- [x] Buat konfigurasi base URL terpisah dari kode utama.
+- [x] Buat struktur folder awal:
+  - [x] `data/api` untuk service SIMPBB.
+  - [x] `data/dto` untuk request/response API.
+  - [x] `data/repository` untuk repository data.
+  - [x] `domain/model` untuk model domain.
+  - [x] `domain/usecase` jika diperlukan.
+  - [x] `ui/navigation` untuk routing screen.
+  - [x] `ui/screen` atau package per fitur.
+  - [x] `core/format`, `core/result`, `core/error`, dan `core/security` untuk helper umum.
+- [x] Buat theme dasar, typography, warna status, dan komponen reusable.
+- [x] Buat navigation graph awal.
+- [x] Buat screen placeholder untuk seluruh UI MVP.
 
 Output tahap ini:
 
-- [ ] Aplikasi dapat build dan run.
-- [ ] Splash atau halaman awal tampil.
-- [ ] Navigation antar placeholder berjalan.
+- [x] Aplikasi dapat build.
+- [ ] Aplikasi sudah dijalankan di emulator/perangkat.
+- [x] Splash atau halaman awal tersedia pada source aplikasi.
+- [ ] Navigation antar placeholder sudah diuji di emulator/perangkat.
+
+Progress Tahap 1:
+
+- Source Android dibuat dengan Gradle Kotlin DSL di `apps/android`.
+- Gradle Wrapper dibuat dengan Gradle `8.10.2`.
+- Module app memakai package `id.pbbku.mobileportal`.
+- Dependency awal sudah mencakup Jetpack Compose, Navigation Compose, Lifecycle ViewModel Compose, kotlinx.coroutines, Retrofit, OkHttp, kotlinx.serialization, DataStore Preferences, Room, dan WorkManager.
+- Struktur source memakai feature-based ringan untuk `feature/home`, `feature/search`, `feature/notifications`, dan `feature/settings`, dengan layer pendukung `core`, `data`, `domain`, dan `ui`.
+- `SimpbbApiConfig.BASE_URL` sudah disiapkan dengan nilai `https://simpbb.technosmart.id/api/rpc/`.
+- Environment Android resmi project memakai setup MSYS2 zsh dengan `ANDROID_HOME=/c/Android/Sdk`.
+- File lokal `apps/android/local.properties` dibuat untuk mengarah ke `C:\Android\Sdk`; file ini tidak di-commit karena sudah masuk `.gitignore`.
+- SDK utama `C:\Android\Sdk` sudah memuat `platforms;android-35` dan `build-tools;35.0.0` untuk kebutuhan `compileSdk=35`.
+- Build command terverifikasi dari MSYS2 zsh: `cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android` lalu `./gradlew :app:assembleDebug`.
+- Build offline terverifikasi dari MSYS2 zsh: `./gradlew :app:assembleDebug --offline`.
+- Hasil verifikasi build: `BUILD SUCCESSFUL`, menghasilkan APK debug di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
+- Runtime test belum dilakukan karena `adb devices` tidak menemukan emulator/perangkat tersambung.
 
 ## 7. Tahap 2 - Fondasi Domain, Local State, dan Security
 

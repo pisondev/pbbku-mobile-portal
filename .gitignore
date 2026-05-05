@@ -1,1 +1,14 @@
 .env
+
+# Android / Gradle
+.gradle/
+build/
+**/build/
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+
+# Generated captures
+captures/

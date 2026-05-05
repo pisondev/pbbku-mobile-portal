@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="@color/pbbku_launcher_background"
+        android:pathData="M0,0h48v48h-48z" />
+    <path
+        android:fillColor="@color/pbbku_launcher_mark"
+        android:pathData="M12,14h24v4h-24zM14,22h20v4h-20zM16,30h16v4h-16z" />
+    <path
+        android:fillColor="@color/pbbku_launcher_mark"
+        android:pathData="M10,10h28v4h-28zM10,34h28v4h-28z" />
+</vector>

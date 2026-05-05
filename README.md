@@ -12,8 +12,11 @@ Status saat ini:
 - Dokumentasi integrasi SIMPBB OP API tersedia di `docs/api/`.
 - Kontrak MVP v1 tersedia di `docs/contract/v1-mvp_contract.md`.
 - Diagram arsitektur tersedia di `docs/diagram/`.
-- Folder Android tersedia di `apps/android/app/`, tetapi source aplikasi belum diinisialisasi.
 - Tahap 0, yaitu persiapan dan pembekuan scope teknis MVP, sudah selesai.
+- Tahap 1, yaitu setup project Android, sudah dieksekusi sampai build debug berhasil.
+- Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
+- APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
+- Runtime test di emulator/perangkat belum dilakukan karena belum ada device yang terdeteksi oleh `adb devices`.
 
 ## Ruang Lingkup MVP
 
@@ -56,7 +59,13 @@ Diagram arsitektur lengkap dapat dilihat di `docs/diagram/2-1_arsitektur-sistem-
 pbbku-mobile-portal/
 +-- apps/
 |   `-- android/
-|       `-- app/
+|       +-- app/
+|       +-- gradle/
+|       +-- build.gradle.kts
+|       +-- gradle.properties
+|       +-- gradlew
+|       +-- gradlew.bat
+|       `-- settings.gradle.kts
 +-- docs/
 |   +-- api/
 |   |   +-- SIMPBB_OP_API.md
@@ -151,7 +160,44 @@ Keputusan scope penting:
 
 ## Menjalankan Proyek
 
-Source Android belum tersedia, sehingga belum ada perintah build atau run aplikasi pada tahap ini. Setelah project Android diinisialisasi, instruksi setup Gradle, build, test, dan run emulator perlu ditambahkan ke README ini.
+Prasyarat lokal:
+
+- JDK 17.
+- MSYS2 zsh dengan konfigurasi Android di `~/.zshrc`.
+- Android SDK utama di `C:\Android\Sdk` atau `/c/Android/Sdk`.
+- Android SDK platform `android-35` dan build-tools `35.0.0`.
+- Android Studio atau emulator/perangkat Android untuk runtime test.
+
+Build debug dari MSYS2 zsh:
+
+```zsh
+source ~/.zshrc
+cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
+./gradlew :app:assembleDebug
+```
+
+APK debug akan tersedia di:
+
+```text
+apps/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Untuk menjalankan di emulator/perangkat setelah device terdeteksi:
+
+```zsh
+source ~/.zshrc
+cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
+./gradlew :app:installDebug
+```
+
+Status verifikasi saat ini:
+
+- Environment zsh terverifikasi memakai `JAVA_HOME=/c/Program Files/Eclipse Adoptium/jdk-17.0.14.7-hotspot`.
+- Environment zsh terverifikasi memakai `ANDROID_HOME=/c/Android/Sdk`.
+- `./gradlew :app:assembleDebug` dari MSYS2 zsh sudah berhasil.
+- `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
+- File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
+- `adb devices` belum menampilkan emulator/perangkat, sehingga runtime dan navigasi UI belum teruji di device.
 
 Untuk eksplorasi API, import file berikut ke Postman:
 
