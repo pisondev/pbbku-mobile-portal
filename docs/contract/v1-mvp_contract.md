@@ -263,23 +263,38 @@ Progress Tahap 4:
 
 ## 10. Tahap 5 - Pencarian dan Daftar Objek Pajak
 
-- [ ] Buat halaman Cari Objek Pajak.
-- [ ] Buat input query untuk NOP atau nama wajib pajak.
-- [ ] Tambahkan debounce agar request tidak berlebihan.
-- [ ] Panggil `objekPajak/search` dengan `query` dan `limit`.
-- [ ] Tampilkan hasil berupa NOP, nama wajib pajak, alamat ringkas jika tersedia, dan status fallback jika data parsial.
-- [ ] Buat empty state ketika hasil kosong.
-- [ ] Buat error state dan tombol retry.
-- [ ] Buat aksi memilih item hasil pencarian untuk membuka Detail Objek Pajak.
-- [ ] Buat halaman daftar objek pajak menggunakan `objekPajak/listDetails` jika diperlukan untuk demo.
-- [ ] Tambahkan pagination `limit` dan `offset` untuk daftar objek pajak jika daftar dipakai.
-- [ ] Tambahkan filter wilayah sederhana jika data wilayah sudah tersedia.
+- [x] Buat halaman Cari Objek Pajak.
+- [x] Buat input query untuk NOP atau nama wajib pajak.
+- [x] Tambahkan debounce agar request tidak berlebihan.
+- [x] Panggil `objekPajak/search` dengan `query` dan `limit`.
+- [x] Tampilkan hasil berupa NOP, nama wajib pajak, alamat ringkas jika tersedia, dan status fallback jika data parsial.
+- [x] Buat empty state ketika hasil kosong.
+- [x] Buat error state dan tombol retry.
+- [x] Buat aksi memilih item hasil pencarian untuk membuka Detail Objek Pajak.
+- [x] Buat halaman daftar objek pajak menggunakan `objekPajak/listDetails` jika diperlukan untuk demo.
+- [x] Tambahkan pagination `limit` dan `offset` untuk daftar objek pajak jika daftar dipakai.
+- [ ] Tambahkan filter wilayah sederhana jika data wilayah sudah tersedia. Catatan: filter wilayah interaktif dipindahkan ke Tahap 9 karena perlu repository dan UI referensi wilayah bertingkat.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat mencari NOP/nama WP.
-- [ ] Pengguna dapat memilih hasil pencarian.
-- [ ] Empty/error/loading state berjalan.
+- [x] Pengguna dapat mencari NOP/nama WP.
+- [x] Pengguna dapat memilih hasil pencarian.
+- [x] Empty/error/loading state berjalan.
+
+Progress Tahap 5:
+
+- Halaman `Cari Objek Pajak` sekarang memakai `SearchViewModel` dan `SearchUiState`.
+- Input pencarian menerima NOP atau nama wajib pajak dan menjalankan request otomatis setelah minimal 3 karakter.
+- Debounce pencarian memakai coroutine delay agar request tidak dikirim pada setiap perubahan karakter secara langsung.
+- Pencarian utama memanggil `objekPajak/search` dengan `query` dan `limit`.
+- Hasil pencarian ditampilkan sebagai kartu berisi nama wajib pajak, NOP lengkap, dan alamat ringkas jika tersedia.
+- Mapper `ObjekPajakMapper` menjaga seluruh segmen NOP sebagai `String` dan membentuk domain `ObjekPajakSummary`.
+- Empty state, loading state, error message, dan tombol `Retry` tersedia di screen pencarian.
+- Tombol `Daftar demo` memanggil `objekPajak/listDetails` dengan parameter demo aman dan mendukung tombol `Muat berikutnya` berbasis `limit` dan `offset`.
+- Memilih hasil pencarian membuka route `object_detail/{nopDisplay}` dan menampilkan placeholder Detail Objek Pajak untuk Tahap 6.
+- Unit test mapper objek pajak ditambahkan untuk response `search` dan `listDetails`.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 11 unit test lulus.
+- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `BUDI` menampilkan hasil API seperti `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka placeholder Detail Objek Pajak.
 
 ## 11. Tahap 6 - Detail Objek Pajak dan Subjek Pajak
 

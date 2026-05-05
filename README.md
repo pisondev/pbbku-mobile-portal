@@ -17,9 +17,10 @@ Status saat ini:
 - Tahap 2, yaitu fondasi domain, local state, dan security, sudah dieksekusi sampai unit test helper dan build debug berhasil.
 - Tahap 3, yaitu API client SIMPBB oRPC, sudah dieksekusi sampai unit test, build debug, dan verifikasi live endpoint wilayah berhasil.
 - Tahap 4, yaitu onboarding, login simulatif, OTP, navigation utama, dan logout, sudah dieksekusi sampai runtime test emulator berhasil.
+- Tahap 5, yaitu pencarian dan daftar objek pajak, sudah dieksekusi sampai unit test, build debug, dan runtime test pencarian API berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
-- Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, dan logout kembali ke Login.
+- Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `BUDI`, hasil objek pajak tampil, dan hasil pertama membuka placeholder Detail Objek Pajak.
 
 ## Ruang Lingkup MVP
 
@@ -208,10 +209,11 @@ Status verifikasi saat ini:
 - `./gradlew :app:assembleDebug` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
-- Unit test saat ini: 9 test lulus untuk parser NOP, masking NIK, validasi NIK, dan wrapper oRPC.
+- Unit test saat ini: 11 test lulus untuk parser NOP, masking NIK, validasi NIK, wrapper oRPC, dan mapper objek pajak.
 - Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - Runtime test dasar berhasil di emulator headless `Pixel_6_API_35`: install debug, fresh onboarding, login NIK demo `3404123456789012`, OTP demo `123456`, Beranda dengan masked NIK `34************12`, dan logout kembali ke Login.
+- Runtime test pencarian berhasil di emulator headless `Pixel_6_API_35`: tab Cari, query `BUDI`, hasil dari `objekPajak/search` tampil, termasuk `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`, lalu item hasil membuka placeholder Detail Objek Pajak.
 
 Untuk eksplorasi API, import file berikut ke Postman:
 

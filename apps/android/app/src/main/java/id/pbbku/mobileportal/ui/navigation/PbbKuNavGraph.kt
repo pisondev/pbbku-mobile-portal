@@ -26,6 +26,7 @@ import id.pbbku.mobileportal.feature.auth.OtpScreen
 import id.pbbku.mobileportal.feature.auth.SplashScreen
 import id.pbbku.mobileportal.feature.home.HomeScreen
 import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
+import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailPlaceholderScreen
 import id.pbbku.mobileportal.feature.search.SearchScreen
 import id.pbbku.mobileportal.feature.settings.SettingsScreen
 
@@ -45,6 +46,7 @@ private object AppRoute {
 private object MainRoute {
     const val HOME = "home"
     const val SEARCH = "search"
+    const val OBJECT_DETAIL = "object_detail"
     const val NOTIFICATIONS = "notifications"
     const val SETTINGS = "settings"
 }
@@ -156,7 +158,19 @@ private fun MainScaffold(
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(MainRoute.HOME) { HomeScreen(session = session) }
-            composable(MainRoute.SEARCH) { SearchScreen() }
+            composable(MainRoute.SEARCH) {
+                SearchScreen(
+                    onOpenDetail = { nopDisplay ->
+                        navController.navigate("${MainRoute.OBJECT_DETAIL}/$nopDisplay")
+                    },
+                )
+            }
+            composable("${MainRoute.OBJECT_DETAIL}/{nopDisplay}") { backStackEntry ->
+                ObjectDetailPlaceholderScreen(
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    onBack = { navController.popBackStack() },
+                )
+            }
             composable(MainRoute.NOTIFICATIONS) { NotificationsScreen() }
             composable(MainRoute.SETTINGS) {
                 SettingsScreen(
