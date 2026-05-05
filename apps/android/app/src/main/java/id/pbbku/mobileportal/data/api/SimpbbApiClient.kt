@@ -22,11 +22,7 @@ object SimpbbApiClient {
         debug: Boolean = BuildConfig.DEBUG,
     ): SimpbbApiService {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (debug) {
-                HttpLoggingInterceptor.Level.BASIC
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+            level = loggingLevelFor(debug)
         }
 
         val okHttpClient = OkHttpClient.Builder()
@@ -43,5 +39,13 @@ object SimpbbApiClient {
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(SimpbbApiService::class.java)
+    }
+
+    internal fun loggingLevelFor(debug: Boolean): HttpLoggingInterceptor.Level {
+        return if (debug) {
+            HttpLoggingInterceptor.Level.BASIC
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
     }
 }

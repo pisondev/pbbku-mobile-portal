@@ -35,8 +35,8 @@ class SearchViewModel(
             it.copy(
                 query = normalized,
                 errorMessage = null,
-                emptyMessage = if (normalized.length < MIN_QUERY_LENGTH) {
-                    "Ketik minimal $MIN_QUERY_LENGTH karakter untuk mencari."
+                emptyMessage = if (normalized.length < SearchConfig.MIN_QUERY_LENGTH) {
+                    "Ketik minimal ${SearchConfig.MIN_QUERY_LENGTH} karakter untuk mencari."
                 } else {
                     null
                 },
@@ -46,12 +46,12 @@ class SearchViewModel(
             )
         }
         searchJob?.cancel()
-        if (normalized.length < MIN_QUERY_LENGTH) {
+        if (normalized.length < SearchConfig.MIN_QUERY_LENGTH) {
             _uiState.update { it.copy(isLoading = false, results = emptyList()) }
             return
         }
         searchJob = viewModelScope.launch {
-            delay(SEARCH_DEBOUNCE_MS)
+            delay(SearchConfig.SEARCH_DEBOUNCE_MS)
             search()
         }
     }
@@ -175,7 +175,7 @@ class SearchViewModel(
     fun loadDemoList(reset: Boolean) {
         searchJob?.cancel()
         viewModelScope.launch {
-            val query = _uiState.value.query.takeIf { it.isNotBlank() } ?: DEFAULT_DEMO_SEARCH
+            val query = _uiState.value.query.takeIf { it.isNotBlank() } ?: SearchConfig.DEFAULT_DEMO_SEARCH
             val offset = if (reset) 0 else currentListOffset
             val filter = _uiState.value.wilayahFilter
             val selectedPropinsi = filter.selectedPropinsi?.code
@@ -193,9 +193,9 @@ class SearchViewModel(
 
             when (
                 val result = simpbbRepository.listObjekPajakDetails(
-                    kdPropinsi = selectedPropinsi ?: DEFAULT_KD_PROPINSI,
-                    kdDati2 = selectedDati2 ?: if (selectedPropinsi == null) DEFAULT_KD_DATI2 else null,
-                    limit = PAGE_SIZE,
+                    kdPropinsi = selectedPropinsi ?: SearchConfig.DEFAULT_KD_PROPINSI,
+                    kdDati2 = selectedDati2 ?: if (selectedPropinsi == null) SearchConfig.DEFAULT_KD_DATI2 else null,
+                    limit = SearchConfig.PAGE_SIZE,
                     offset = offset,
                     search = query,
                 )
@@ -212,7 +212,7 @@ class SearchViewModel(
                         emptyMessage = "Data objek pajak tidak ditemukan.",
                         modeLabel = "Daftar demo",
                         totalRows = page.total,
-                        canLoadMore = page.total?.let { merged.size < it } ?: page.rows.size == PAGE_SIZE,
+                        canLoadMore = page.total?.let { merged.size < it } ?: page.rows.size == SearchConfig.PAGE_SIZE,
                     )
                 }
             }
@@ -313,7 +313,7 @@ class SearchViewModel(
     private fun search() {
         viewModelScope.launch {
             val query = _uiState.value.query.trim()
-            if (query.length < MIN_QUERY_LENGTH) return@launch
+            if (query.length < SearchConfig.MIN_QUERY_LENGTH) return@launch
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -324,7 +324,7 @@ class SearchViewModel(
                     canLoadMore = false,
                 )
             }
-            when (val result = simpbbRepository.searchObjekPajak(query = query, limit = PAGE_SIZE)) {
+            when (val result = simpbbRepository.searchObjekPajak(query = query, limit = SearchConfig.PAGE_SIZE)) {
                 AppResult.Empty -> showEmpty("Hasil pencarian tidak ditemukan.")
                 is AppResult.Error -> showError(result.message)
                 AppResult.Loading -> Unit
@@ -385,12 +385,5 @@ class SearchViewModel(
         }
     }
 
-    companion object {
-        private const val SEARCH_DEBOUNCE_MS = 500L
-        private const val MIN_QUERY_LENGTH = 3
-        private const val PAGE_SIZE = 10
-        private const val DEFAULT_DEMO_SEARCH = "BUDI"
-        private const val DEFAULT_KD_PROPINSI = "32"
-        private const val DEFAULT_KD_DATI2 = "04"
-    }
+    companion object
 }

@@ -654,28 +654,40 @@ Progress Tahap 15:
 
 ## 21. Tahap 16 - Pengujian Non-Fungsional
 
-- [ ] Beranda tampil dalam waktu wajar setelah session lokal tersedia.
-- [ ] Loading muncul cepat saat request pencarian dimulai.
-- [ ] Request pencarian memakai limit.
-- [ ] Daftar objek/SPPT memakai pagination jika data besar.
-- [ ] Request API tidak memblokir UI.
-- [ ] Pencarian memakai debounce.
-- [ ] Cache lokal tampil cepat.
-- [ ] Aplikasi tidak crash pada response kosong.
-- [ ] Aplikasi tidak crash pada field null.
-- [ ] Aplikasi menampilkan pesan saat internet mati.
-- [ ] Base URL tidak hardcoded tersebar di banyak tempat.
-- [ ] Repository pattern memisahkan data layer dari UI.
-- [ ] DTO, domain model, dan UI model dipisahkan minimal untuk data kompleks.
-- [ ] Format rupiah benar.
-- [ ] Format tanggal Indonesia benar.
-- [ ] Data resmi API dan data dummy/prototipe dibedakan.
-- [ ] Tidak ada data pribadi nyata di repository.
-- [ ] Tidak ada NIK penuh di log debug.
+- [x] Beranda tampil dalam waktu wajar setelah session lokal tersedia.
+- [x] Loading muncul cepat saat request pencarian dimulai.
+- [x] Request pencarian memakai limit.
+- [x] Daftar objek/SPPT memakai pagination jika data besar.
+- [x] Request API tidak memblokir UI.
+- [x] Pencarian memakai debounce.
+- [x] Cache lokal tampil cepat.
+- [x] Aplikasi tidak crash pada response kosong.
+- [x] Aplikasi tidak crash pada field null.
+- [x] Aplikasi menampilkan pesan saat internet mati.
+- [x] Base URL tidak hardcoded tersebar di banyak tempat.
+- [x] Repository pattern memisahkan data layer dari UI.
+- [x] DTO, domain model, dan UI model dipisahkan minimal untuk data kompleks.
+- [x] Format rupiah benar.
+- [x] Format tanggal Indonesia benar.
+- [x] Data resmi API dan data dummy/prototipe dibedakan.
+- [x] Tidak ada data pribadi nyata di repository.
+- [x] Tidak ada NIK penuh di log debug.
 
 Output tahap ini:
 
-- [ ] Aplikasi memenuhi kebutuhan performa, keamanan, keandalan, maintainability, dan kualitas data MVP.
+- [x] Aplikasi memenuhi kebutuhan performa, keamanan, keandalan, maintainability, dan kualitas data MVP.
+
+Progress Tahap 16:
+
+- Pengujian non-fungsional tahap ini dieksekusi lewat unit test dan inspeksi konfigurasi agar dapat berjalan offline tanpa emulator.
+- `SearchConfig` ditambahkan untuk membuat aturan debounce, panjang minimum query, limit halaman, dan default demo menjadi konfigurasi terpusat yang bisa diuji.
+- `SimpbbApiClient.loggingLevelFor()` ditambahkan agar kebijakan logging debug dapat diuji; debug memakai level `BASIC`, bukan `BODY`, dan release memakai `NONE`.
+- `NonFunctionalContractTest` ditambahkan untuk menguji limit/pagination request pencarian dan SPPT, debounce config, base URL/endpoint terpusat, formatter rupiah/tanggal/status Indonesia, mapper response kosong/null, pesan internet mati/timeout, label dummy/prototipe, dan kebijakan logging.
+- Catatan hasil dan mapping kriteria non-fungsional tersedia di `docs/testing/nonfunctional_unit_test_notes.md`.
+- Hasil terakhir `:app:testDebugUnitTest`: 45 test lulus, 0 gagal, 0 error.
+- Verifikasi build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
+- Catatan scope: pengukuran waktu aktual Beranda, loading visual, cache latency nyata, dan profiling request non-blocking di perangkat tetap lebih tepat dilakukan lewat runtime emulator/profiling; secara implementasi Beranda membaca session lokal, request API dipanggil dari coroutine ViewModel, dan cache memakai Room lokal.
 
 ## 22. Tahap 17 - Dokumentasi, Demo, dan Finalisasi
 
