@@ -10,8 +10,10 @@ Status saat ini:
 
 - Dokumentasi SRS tersedia di `docs/srs/SRS_PBBKu.md`.
 - Dokumentasi integrasi SIMPBB OP API tersedia di `docs/api/`.
+- Kontrak MVP v1 tersedia di `docs/contract/v1-mvp_contract.md`.
 - Diagram arsitektur tersedia di `docs/diagram/`.
 - Folder Android tersedia di `apps/android/app/`, tetapi source aplikasi belum diinisialisasi.
+- Tahap 0, yaitu persiapan dan pembekuan scope teknis MVP, sudah selesai.
 
 ## Ruang Lingkup MVP
 
@@ -60,6 +62,8 @@ pbbku-mobile-portal/
 |   |   +-- SIMPBB_OP_API.md
 |   |   +-- SIMPBB_OP_API.postman_collection.json
 |   |   `-- SIMPBB_OP_API.postman_environment.json
+|   +-- contract/
+|   |   `-- v1-mvp_contract.md
 |   +-- diagram/
 |   |   `-- 2-1_arsitektur-sistem-pbbku.png
 |   `-- srs/
@@ -77,6 +81,7 @@ Dokumen utama proyek:
 - `docs/api/SIMPBB_OP_API.md`: ringkasan endpoint SIMPBB OP API untuk integrasi aplikasi.
 - `docs/api/SIMPBB_OP_API.postman_collection.json`: Postman Collection untuk eksplorasi endpoint.
 - `docs/api/SIMPBB_OP_API.postman_environment.json`: Postman Environment berisi variable base URL dan contoh parameter.
+- `docs/contract/v1-mvp_contract.md`: kontrak kerja MVP, tahapan todo, acceptance criteria, dan advanced feature.
 
 ## SIMPBB OP API
 
@@ -122,16 +127,27 @@ Catatan integrasi penting:
 - Response utama dibaca dari field `json`.
 - Endpoint write seperti `objekPajak/save` tidak diprioritaskan untuk portal wajib pajak.
 
-## Rencana Teknologi Android
+## Keputusan Teknologi Android MVP
 
-Rencana stack aplikasi:
+Stack final untuk MVP:
 
-- Kotlin untuk bahasa utama Android.
-- Jetpack Compose untuk antarmuka pengguna.
-- Retrofit/OkHttp atau Ktor Client untuk networking.
-- kotlinx.serialization, Gson, atau Moshi untuk parsing JSON.
-- DataStore atau Room untuk session simulatif, cache, preferensi, dan draft lokal.
-- WorkManager atau AlarmManager untuk notifikasi lokal.
+- Platform: Android.
+- Bahasa utama: Kotlin.
+- UI framework: Jetpack Compose.
+- Networking: Retrofit + OkHttp.
+- JSON parser: kotlinx.serialization.
+- Session dan preferensi lokal: DataStore Preferences.
+- Cache dan draft terstruktur: Room.
+- Notifikasi lokal: WorkManager.
+- Minimum SDK: Android 8.0/API 26.
+- Struktur package: feature-based dengan layer ringan.
+
+Keputusan scope penting:
+
+- Data resmi tetap berasal dari SIMPBB OP API.
+- Data lokal hanya untuk session simulatif, preferensi, cache read-only, notifikasi lokal, dan draft/prototipe.
+- Endpoint write seperti `objekPajak/save` tidak digunakan dalam alur MVP portal wajib pajak.
+- Data demo menggunakan contoh Postman environment dan/atau data dummy aman, bukan data pribadi nyata.
 
 ## Menjalankan Proyek
 

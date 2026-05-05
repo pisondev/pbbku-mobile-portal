@@ -62,23 +62,40 @@ MVP selesai ketika pengguna demo dapat menjalankan alur utama berikut:
 
 ## 5. Tahap 0 - Persiapan dan Pembekuan Scope
 
-- [ ] Tetapkan Android sebagai satu-satunya platform MVP.
-- [ ] Tetapkan Kotlin sebagai bahasa utama.
-- [ ] Tetapkan Jetpack Compose sebagai UI framework.
-- [ ] Pilih networking client: Retrofit/OkHttp atau Ktor Client.
-- [ ] Pilih JSON parser: kotlinx.serialization, Moshi, atau Gson.
-- [ ] Pilih local storage: DataStore untuk session/preferensi dan Room atau file/DataStore untuk cache/draft jika diperlukan.
-- [ ] Pilih mekanisme notifikasi lokal: WorkManager atau AlarmManager.
-- [ ] Tetapkan minimum Android SDK, disarankan API 26 atau lebih baru.
-- [ ] Tetapkan struktur package berbasis fitur/layer.
-- [ ] Tetapkan data demo aman dari Postman environment atau data dummy yang tidak mengandung data pribadi nyata.
-- [ ] Dokumentasikan bahwa endpoint write `objekPajak/save` tidak dipakai di MVP.
+- [x] Tetapkan Android sebagai satu-satunya platform MVP.
+- [x] Tetapkan Kotlin sebagai bahasa utama.
+- [x] Tetapkan Jetpack Compose sebagai UI framework.
+- [x] Tetapkan networking client: Retrofit + OkHttp.
+- [x] Tetapkan JSON parser: kotlinx.serialization.
+- [x] Tetapkan local storage: DataStore Preferences untuk session/preferensi dan Room untuk cache/draft terstruktur.
+- [x] Tetapkan mekanisme notifikasi lokal: WorkManager.
+- [x] Tetapkan minimum Android SDK: Android 8.0/API 26.
+- [x] Tetapkan struktur package: feature-based dengan layer ringan.
+- [x] Tetapkan data demo aman dari Postman environment dan/atau data dummy yang tidak mengandung data pribadi nyata.
+- [x] Dokumentasikan bahwa endpoint write `objekPajak/save` tidak dipakai di MVP.
 
 Output tahap ini:
 
-- [ ] Keputusan stack final dicatat di README atau dokumen teknis.
-- [ ] Scope MVP dan non-MVP dipahami seluruh anggota tim.
-- [ ] Data demo aman tersedia.
+- [x] Keputusan stack final dicatat di README atau dokumen teknis.
+- [x] Scope MVP dan non-MVP dipahami seluruh anggota tim.
+- [x] Data demo aman tersedia.
+
+Keputusan final Tahap 0:
+
+| Area | Keputusan |
+|---|---|
+| Platform | Android saja untuk MVP. |
+| Bahasa utama | Kotlin. |
+| UI framework | Jetpack Compose. |
+| Networking | Retrofit + OkHttp. |
+| JSON parser | kotlinx.serialization. |
+| Session dan preferensi | DataStore Preferences. |
+| Cache dan draft terstruktur | Room. |
+| Notifikasi lokal | WorkManager. |
+| Minimum SDK | Android 8.0/API 26. |
+| Struktur package | Feature-based dengan layer ringan per fitur. |
+| Data demo | Data contoh Postman environment dan/atau data dummy yang aman, bukan data pribadi nyata. |
+| Endpoint write | `objekPajak/save` tidak dipakai dalam alur MVP portal wajib pajak. |
 
 ## 6. Tahap 1 - Setup Project Android
 
