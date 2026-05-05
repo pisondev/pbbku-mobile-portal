@@ -1,0 +1,738 @@
+{
+  "info": {
+    "_postman_id": "54b8cf88-ef5d-45ca-b85d-87b4fb1d65f4",
+    "name": "SIMPBB OP API",
+    "description": "Postman Collection untuk SIMPBB OP API. Semua endpoint menggunakan POST dan wrapper oRPC { json: {...} }. Disusun untuk kebutuhan integrasi aplikasi PBB-Ku.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Objek Pajak",
+      "description": "Router utama untuk pengelolaan data SPOP dan Subjek Pajak.",
+      "item": [
+        {
+          "name": "search - Cari NOP / Nama WP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"query\": \"{{query}}\",\n    \"limit\": \"{{limit}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "search"
+              ]
+            },
+            "description": "Mencari NOP atau Nama Wajib Pajak untuk autocomplete UI."
+          },
+          "response": []
+        },
+        {
+          "name": "listDetails - Daftar Objek Pajak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"limit\": \"{{limit}}\",\n    \"offset\": \"{{offset}}\",\n    \"search\": \"{{search}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/listDetails",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "listDetails"
+              ]
+            },
+            "description": "Menampilkan daftar NOP dengan agregasi luas bumi dan bangunan."
+          },
+          "response": []
+        },
+        {
+          "name": "getByNop - Detail Objek Pajak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/getByNop",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "getByNop"
+              ]
+            },
+            "description": "Mengambil profil lengkap satu NOP, termasuk data Subjek Pajak dan status keanggotaan."
+          },
+          "response": []
+        },
+        {
+          "name": "save - Upsert SPOP dan Subjek Pajak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"spop\": {\n      \"kdPropinsi\": \"{{kdPropinsi}}\",\n      \"kdDati2\": \"{{kdDati2}}\",\n      \"kdKecamatan\": \"{{kdKecamatan}}\",\n      \"kdKelurahan\": \"{{kdKelurahan}}\",\n      \"kdBlok\": \"{{kdBlok}}\",\n      \"noUrut\": \"{{noUrut}}\",\n      \"kdJnsOp\": \"{{kdJnsOp}}\",\n      \"subjekPajakId\": \"{{subjekPajakId}}\",\n      \"jalanOp\": \"{{jalanOp}}\",\n      \"luasBumi\": 250,\n      \"nilaiSistemBumi\": 500000000,\n      \"kdStatusWp\": \"1\",\n      \"jnsBumi\": \"1\",\n      \"jnsTransaksiOp\": \"1\"\n    },\n    \"subjekPajak\": {\n      \"subjekPajakId\": \"{{subjekPajakId}}\",\n      \"nmWp\": \"{{nmWp}}\",\n      \"jalanWp\": \"{{jalanWp}}\",\n      \"statusPekerjaanWp\": \"1\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/save",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "save"
+              ]
+            },
+            "description": "Menyimpan atau memperbarui data SPOP dan Subjek Pajak. Gunakan hati-hati karena endpoint ini bersifat write/upsert."
+          },
+          "response": []
+        },
+        {
+          "name": "getSpptHistory - Histori SPPT by NOP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/getSpptHistory",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "getSpptHistory"
+              ]
+            },
+            "description": "Melihat histori tagihan SPPT dari tahun ke tahun untuk satu NOP."
+          },
+          "response": []
+        },
+        {
+          "name": "getTunggakan - Daftar Tunggakan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/getTunggakan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "getTunggakan"
+              ]
+            },
+            "description": "Mengambil daftar SPPT yang belum lunas."
+          },
+          "response": []
+        },
+        {
+          "name": "getNextNoUrut - Nomor Urut NOP Berikutnya",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/getNextNoUrut",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "getNextNoUrut"
+              ]
+            },
+            "description": "Mendapatkan nomor urut NOP berikutnya yang tersedia di satu blok."
+          },
+          "response": []
+        },
+        {
+          "name": "getNextNoFormulir - Nomor Formulir SPOP Berikutnya",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/objekPajak/getNextNoFormulir",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "objekPajak",
+                "getNextNoFormulir"
+              ]
+            },
+            "description": "Mendapatkan nomor formulir SPOP berikutnya untuk tahun berjalan."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "LSPOP",
+      "description": "Router manajemen data bangunan atau Lampiran SPOP.",
+      "item": [
+        {
+          "name": "listByNop - Daftar Bangunan by NOP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/lspop/listByNop",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lspop",
+                "listByNop"
+              ]
+            },
+            "description": "Mengambil semua daftar bangunan yang terdaftar pada satu NOP beserta detail JPB."
+          },
+          "response": []
+        },
+        {
+          "name": "getBuilding - Detail Bangunan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\",\n    \"noBng\": \"{{noBng}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/lspop/getBuilding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lspop",
+                "getBuilding"
+              ]
+            },
+            "description": "Mengambil detail spesifik satu bangunan."
+          },
+          "response": []
+        },
+        {
+          "name": "listFasilitas - Fasilitas Bangunan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\",\n    \"noBng\": \"{{noBng}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/lspop/listFasilitas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lspop",
+                "listFasilitas"
+              ]
+            },
+            "description": "Mengambil daftar fasilitas pada satu bangunan."
+          },
+          "response": []
+        },
+        {
+          "name": "nextNoBng - Nomor Bangunan Berikutnya",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/lspop/nextNoBng",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lspop",
+                "nextNoBng"
+              ]
+            },
+            "description": "Mendapatkan nomor bangunan berikutnya untuk satu NOP."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Wilayah",
+      "description": "Router helper untuk data referensi wilayah geografis.",
+      "item": [
+        {
+          "name": "listPropinsi - Daftar Provinsi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wilayah/listPropinsi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wilayah",
+                "listPropinsi"
+              ]
+            },
+            "description": "Mengambil daftar provinsi."
+          },
+          "response": []
+        },
+        {
+          "name": "listDati2 - Daftar Kabupaten/Kota",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wilayah/listDati2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wilayah",
+                "listDati2"
+              ]
+            },
+            "description": "Mengambil daftar kabupaten/kota berdasarkan provinsi."
+          },
+          "response": []
+        },
+        {
+          "name": "listKecamatan - Daftar Kecamatan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wilayah/listKecamatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wilayah",
+                "listKecamatan"
+              ]
+            },
+            "description": "Mengambil daftar kecamatan berdasarkan provinsi dan kabupaten/kota."
+          },
+          "response": []
+        },
+        {
+          "name": "listKelurahan - Daftar Kelurahan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wilayah/listKelurahan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wilayah",
+                "listKelurahan"
+              ]
+            },
+            "description": "Mengambil daftar kelurahan berdasarkan provinsi, kabupaten/kota, dan kecamatan."
+          },
+          "response": []
+        },
+        {
+          "name": "listBlok - Daftar Blok",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wilayah/listBlok",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wilayah",
+                "listBlok"
+              ]
+            },
+            "description": "Mengambil daftar blok yang tersedia di suatu kelurahan."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SPPT",
+      "description": "Router untuk akses data tagihan dan histori pembayaran pajak.",
+      "item": [
+        {
+          "name": "listByNop - Histori Tagihan by NOP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/sppt/listByNop",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sppt",
+                "listByNop"
+              ]
+            },
+            "description": "Mengambil histori tagihan pajak untuk satu NOP dari tahun ke tahun."
+          },
+          "response": []
+        },
+        {
+          "name": "get - Detail SPPT Tahun Pajak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\",\n    \"thnPajakSppt\": \"{{thnPajakSppt}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/sppt/get",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sppt",
+                "get"
+              ]
+            },
+            "description": "Mengambil detail tagihan satu tahun pajak tertentu."
+          },
+          "response": []
+        },
+        {
+          "name": "list - Pencarian SPPT Massal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"thnPajak\": \"{{thnPajak}}\",\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"statusPembayaran\": \"{{statusPembayaran}}\",\n    \"limit\": \"{{limit}}\",\n    \"offset\": \"{{offset}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/sppt/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sppt",
+                "list"
+              ]
+            },
+            "description": "Pencarian SPPT massal dengan filter tahun, wilayah, atau status bayar."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Status code is 2xx', function () {",
+          "  pm.expect(pm.response.code).to.be.within(200, 299);",
+          "});",
+          "",
+          "pm.test('Response is JSON', function () {",
+          "  pm.response.to.have.jsonBody();",
+          "});",
+          "",
+          "pm.test('Response has json wrapper when body is not empty', function () {",
+          "  if (pm.response.text()) {",
+          "    const body = pm.response.json();",
+          "    pm.expect(body).to.have.property('json');",
+          "  }",
+          "});"
+        ]
+      }
+    }
+  ]
+}

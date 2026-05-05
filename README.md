@@ -1,0 +1,151 @@
+# PBB-Ku Mobile Portal
+
+PBB-Ku Mobile Portal adalah proyek aplikasi mobile Android untuk portal wajib pajak PBB-P2. Aplikasi dirancang sebagai client yang membantu wajib pajak melihat informasi objek pajak, data bangunan, histori SPPT, tunggakan, dan pengingat pembayaran dengan mengambil data dari SIMPBB OP API.
+
+Proyek ini disusun untuk kebutuhan Proyek 2 Mobile Apps. Pada fase MVP, PBB-Ku tidak membangun backend internal dan tidak menyimpan data resmi PBB di database sendiri. Data resmi berasal dari SIMPBB OP API, sementara aplikasi hanya menyimpan data lokal yang dibutuhkan untuk session simulatif, cache, preferensi, notifikasi lokal, dan draft fitur prototipe.
+
+## Status Proyek
+
+Status saat ini:
+
+- Dokumentasi SRS tersedia di `docs/srs/SRS_PBBKu.md`.
+- Dokumentasi integrasi SIMPBB OP API tersedia di `docs/api/`.
+- Diagram arsitektur tersedia di `docs/diagram/`.
+- Folder Android tersedia di `apps/android/app/`, tetapi source aplikasi belum diinisialisasi.
+
+## Ruang Lingkup MVP
+
+Fitur utama yang dirancang untuk MVP:
+
+- Login atau onboarding simulatif menggunakan NIK dan OTP.
+- Pencarian NOP atau nama wajib pajak.
+- Detail objek pajak dan subjek pajak.
+- Daftar dan detail bangunan/LSPOP.
+- Histori SPPT dan detail tagihan per tahun pajak.
+- Daftar tunggakan.
+- Filter referensi wilayah.
+- Informasi pembayaran non-transaksional.
+- Notifikasi lokal untuk pengingat jatuh tempo.
+- Form pelaporan mandiri perubahan bangunan sebagai prototipe, tanpa mengubah data resmi.
+
+Fitur yang tidak termasuk MVP:
+
+- Backend internal.
+- Database server internal.
+- Payment gateway atau transaksi pembayaran nyata.
+- Update langsung data resmi SPOP/LSPOP.
+- Panel admin Bapenda.
+
+## Arsitektur
+
+```text
+Wajib Pajak
+  -> Android App PBB-Ku
+  -> SIMPBB OP API
+  -> SIMPBB Core System dan Database
+  -> Data Objek Pajak, Subjek Pajak, Bangunan, SPPT, Tunggakan
+```
+
+Diagram arsitektur lengkap dapat dilihat di `docs/diagram/2-1_arsitektur-sistem-pbbku.png`.
+
+## Struktur Repository
+
+```text
+pbbku-mobile-portal/
++-- apps/
+|   `-- android/
+|       `-- app/
++-- docs/
+|   +-- api/
+|   |   +-- SIMPBB_OP_API.md
+|   |   +-- SIMPBB_OP_API.postman_collection.json
+|   |   `-- SIMPBB_OP_API.postman_environment.json
+|   +-- diagram/
+|   |   `-- 2-1_arsitektur-sistem-pbbku.png
+|   `-- srs/
+|       `-- SRS_PBBKu.md
++-- .env
++-- .gitignore
+`-- README.md
+```
+
+## Dokumentasi
+
+Dokumen utama proyek:
+
+- `docs/srs/SRS_PBBKu.md`: Software Requirements Specification berdasarkan IEEE 830-1998.
+- `docs/api/SIMPBB_OP_API.md`: ringkasan endpoint SIMPBB OP API untuk integrasi aplikasi.
+- `docs/api/SIMPBB_OP_API.postman_collection.json`: Postman Collection untuk eksplorasi endpoint.
+- `docs/api/SIMPBB_OP_API.postman_environment.json`: Postman Environment berisi variable base URL dan contoh parameter.
+
+## SIMPBB OP API
+
+Konfigurasi dasar API:
+
+```text
+Base URL     : https://simpbb.technosmart.id/api/rpc
+Protocol     : oRPC over HTTP POST
+Content-Type : application/json
+Auth         : PUBLIC untuk router terdokumentasi
+```
+
+Semua request menggunakan method `POST` dan body JSON dengan wrapper:
+
+```json
+{
+  "json": {
+    "param1": "value"
+  }
+}
+```
+
+Endpoint prioritas untuk aplikasi:
+
+- `objekPajak/search`
+- `objekPajak/getByNop`
+- `objekPajak/getSpptHistory`
+- `objekPajak/getTunggakan`
+- `lspop/listByNop`
+- `lspop/getBuilding`
+- `lspop/listFasilitas`
+- `sppt/listByNop`
+- `sppt/get`
+- `wilayah/listPropinsi`
+- `wilayah/listDati2`
+- `wilayah/listKecamatan`
+- `wilayah/listKelurahan`
+- `wilayah/listBlok`
+
+Catatan integrasi penting:
+
+- Segmen NOP harus diperlakukan sebagai string agar leading zero tidak hilang.
+- Response utama dibaca dari field `json`.
+- Endpoint write seperti `objekPajak/save` tidak diprioritaskan untuk portal wajib pajak.
+
+## Rencana Teknologi Android
+
+Rencana stack aplikasi:
+
+- Kotlin untuk bahasa utama Android.
+- Jetpack Compose untuk antarmuka pengguna.
+- Retrofit/OkHttp atau Ktor Client untuk networking.
+- kotlinx.serialization, Gson, atau Moshi untuk parsing JSON.
+- DataStore atau Room untuk session simulatif, cache, preferensi, dan draft lokal.
+- WorkManager atau AlarmManager untuk notifikasi lokal.
+
+## Menjalankan Proyek
+
+Source Android belum tersedia, sehingga belum ada perintah build atau run aplikasi pada tahap ini. Setelah project Android diinisialisasi, instruksi setup Gradle, build, test, dan run emulator perlu ditambahkan ke README ini.
+
+Untuk eksplorasi API, import file berikut ke Postman:
+
+1. `docs/api/SIMPBB_OP_API.postman_collection.json`
+2. `docs/api/SIMPBB_OP_API.postman_environment.json`
+
+## Keamanan dan Data Demo
+
+- Jangan gunakan data pribadi nyata untuk demonstrasi publik.
+- Jangan commit secret, token, atau credential ke repository.
+- File `.env` disiapkan untuk konfigurasi lokal dan sudah masuk `.gitignore`.
+- NIK pada UI harus disamarkan setelah login.
+- Log debug tidak boleh memuat NIK penuh atau data sensitif.
