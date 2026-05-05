@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -29,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.data.session.SimulatedSession
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun SettingsScreen(
@@ -51,18 +52,22 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(
-                modifier = Modifier.padding(bottom = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
-                Text(
-                    text = "Pengaturan",
-                    style = MaterialTheme.typography.headlineSmall,
+                InfoPill(
+                    text = "Kontrol data lokal",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+                PageHeader(
+                    title = "Pengaturan",
+                    subtitle = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
                 )
                 Text(
-                    text = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
+                    text = "Kelola reminder, cache, draft laporan, informasi aplikasi, dan session simulatif.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }
@@ -127,16 +132,11 @@ private fun ReminderCard(
     reminderEnabled: Boolean,
     onReminderChanged: (Boolean) -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-    ) {
+    AppCard {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(0.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(
@@ -169,16 +169,7 @@ private fun LocalDataCard(
     message: String?,
     onAction: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+    AppCard {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
@@ -202,21 +193,11 @@ private fun LocalDataCard(
                 )
             }
         }
-    }
 }
 
 @Composable
 private fun AppInfoCard(versionText: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
+    AppCard {
             Text(
                 text = "Informasi aplikasi",
                 style = MaterialTheme.typography.bodyLarge,
@@ -232,21 +213,13 @@ private fun AppInfoCard(versionText: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-    }
 }
 
 @Composable
 private fun DebugInfoCard(items: List<String>) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+    AppCard(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
             Text(
                 text = "Mode Pengembang",
                 style = MaterialTheme.typography.bodyLarge,
@@ -259,5 +232,4 @@ private fun DebugInfoCard(items: List<String>) {
                 )
             }
         }
-    }
 }

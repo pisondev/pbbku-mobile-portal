@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -28,6 +26,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.BuildingDetail
 import id.pbbku.mobileportal.domain.model.BuildingFacility
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun BuildingDetailScreen(
@@ -49,13 +50,19 @@ fun BuildingDetailScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
                 OutlinedButton(onClick = onBack) {
                     Text("Kembali")
                 }
-                Text(
-                    text = "Detail Bangunan",
-                    style = MaterialTheme.typography.headlineSmall,
+                InfoPill(
+                    text = "Detail LSPOP",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                )
+                PageHeader(
+                    title = "Detail Bangunan",
+                    subtitle = "Periksa data bangunan sebelum membuat laporan perubahan.",
                 )
                 uiState.nop?.let {
                     Text(
@@ -192,22 +199,14 @@ private fun DetailCard(
     title: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+    AppCard(
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            content()
-        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        content()
     }
 }
 

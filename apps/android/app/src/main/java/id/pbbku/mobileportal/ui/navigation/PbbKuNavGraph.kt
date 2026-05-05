@@ -3,6 +3,8 @@ package id.pbbku.mobileportal.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,6 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -40,6 +44,7 @@ import id.pbbku.mobileportal.feature.sppt.TunggakanScreen
 private data class TopLevelRoute(
     val route: String,
     val label: String,
+    val iconText: String,
 )
 
 private object AppRoute {
@@ -66,10 +71,10 @@ private object MainRoute {
 }
 
 private val topLevelRoutes = listOf(
-    TopLevelRoute(MainRoute.HOME, "Beranda"),
-    TopLevelRoute(MainRoute.SEARCH, "Cari"),
-    TopLevelRoute(MainRoute.NOTIFICATIONS, "Notifikasi"),
-    TopLevelRoute(MainRoute.SETTINGS, "Pengaturan"),
+    TopLevelRoute(MainRoute.HOME, "Beranda", "B"),
+    TopLevelRoute(MainRoute.SEARCH, "Cari", "C"),
+    TopLevelRoute(MainRoute.NOTIFICATIONS, "Notifikasi", "N"),
+    TopLevelRoute(MainRoute.SETTINGS, "Pengaturan", "P"),
 )
 
 @Composable
@@ -142,8 +147,12 @@ private fun MainScaffold(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 4.dp,
+            ) {
                 topLevelRoutes.forEach { destination ->
                     val selected = currentDestination?.hierarchy?.any {
                         it.route == destination.route
@@ -160,7 +169,20 @@ private fun MainScaffold(
                             }
                         },
                         label = { Text(destination.label) },
-                        icon = { Text(destination.label.take(1)) },
+                        icon = {
+                            Text(
+                                text = destination.iconText,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }

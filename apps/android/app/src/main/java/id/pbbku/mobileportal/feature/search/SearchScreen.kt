@@ -38,6 +38,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.ObjekPajakSummary
 import id.pbbku.mobileportal.domain.model.WilayahItem
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
+import id.pbbku.mobileportal.ui.component.StateCard
 
 @Composable
 fun SearchScreen(
@@ -56,10 +60,17 @@ fun SearchScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "Cari Objek Pajak",
-                    style = MaterialTheme.typography.headlineSmall,
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                InfoPill(
+                    text = "Pencarian SIMPBB",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+                PageHeader(
+                    title = "Cari Objek Pajak",
+                    subtitle = "Cari NOP atau nama wajib pajak. Hasil detail tetap dibaca dari data resmi SIMPBB OP API.",
                 )
                 OutlinedTextField(
                     value = uiState.query,
@@ -143,14 +154,9 @@ private fun WilayahFilter(
     onSelectBlok: (WilayahItem?) -> Unit,
     onClear: () -> Unit,
 ) {
-    Card(
+    AppCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -215,7 +221,6 @@ private fun WilayahFilter(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-        }
     }
 }
 
@@ -281,7 +286,7 @@ private fun SearchStatus(
         }
 
         uiState.errorMessage != null -> {
-            MessageCard(
+            StateCard(
                 title = "Data belum dapat dimuat",
                 message = uiState.errorMessage,
                 actionText = "Coba Lagi",
@@ -290,7 +295,7 @@ private fun SearchStatus(
         }
 
         uiState.emptyMessage != null -> {
-            MessageCard(
+            StateCard(
                 title = "Hasil tidak ditemukan",
                 message = uiState.emptyMessage,
             )
@@ -303,42 +308,6 @@ private fun SearchStatus(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
-        }
-    }
-}
-
-@Composable
-private fun MessageCard(
-    title: String,
-    message: String,
-    actionText: String? = null,
-    onAction: (() -> Unit)? = null,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = message,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            if (actionText != null && onAction != null) {
-                OutlinedButton(
-                    onClick = onAction,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(actionText)
-                }
-            }
         }
     }
 }

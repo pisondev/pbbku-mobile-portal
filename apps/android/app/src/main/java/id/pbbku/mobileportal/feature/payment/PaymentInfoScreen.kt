@@ -26,6 +26,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.PaymentStatus
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 import id.pbbku.mobileportal.ui.component.PaymentStatusLabel
 import id.pbbku.mobileportal.ui.component.statusColor
 
@@ -82,13 +85,20 @@ private fun HeaderBlock(
     taxYear: String,
     onBack: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    AppCard(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+    ) {
         OutlinedButton(onClick = onBack) {
             Text("Kembali")
         }
-        Text(
-            text = "Informasi Pembayaran",
-            style = MaterialTheme.typography.headlineSmall,
+        InfoPill(
+            text = "Non-transaksional",
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary,
+        )
+        PageHeader(
+            title = "Informasi Pembayaran",
+            subtitle = "Arahan pembayaran umum tanpa memproses transaksi di aplikasi.",
         )
         Text(
             text = "NOP: $nopText",
@@ -205,20 +215,12 @@ private fun DetailCard(
     title: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            content()
-        }
+    AppCard {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        content()
     }
 }
 

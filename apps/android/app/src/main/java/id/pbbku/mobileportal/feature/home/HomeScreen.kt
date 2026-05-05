@@ -4,20 +4,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import id.pbbku.mobileportal.data.session.SimulatedSession
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun HomeScreen(
@@ -31,15 +33,22 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = "Beranda",
-                    style = MaterialTheme.typography.headlineSmall,
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                InfoPill(
+                    text = "Session simulatif aktif",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+                PageHeader(
+                    title = "Beranda",
+                    subtitle = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
                 )
                 Text(
-                    text = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
+                    text = "Mulai dari pencarian objek pajak untuk melihat detail, tagihan, bangunan, dan laporan perubahan.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }
@@ -47,6 +56,7 @@ fun HomeScreen(
             ActionCard(
                 title = "Mulai dari NOP atau nama wajib pajak",
                 description = "Cari objek pajak, lalu buka detail, SPPT, tunggakan, bangunan, atau laporan perubahan.",
+                label = "Alur utama",
             ) {
                 Button(
                     onClick = onOpenSearch,
@@ -60,6 +70,7 @@ fun HomeScreen(
             ActionCard(
                 title = "Pengingat jatuh tempo",
                 description = "Reminder bersifat lokal di perangkat dan tidak berasal dari server Bapenda.",
+                label = "Notifikasi lokal",
             ) {
                 OutlinedButton(
                     onClick = onOpenNotifications,
@@ -79,27 +90,32 @@ fun HomeScreen(
 private fun ActionCard(
     title: String,
     description: String,
+    label: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+    AppCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            content()
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                InfoPill(text = label)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
+        content()
     }
 }
 
@@ -108,6 +124,7 @@ private fun TermsCard() {
     ActionCard(
         title = "Istilah PBB",
         description = "Ringkasan istilah yang sering muncul di aplikasi.",
+        label = "Bantuan cepat",
     ) {
         TermText("NOP", "Nomor Objek Pajak untuk mengenali tanah atau bangunan.")
         TermText("NJOP", "Nilai Jual Objek Pajak yang menjadi dasar perhitungan PBB.")

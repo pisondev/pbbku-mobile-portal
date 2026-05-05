@@ -7,12 +7,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -28,6 +25,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.data.local.report.ReportDraftStatus
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun ReportDraftScreen(
@@ -48,16 +48,22 @@ fun ReportDraftScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
                 OutlinedButton(onClick = onBack) {
                     Text("Kembali")
                 }
-                Text(
-                    text = "Laporan Perubahan Bangunan",
-                    style = MaterialTheme.typography.headlineSmall,
+                InfoPill(
+                    text = "Draft prototipe lokal",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                )
+                PageHeader(
+                    title = "Laporan Perubahan Bangunan",
+                    subtitle = "Susun laporan perubahan LSPOP tanpa mengubah data resmi SIMPBB.",
                 )
                 Text(
-                    text = "Draft prototipe lokal. Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda.",
+                    text = "Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -111,6 +117,7 @@ fun ReportDraftScreen(
 @Composable
 private fun ReportStatusCard(uiState: ReportDraftUiState) {
     DetailCard(title = "Status Laporan") {
+        InfoPill(text = uiState.status.toDisplayText())
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Status", uiState.status.toDisplayText())
         if (uiState.isLoadingBuilding) {
@@ -310,22 +317,14 @@ private fun DetailCard(
     title: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+    AppCard(
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            content()
-        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        content()
     }
 }
 

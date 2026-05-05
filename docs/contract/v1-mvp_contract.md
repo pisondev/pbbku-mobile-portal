@@ -603,6 +603,10 @@ Progress Tahap 14:
 - Empty dan error state pencarian diperbaiki menjadi kartu informatif; error state menyediakan tombol `Coba Lagi` dekat pesan error.
 - Beranda, pencarian, tagihan, pembayaran, notifikasi, pengaturan, dan laporan tetap memakai layout scroll vertikal (`LazyColumn`) agar konten panjang aman pada portrait smartphone.
 - Label prototipe/dummy yang sudah ada pada pembayaran, notifikasi demo, laporan perubahan, dan mode developer dipertahankan agar data resmi API tidak tercampur dengan data simulatif.
+- Polish lanjutan menambahkan design token theme untuk warna, tipografi, dan radius komponen agar tampilan lebih modern dan konsisten tanpa mengubah scope MVP.
+- Komponen bersama `AppCard`, `PageHeader`, `InfoPill`, dan `StateCard` dipakai untuk merapikan hierarchy konten, empty/error state, dan label konteks pada alur utama.
+- Header kontekstual ditambahkan/dirapikan pada onboarding, login, OTP, beranda, pencarian, detail objek pajak, tagihan, pembayaran, bangunan, laporan perubahan, notifikasi, dan pengaturan.
+- Navigasi bawah dibuat lebih jelas dengan state warna aktif/nonaktif yang konsisten dengan theme aplikasi.
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
 - Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 - Catatan: verifikasi visual langsung di emulator belum dilakukan pada tahap ini.

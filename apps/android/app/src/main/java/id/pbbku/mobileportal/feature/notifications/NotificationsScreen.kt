@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +21,9 @@ import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toIndonesianDateTimeText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.PaymentReminder
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun NotificationsScreen(
@@ -39,10 +40,17 @@ fun NotificationsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = "Notifikasi",
-                    style = MaterialTheme.typography.headlineSmall,
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                InfoPill(
+                    text = if (uiState.reminderEnabled) "Reminder aktif" else "Reminder nonaktif",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+                PageHeader(
+                    title = "Notifikasi",
+                    subtitle = "Daftar reminder lokal untuk jatuh tempo SPPT.",
                 )
                 Text(
                     text = if (uiState.reminderEnabled) {
@@ -73,16 +81,7 @@ fun NotificationsScreen(
 
 @Composable
 private fun EmptyCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+    AppCard {
             Text(
                 text = "Belum ada reminder",
                 style = MaterialTheme.typography.titleMedium,
@@ -93,21 +92,24 @@ private fun EmptyCard() {
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
-    }
 }
 
 @Composable
 private fun ReminderCard(reminder: PaymentReminder) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+    AppCard {
+            InfoPill(
+                text = reminder.status.displayText,
+                containerColor = if (reminder.isSimulation) {
+                    MaterialTheme.colorScheme.errorContainer
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                },
+                contentColor = if (reminder.isSimulation) {
+                    MaterialTheme.colorScheme.onErrorContainer
+                } else {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                },
+            )
             Text(
                 text = "Tagihan ${reminder.taxYear}",
                 style = MaterialTheme.typography.titleMedium,
@@ -127,7 +129,6 @@ private fun ReminderCard(reminder: PaymentReminder) {
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-    }
 }
 
 @Composable

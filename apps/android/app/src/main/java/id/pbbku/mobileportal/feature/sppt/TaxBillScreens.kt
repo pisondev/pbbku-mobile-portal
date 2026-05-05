@@ -30,6 +30,9 @@ import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.TaxBillDetail
 import id.pbbku.mobileportal.domain.model.TaxBillSummary
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 import id.pbbku.mobileportal.ui.component.PaymentStatusLabel
 
 @Composable
@@ -180,13 +183,20 @@ private fun HeaderBlock(
     nopText: String?,
     onBack: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    AppCard(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+    ) {
         OutlinedButton(onClick = onBack) {
             Text("Kembali")
         }
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
+        InfoPill(
+            text = "Tagihan PBB-P2",
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary,
+        )
+        PageHeader(
+            title = title,
+            subtitle = "Status, nominal, jatuh tempo, dan rincian perhitungan bila tersedia.",
         )
         nopText?.let {
             Text(
@@ -338,22 +348,12 @@ private fun DetailCard(
     title: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            content()
-        }
+    AppCard {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        content()
     }
 }
 

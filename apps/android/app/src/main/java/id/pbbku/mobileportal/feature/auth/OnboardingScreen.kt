@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
 
 @Composable
 fun OnboardingScreen(
@@ -34,30 +34,33 @@ fun OnboardingScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Column(
-                modifier = Modifier.padding(bottom = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
+                InfoPill(
+                    text = "Portal wajib pajak PBB-P2",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
                 Text(
                     text = "PBB-Ku",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
-                    text = "Akses informasi PBB-P2 dari satu aplikasi Android.",
+                    text = "Akses objek pajak, SPPT, tunggakan, pengingat, dan draft laporan perubahan bangunan dari satu aplikasi Android.",
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }
-        items(items) { item ->
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                ),
+        items(items.withIndex().toList()) { indexedItem ->
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.surface,
             ) {
+                InfoPill(text = "Fitur ${indexedItem.index + 1}")
                 Text(
-                    text = item,
-                    modifier = Modifier.padding(16.dp),
+                    text = indexedItem.value,
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }

@@ -28,6 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.ObjekPajakDetail
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun ObjectDetailScreen(
@@ -52,13 +55,20 @@ fun ObjectDetailScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
                 OutlinedButton(onClick = onBack) {
                     Text("Kembali")
                 }
-                Text(
-                    text = "Detail Objek Pajak",
-                    style = MaterialTheme.typography.headlineSmall,
+                InfoPill(
+                    text = "Data resmi SIMPBB",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+                PageHeader(
+                    title = "Detail Objek Pajak",
+                    subtitle = "Profil objek pajak, subjek pajak, dan shortcut fitur terkait.",
                 )
                 uiState.nop?.let { nop ->
                     Text(
@@ -221,22 +231,12 @@ private fun DetailCard(
     title: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            content()
-        }
+    AppCard {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        content()
     }
 }
 

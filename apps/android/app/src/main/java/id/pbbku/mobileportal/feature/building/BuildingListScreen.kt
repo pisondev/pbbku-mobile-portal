@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -26,6 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.BuildingSummary
+import id.pbbku.mobileportal.ui.component.AppCard
+import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
 fun BuildingListScreen(
@@ -46,13 +47,19 @@ fun BuildingListScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
                 OutlinedButton(onClick = onBack) {
                     Text("Kembali")
                 }
-                Text(
-                    text = "Daftar Bangunan",
-                    style = MaterialTheme.typography.headlineSmall,
+                InfoPill(
+                    text = "Data LSPOP",
+                    containerColor = MaterialTheme.colorScheme.surface,
+                )
+                PageHeader(
+                    title = "Daftar Bangunan",
+                    subtitle = "Bangunan dan ringkasan LSPOP untuk NOP terpilih.",
                 )
                 uiState.nop?.let {
                     Text(
@@ -135,43 +142,36 @@ private fun BuildingSummaryCard(
     building: BuildingSummary,
     onClick: () -> Unit,
 ) {
-    Card(
+    AppCard(
         modifier = Modifier
-            .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
+        InfoPill(text = building.noBng)
+        Text(
+            text = building.label,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Text(
+            text = building.jpb ?: building.jenisBangunan ?: "Jenis bangunan tidak tersedia",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = "Luas: ${building.luasBangunan?.let { "${it.toLong()} m2" } ?: "Data tidak tersedia"}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = "Lantai: ${building.jumlahLantai?.toString() ?: "Data tidak tersedia"}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        building.nilaiSistemBangunan?.let {
             Text(
-                text = building.label,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = building.jpb ?: building.jenisBangunan ?: "Jenis bangunan tidak tersedia",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                text = "Luas: ${building.luasBangunan?.let { "${it.toLong()} m2" } ?: "Data tidak tersedia"}",
-                style = MaterialTheme.typography.bodyMedium,
+                text = "NJOP bangunan: ${it.toRupiahText()}",
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Text(
-                text = "Lantai: ${building.jumlahLantai?.toString() ?: "Data tidak tersedia"}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            building.nilaiSistemBangunan?.let {
-                Text(
-                    text = "NJOP bangunan: ${it.toRupiahText()}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 }
