@@ -14,6 +14,7 @@ Status saat ini:
 - Diagram arsitektur tersedia di `docs/diagram/`.
 - Tahap 0, yaitu persiapan dan pembekuan scope teknis MVP, sudah selesai.
 - Tahap 1, yaitu setup project Android, sudah dieksekusi sampai build debug berhasil.
+- Tahap 2, yaitu fondasi domain, local state, dan security, sudah dieksekusi sampai unit test helper dan build debug berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
 - Runtime test di emulator/perangkat belum dilakukan karena belum ada device yang terdeteksi oleh `adb devices`.
@@ -176,6 +177,14 @@ cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
 ./gradlew :app:assembleDebug
 ```
 
+Unit test dan build debug:
+
+```zsh
+source ~/.zshrc
+cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
+./gradlew :app:testDebugUnitTest :app:assembleDebug
+```
+
 APK debug akan tersedia di:
 
 ```text
@@ -196,6 +205,8 @@ Status verifikasi saat ini:
 - Environment zsh terverifikasi memakai `ANDROID_HOME=/c/Android/Sdk`.
 - `./gradlew :app:assembleDebug` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
+- `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
+- Unit test saat ini: 4 test lulus untuk parser NOP dan masking NIK.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - `adb devices` belum menampilkan emulator/perangkat, sehingga runtime dan navigasi UI belum teruji di device.
 

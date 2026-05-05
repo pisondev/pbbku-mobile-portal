@@ -141,27 +141,42 @@ Progress Tahap 1:
 
 ## 7. Tahap 2 - Fondasi Domain, Local State, dan Security
 
-- [ ] Buat model `Nop` dengan semua segmen bertipe `String`.
-- [ ] Buat helper untuk membentuk NOP display lengkap tanpa menghapus leading zero.
-- [ ] Buat parser NOP lengkap ke `NOP_OBJECT` jika pengguna memasukkan NOP sebagai satu string.
-- [ ] Buat formatter rupiah.
-- [ ] Buat formatter tanggal Indonesia.
-- [ ] Buat formatter status bayar: `Lunas`, `Belum Lunas`, `Jatuh Tempo`, dan fallback `Tidak Diketahui`.
-- [ ] Buat result wrapper client untuk `Loading`, `Success`, `Empty`, dan `Error`.
-- [ ] Buat mapping error network, timeout, HTTP error, parse error, dan empty response.
-- [ ] Buat local session simulatif.
-- [ ] Buat masking NIK, misalnya `34************12`.
-- [ ] Pastikan NIK tidak disimpan plaintext. Jika penyimpanan aman belum tersedia, simpan token/session simulatif dan NIK masked saja.
-- [ ] Buat mekanisme hapus session/logout.
-- [ ] Buat mekanisme cache read-only data terakhir dengan timestamp.
-- [ ] Buat penyimpanan draft laporan perubahan bangunan.
+- [x] Buat model `Nop` dengan semua segmen bertipe `String`.
+- [x] Buat helper untuk membentuk NOP display lengkap tanpa menghapus leading zero.
+- [x] Buat parser NOP lengkap ke `NOP_OBJECT` jika pengguna memasukkan NOP sebagai satu string.
+- [x] Buat formatter rupiah.
+- [x] Buat formatter tanggal Indonesia.
+- [x] Buat formatter status bayar: `Lunas`, `Belum Lunas`, `Jatuh Tempo`, dan fallback `Tidak Diketahui`.
+- [x] Buat result wrapper client untuk `Loading`, `Success`, `Empty`, dan `Error`.
+- [x] Buat mapping error network, timeout, HTTP error, parse error, dan empty response.
+- [x] Buat local session simulatif.
+- [x] Buat masking NIK, misalnya `34************12`.
+- [x] Pastikan NIK tidak disimpan plaintext. Jika penyimpanan aman belum tersedia, simpan token/session simulatif dan NIK masked saja.
+- [x] Buat mekanisme hapus session/logout.
+- [x] Buat mekanisme cache read-only data terakhir dengan timestamp.
+- [x] Buat penyimpanan draft laporan perubahan bangunan.
 
 Output tahap ini:
 
-- [ ] Model dasar siap dipakai semua fitur.
-- [ ] Session lokal simulatif berjalan.
-- [ ] Cache dan draft lokal siap dipakai.
-- [ ] Kebijakan masking data sensitif diterapkan sejak awal.
+- [x] Model dasar siap dipakai semua fitur.
+- [x] Session lokal simulatif berjalan.
+- [x] Cache dan draft lokal siap dipakai.
+- [x] Kebijakan masking data sensitif diterapkan sejak awal.
+
+Progress Tahap 2:
+
+- `Nop` sekarang memiliki `parseOrNull`, `asDisplayText`, `asGroupedText`, dan `asApiMap`; seluruh segmen tetap `String`.
+- `PaymentStatus` menyiapkan label `Lunas`, `Belum Lunas`, `Jatuh Tempo`, dan `Tidak Diketahui`.
+- Formatter rupiah, tanggal Indonesia, dan status pembayaran disiapkan di `core/format`.
+- `AppResult` dan `AppError` menyiapkan state dan pesan untuk loading, success, empty, network error, timeout, HTTP error, parse error, dan unknown error.
+- `SessionDataStore` memakai DataStore Preferences untuk menyimpan `maskedNik`, `sessionToken`, dan timestamp session; NIK asli tidak disimpan plaintext.
+- Logout simulatif tersedia melalui `SessionDataStore.logout()`.
+- `PbbKuDatabase` memakai Room untuk `cache_entries` dan `report_drafts`.
+- `LocalCacheRepository` menyimpan cache read-only dengan `updatedAtEpochMillis`.
+- `ReportDraftRepository` menyimpan draft laporan perubahan bangunan dengan status `DRAFT`, `READY_TO_SUBMIT`, atau `SENT_SIMULATION`.
+- `PbbKuApplication` menyiapkan akses lazy ke `PbbKuDatabase` dan `SessionDataStore`.
+- Unit test helper kritis tersedia untuk NOP parser dan NIK masker.
+- Verifikasi: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil, total 4 unit test lulus.
 
 ## 8. Tahap 3 - API Client SIMPBB oRPC
 
