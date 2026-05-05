@@ -25,6 +25,7 @@ Status saat ini:
 - Tahap 10, yaitu informasi pembayaran non-transaksional dan SSPD prototipe, sudah dieksekusi sampai build debug dan lint debug berhasil.
 - Tahap 11, yaitu notifikasi lokal pengingat jatuh tempo, sudah dieksekusi sampai toggle reminder, WorkManager, halaman notifikasi, build debug, dan lint debug berhasil.
 - Tahap 12, yaitu laporan mandiri perubahan bangunan, sudah dieksekusi sampai form draft lokal/prototipe, validasi, ringkasan simulasi, hapus draft, unit test, build debug, dan lint debug berhasil.
+- Tahap 13, yaitu pengaturan, cache, dan debug mode, sudah dieksekusi sampai aksi hapus cache, hapus draft laporan, info versi aplikasi, mode developer debug-only, build debug, dan lint debug berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
 - Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `BUDI`, hasil objek pajak tampil, dan hasil pertama membuka Detail Objek Pajak.

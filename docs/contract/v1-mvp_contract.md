@@ -544,20 +544,34 @@ Progress Tahap 12:
 
 ## 18. Tahap 13 - Pengaturan, Cache, dan Debug Mode
 
-- [ ] Buat halaman Pengaturan.
-- [ ] Tampilkan NIK masked atau identitas session simulatif.
-- [ ] Sediakan toggle notifikasi.
-- [ ] Sediakan hapus cache.
-- [ ] Sediakan hapus draft laporan.
-- [ ] Sediakan logout.
-- [ ] Tampilkan informasi aplikasi dan versi.
-- [ ] Buat debug mode hanya untuk developer jika diperlukan.
-- [ ] Pastikan debug log tidak memuat NIK penuh, nomor telepon, atau alamat lengkap.
+- [x] Buat halaman Pengaturan.
+- [x] Tampilkan NIK masked atau identitas session simulatif.
+- [x] Sediakan toggle notifikasi.
+- [x] Sediakan hapus cache.
+- [x] Sediakan hapus draft laporan.
+- [x] Sediakan logout.
+- [x] Tampilkan informasi aplikasi dan versi.
+- [x] Buat debug mode hanya untuk developer jika diperlukan.
+- [x] Pastikan debug log tidak memuat NIK penuh, nomor telepon, atau alamat lengkap.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat mengontrol data lokal.
-- [ ] Session, cache, dan draft dapat dihapus.
+- [x] Pengguna dapat mengontrol data lokal.
+- [x] Session, cache, dan draft dapat dihapus.
+
+Progress Tahap 13:
+
+- Halaman Pengaturan yang sudah ada dilengkapi menjadi kontrol data lokal nyata, bukan daftar item statis.
+- Pengaturan tetap menampilkan NIK dalam bentuk masked dari session simulatif.
+- Toggle `Pengingat jatuh tempo` tetap memakai `PaymentReminderRepository` dan meminta izin `POST_NOTIFICATIONS` pada Android 13+ sebelum mengaktifkan reminder.
+- Tombol `Hapus Cache` memanggil `LocalCacheRepository.clearAll()` untuk menghapus cache read-only data terakhir.
+- Tombol `Hapus Draft Laporan` memanggil `ReportDraftRepository.clearAll()` untuk menghapus semua draft laporan perubahan bangunan lokal.
+- Logout tetap menghapus session melalui flow autentikasi yang sudah ada.
+- Kartu informasi aplikasi menampilkan nama aplikasi dan versi dari `BuildConfig.VERSION_NAME`/`VERSION_CODE`.
+- Kartu `Mode Developer` hanya tampil pada build debug dan berisi ringkasan aman: build debug, base URL API, logging jaringan level `BASIC`, dan catatan bahwa NIK penuh tidak disimpan/ditampilkan.
+- Tidak ada penambahan log yang memuat NIK penuh, nomor telepon, alamat lengkap, atau body request/response API.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 19. Tahap 14 - UI Polish dan Usability
 
