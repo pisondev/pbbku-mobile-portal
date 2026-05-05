@@ -11,3 +11,6 @@ data class OrpcRequest<T>(
 data class OrpcResponse<T>(
     val json: T? = null,
 )
+
+@Serializable
+class EmptyRequest

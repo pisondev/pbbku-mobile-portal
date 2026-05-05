@@ -180,36 +180,51 @@ Progress Tahap 2:
 
 ## 8. Tahap 3 - API Client SIMPBB oRPC
 
-- [ ] Buat API client dengan base URL `https://simpbb.technosmart.id/api/rpc`.
-- [ ] Pastikan semua endpoint menggunakan `POST`.
-- [ ] Buat request wrapper generik `{ "json": ... }`.
-- [ ] Buat response wrapper generik yang membaca field `json`.
-- [ ] Buat interceptor/logging hanya untuk debug dan tidak mencetak data sensitif penuh.
-- [ ] Implementasi endpoint `objekPajak/search` dengan input `query`, `limit`.
-- [ ] Implementasi endpoint `objekPajak/listDetails` dengan input `kdPropinsi`, `kdDati2`, `limit`, `offset`, `search`.
-- [ ] Implementasi endpoint `objekPajak/getByNop` dengan `NOP_OBJECT`.
-- [ ] Implementasi endpoint `objekPajak/getSpptHistory` dengan `NOP_OBJECT`.
-- [ ] Implementasi endpoint `objekPajak/getTunggakan` dengan `NOP_OBJECT`.
-- [ ] Implementasi endpoint `lspop/listByNop` dengan `NOP_OBJECT`.
-- [ ] Implementasi endpoint `lspop/getBuilding` dengan `NOP_OBJECT` dan `noBng`.
-- [ ] Implementasi endpoint `lspop/listFasilitas` dengan `NOP_OBJECT` dan `noBng`.
-- [ ] Implementasi endpoint `sppt/listByNop` dengan `NOP_OBJECT`.
-- [ ] Implementasi endpoint `sppt/get` dengan `NOP_OBJECT` dan `thnPajakSppt`.
-- [ ] Implementasi endpoint `sppt/list` dengan `thnPajak`, `kdPropinsi`, `statusPembayaran`, `limit`, `offset` jika dibutuhkan untuk demo/eksplorasi.
-- [ ] Implementasi endpoint `wilayah/listPropinsi`.
-- [ ] Implementasi endpoint `wilayah/listDati2` dengan `kdPropinsi`.
-- [ ] Implementasi endpoint `wilayah/listKecamatan` dengan `kdPropinsi`, `kdDati2`.
-- [ ] Implementasi endpoint `wilayah/listKelurahan` dengan `kdPropinsi`, `kdDati2`, `kdKecamatan`.
-- [ ] Implementasi endpoint `wilayah/listBlok` dengan `kdPropinsi`, `kdDati2`, `kdKecamatan`, `kdKelurahan`.
-- [ ] Jangan expose endpoint `objekPajak/save` ke alur UI wajib pajak.
-- [ ] Buat repository yang mengubah DTO mentah menjadi domain model.
-- [ ] Buat fallback untuk field optional/null.
+- [x] Buat API client dengan base URL `https://simpbb.technosmart.id/api/rpc`.
+- [x] Pastikan semua endpoint menggunakan `POST`.
+- [x] Buat request wrapper generik `{ "json": ... }`.
+- [x] Buat response wrapper generik yang membaca field `json`.
+- [x] Buat interceptor/logging hanya untuk debug dan tidak mencetak data sensitif penuh.
+- [x] Implementasi endpoint `objekPajak/search` dengan input `query`, `limit`.
+- [x] Implementasi endpoint `objekPajak/listDetails` dengan input `kdPropinsi`, `kdDati2`, `limit`, `offset`, `search`.
+- [x] Implementasi endpoint `objekPajak/getByNop` dengan `NOP_OBJECT`.
+- [x] Implementasi endpoint `objekPajak/getSpptHistory` dengan `NOP_OBJECT`.
+- [x] Implementasi endpoint `objekPajak/getTunggakan` dengan `NOP_OBJECT`.
+- [x] Implementasi endpoint `lspop/listByNop` dengan `NOP_OBJECT`.
+- [x] Implementasi endpoint `lspop/getBuilding` dengan `NOP_OBJECT` dan `noBng`.
+- [x] Implementasi endpoint `lspop/listFasilitas` dengan `NOP_OBJECT` dan `noBng`.
+- [x] Implementasi endpoint `sppt/listByNop` dengan `NOP_OBJECT`.
+- [x] Implementasi endpoint `sppt/get` dengan `NOP_OBJECT` dan `thnPajakSppt`.
+- [x] Implementasi endpoint `sppt/list` dengan `thnPajak`, `kdPropinsi`, `statusPembayaran`, `limit`, `offset` jika dibutuhkan untuk demo/eksplorasi.
+- [x] Implementasi endpoint `wilayah/listPropinsi`.
+- [x] Implementasi endpoint `wilayah/listDati2` dengan `kdPropinsi`.
+- [x] Implementasi endpoint `wilayah/listKecamatan` dengan `kdPropinsi`, `kdDati2`.
+- [x] Implementasi endpoint `wilayah/listKelurahan` dengan `kdPropinsi`, `kdDati2`, `kdKecamatan`.
+- [x] Implementasi endpoint `wilayah/listBlok` dengan `kdPropinsi`, `kdDati2`, `kdKecamatan`, `kdKelurahan`.
+- [x] Jangan expose endpoint `objekPajak/save` ke alur UI wajib pajak.
+- [x] Buat repository yang mengubah DTO mentah menjadi domain model.
+- [x] Buat fallback untuk field optional/null.
 
 Output tahap ini:
 
-- [ ] API client dapat memanggil endpoint prioritas.
-- [ ] Repository siap dikonsumsi ViewModel.
-- [ ] Leading zero pada NOP terbukti tidak berubah.
+- [x] API client dapat memanggil endpoint prioritas.
+- [x] Repository siap dikonsumsi ViewModel.
+- [x] Leading zero pada NOP terbukti tidak berubah.
+
+Progress Tahap 3:
+
+- `SimpbbApiClient` memakai Retrofit + OkHttp + kotlinx.serialization dengan base URL `https://simpbb.technosmart.id/api/rpc/`.
+- Logging OkHttp hanya `BASIC` saat debug, sehingga body request/response tidak dicetak ke log.
+- Semua endpoint prioritas router `objekPajak`, `lspop`, `sppt`, dan `wilayah` tersedia di `SimpbbApiService`.
+- Endpoint write `objekPajak/save` tidak dibuat di service dan tidak tersedia di repository MVP.
+- DTO request menjaga kode wilayah/NOP sebagai `String`, termasuk `kdKecamatan`, `kdKelurahan`, `kdBlok`, dan `noUrut`.
+- `SimpbbRepository` mengembalikan `AppResult<ApiPayload>` agar ViewModel dapat menerima success, empty, dan error state secara konsisten.
+- Mapping response membaca field `json`; response null/`JsonNull` diperlakukan sebagai empty state.
+- `PbbKuApplication` menyiapkan `simpbbApiService` dan `simpbbRepository` secara lazy.
+- Unit test wrapper oRPC memastikan `{ "json": ... }` terbentuk dan leading zero NOP tetap terserialisasi sebagai string.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 6 unit test lulus.
+- Verifikasi live API ringan: `POST /wilayah/listPropinsi` dengan body `{"json":{}}` berhasil dan response terbaca dari field `json`.
+- Catatan: live test baru dilakukan pada endpoint wilayah yang aman; endpoint objek pajak/SPPT/LSPOP akan divalidasi saat fitur UI terkait diimplementasikan agar tidak mengekspos data demo sembarangan.
 
 ## 9. Tahap 4 - Onboarding, Login Simulatif, dan Navigasi Utama
 

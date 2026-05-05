@@ -15,6 +15,7 @@ Status saat ini:
 - Tahap 0, yaitu persiapan dan pembekuan scope teknis MVP, sudah selesai.
 - Tahap 1, yaitu setup project Android, sudah dieksekusi sampai build debug berhasil.
 - Tahap 2, yaitu fondasi domain, local state, dan security, sudah dieksekusi sampai unit test helper dan build debug berhasil.
+- Tahap 3, yaitu API client SIMPBB oRPC, sudah dieksekusi sampai unit test, build debug, dan verifikasi live endpoint wilayah berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
 - Runtime test di emulator/perangkat belum dilakukan karena belum ada device yang terdeteksi oleh `adb devices`.
@@ -206,7 +207,8 @@ Status verifikasi saat ini:
 - `./gradlew :app:assembleDebug` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
-- Unit test saat ini: 4 test lulus untuk parser NOP dan masking NIK.
+- Unit test saat ini: 6 test lulus untuk parser NOP, masking NIK, dan wrapper oRPC.
+- Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - `adb devices` belum menampilkan emulator/perangkat, sehingga runtime dan navigasi UI belum teruji di device.
 
