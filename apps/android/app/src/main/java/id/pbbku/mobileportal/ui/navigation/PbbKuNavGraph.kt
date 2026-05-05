@@ -19,7 +19,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import id.pbbku.mobileportal.data.session.SimulatedSession
-import id.pbbku.mobileportal.domain.model.Nop
 import id.pbbku.mobileportal.feature.auth.AuthViewModel
 import id.pbbku.mobileportal.feature.auth.LoginScreen
 import id.pbbku.mobileportal.feature.auth.OnboardingScreen
@@ -31,12 +30,12 @@ import id.pbbku.mobileportal.feature.home.HomeScreen
 import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
 import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailScreen
 import id.pbbku.mobileportal.feature.payment.PaymentInfoScreen
+import id.pbbku.mobileportal.feature.report.ReportDraftScreen
 import id.pbbku.mobileportal.feature.search.SearchScreen
 import id.pbbku.mobileportal.feature.settings.SettingsScreen
 import id.pbbku.mobileportal.feature.sppt.SpptHistoryScreen
 import id.pbbku.mobileportal.feature.sppt.TaxBillDetailScreen
 import id.pbbku.mobileportal.feature.sppt.TunggakanScreen
-import id.pbbku.mobileportal.ui.screen.PlaceholderScreen
 
 private data class TopLevelRoute(
     val route: String,
@@ -256,16 +255,17 @@ private fun MainScaffold(
                 )
             }
             composable("${MainRoute.REPORT}/{nopDisplay}") { backStackEntry ->
-                RelatedPlaceholderScreen(
-                    title = "Laporan Perubahan Bangunan",
+                ReportDraftScreen(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    noBng = null,
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable("${MainRoute.REPORT}/{nopDisplay}/{noBng}") { backStackEntry ->
-                RelatedPlaceholderScreen(
-                    title = "Laporan Perubahan Bangunan",
+                ReportDraftScreen(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
                     noBng = backStackEntry.arguments?.getString("noBng").orEmpty(),
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable(MainRoute.NOTIFICATIONS) { NotificationsScreen() }
@@ -277,26 +277,6 @@ private fun MainScaffold(
             }
         }
     }
-}
-
-@Composable
-private fun RelatedPlaceholderScreen(
-    title: String,
-    nopDisplay: String,
-    noBng: String? = null,
-    taxYear: String? = null,
-    extraNote: String = "Fitur ini akan dilanjutkan pada tahap kontrak berikutnya.",
-) {
-    val items = buildList {
-        add("NOP: ${Nop.parseOrNull(nopDisplay)?.asGroupedText() ?: nopDisplay}")
-        noBng?.takeIf { it.isNotBlank() }?.let { add("Bangunan: $it") }
-        taxYear?.takeIf { it.isNotBlank() }?.let { add("Tahun pajak: $it") }
-        add(extraNote)
-    }
-    PlaceholderScreen(
-        title = title,
-        items = items,
-    )
 }
 
 private fun NavController.navigateAndClear(route: String) {

@@ -506,26 +506,41 @@ Progress Tahap 11:
 
 ## 17. Tahap 12 - Laporan Mandiri Perubahan Bangunan
 
-- [ ] Buat halaman Laporan Perubahan Bangunan.
-- [ ] Prefill NOP dari objek pajak yang sedang dibuka.
-- [ ] Prefill nomor bangunan dan data lama dari LSPOP jika tersedia.
-- [ ] Form memuat NOP, nomor bangunan, jenis perubahan, luas bangunan lama, luas bangunan baru, jumlah lantai lama, jumlah lantai baru, dan deskripsi perubahan.
-- [ ] Validasi luas baru berupa angka valid.
-- [ ] Validasi jumlah lantai baru berupa angka valid.
-- [ ] Validasi deskripsi perubahan tidak kosong saat submit simulasi.
-- [ ] Tampilkan perbandingan data lama vs data baru.
-- [ ] Tampilkan ringkasan sebelum submit simulasi.
-- [ ] Simpan laporan sebagai draft lokal.
-- [ ] Tampilkan status `Draft`, `Siap Diajukan`, atau `Terkirim Simulasi`.
-- [ ] Beri peringatan bahwa perubahan data resmi memerlukan verifikasi petugas Bapenda.
-- [ ] Sediakan hapus draft.
-- [ ] Jangan memanggil `objekPajak/save` untuk laporan MVP.
+- [x] Buat halaman Laporan Perubahan Bangunan.
+- [x] Prefill NOP dari objek pajak yang sedang dibuka.
+- [x] Prefill nomor bangunan dan data lama dari LSPOP jika tersedia.
+- [x] Form memuat NOP, nomor bangunan, jenis perubahan, luas bangunan lama, luas bangunan baru, jumlah lantai lama, jumlah lantai baru, dan deskripsi perubahan.
+- [x] Validasi luas baru berupa angka valid.
+- [x] Validasi jumlah lantai baru berupa angka valid.
+- [x] Validasi deskripsi perubahan tidak kosong saat submit simulasi.
+- [x] Tampilkan perbandingan data lama vs data baru.
+- [x] Tampilkan ringkasan sebelum submit simulasi.
+- [x] Simpan laporan sebagai draft lokal.
+- [x] Tampilkan status `Draft`, `Siap Diajukan`, atau `Terkirim Simulasi`.
+- [x] Beri peringatan bahwa perubahan data resmi memerlukan verifikasi petugas Bapenda.
+- [x] Sediakan hapus draft.
+- [x] Jangan memanggil `objekPajak/save` untuk laporan MVP.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat membuat draft laporan perubahan bangunan.
-- [ ] Laporan tidak mengubah data resmi.
-- [ ] Status prototipe terlihat jelas.
+- [x] Pengguna dapat membuat draft laporan perubahan bangunan.
+- [x] Laporan tidak mengubah data resmi.
+- [x] Status prototipe terlihat jelas.
+
+Progress Tahap 12:
+
+- Placeholder `Laporan Perubahan Bangunan` diganti dengan `ReportDraftScreen`.
+- Route laporan dari Detail Objek Pajak mem-prefill NOP, sedangkan route dari Detail Bangunan mem-prefill NOP dan nomor bangunan.
+- `ReportDraftViewModel` memuat data lama bangunan dari `lspop/getBuilding` bila nomor bangunan tersedia, lalu mengisi luas bangunan lama, jumlah lantai lama, JPB, dan jenis bangunan lama jika response API tersedia.
+- Form laporan memuat NOP, nomor bangunan, jenis perubahan, luas lama/baru, jumlah lantai lama/baru, dan deskripsi perubahan.
+- Validasi form ditambahkan melalui `ReportDraftFormValidator`: luas baru harus angka valid, jumlah lantai baru harus angka bulat valid, dan deskripsi wajib diisi untuk ringkasan/submit simulasi.
+- Pengguna dapat menyimpan draft lokal dengan status `Draft`, menyiapkan ringkasan dengan status `Siap Diajukan`, atau menandai laporan sebagai `Terkirim Simulasi`.
+- Ringkasan sebelum submit menampilkan perbandingan data lama vs baru dan label bahwa laporan hanya prototipe lokal, bukan perubahan data resmi SIMPBB.
+- `ReportDraftRepository` dihubungkan ke `PbbKuApplication` sehingga screen laporan menyimpan, memuat ulang, dan menghapus draft dari tabel Room `report_drafts`.
+- Tidak ada pemanggilan endpoint write `objekPajak/save`; fitur laporan tetap lokal/prototipe sesuai batasan MVP.
+- Unit test `ReportDraftFormValidatorTest` ditambahkan untuk validasi draft, submit simulasi, luas, dan jumlah lantai.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 18. Tahap 13 - Pengaturan, Cache, dan Debug Mode
 
@@ -659,7 +674,7 @@ Output tahap ini:
 - [ ] Filter/referensi wilayah memakai endpoint `wilayah/*` jika fitur filter masuk build demo.
 - [ ] Informasi pembayaran bersifat non-transaksional.
 - [ ] Notifikasi lokal dapat didemonstrasikan atau minimal terjadwal dengan data jatuh tempo/simulasi.
-- [ ] Laporan perubahan bangunan tersimpan lokal sebagai draft/prototipe.
+- [x] Laporan perubahan bangunan tersimpan lokal sebagai draft/prototipe.
 - [ ] Tidak ada endpoint write resmi yang dipanggil dari alur MVP.
 - [ ] Semua NOP tetap menjaga leading zero.
 - [ ] Data cache diberi timestamp.

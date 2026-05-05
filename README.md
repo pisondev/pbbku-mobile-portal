@@ -24,6 +24,7 @@ Status saat ini:
 - Tahap 9, yaitu referensi wilayah dan filter, sudah dieksekusi sampai repository wilayah, filter bertingkat, unit test, lint debug, dan build debug berhasil.
 - Tahap 10, yaitu informasi pembayaran non-transaksional dan SSPD prototipe, sudah dieksekusi sampai build debug dan lint debug berhasil.
 - Tahap 11, yaitu notifikasi lokal pengingat jatuh tempo, sudah dieksekusi sampai toggle reminder, WorkManager, halaman notifikasi, build debug, dan lint debug berhasil.
+- Tahap 12, yaitu laporan mandiri perubahan bangunan, sudah dieksekusi sampai form draft lokal/prototipe, validasi, ringkasan simulasi, hapus draft, unit test, build debug, dan lint debug berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
 - Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `BUDI`, hasil objek pajak tampil, dan hasil pertama membuka Detail Objek Pajak.
@@ -216,7 +217,7 @@ Status verifikasi saat ini:
 - `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:lintDebug` dari MSYS2 zsh sudah berhasil.
-- Unit test saat ini: 21 test lulus untuk parser NOP, masking NIK, validasi NIK, wrapper oRPC, mapper objek pajak, mapper detail objek pajak, mapper LSPOP, mapper SPPT, mapper wilayah, dan request detail bangunan.
+- Unit test saat ini mencakup parser NOP, masking NIK, validasi NIK, wrapper oRPC, mapper objek pajak, mapper detail objek pajak, mapper LSPOP, mapper SPPT, mapper wilayah, request detail bangunan, dan validasi form laporan perubahan bangunan.
 - Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - Runtime test dasar berhasil di emulator headless `Pixel_6_API_35`: install debug, fresh onboarding, login NIK demo `3404123456789012`, OTP demo `123456`, Beranda dengan masked NIK `34************12`, dan logout kembali ke Login.
