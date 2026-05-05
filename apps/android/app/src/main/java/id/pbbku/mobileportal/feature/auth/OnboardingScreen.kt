@@ -1,4 +1,4 @@
-package id.pbbku.mobileportal.feature.settings
+package id.pbbku.mobileportal.feature.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,43 +16,41 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import id.pbbku.mobileportal.data.session.SimulatedSession
 
 @Composable
-fun SettingsScreen(
-    session: SimulatedSession?,
-    onLogout: () -> Unit,
+fun OnboardingScreen(
+    onContinue: () -> Unit,
 ) {
     val items = listOf(
-        "Preferensi notifikasi",
-        "Hapus cache",
-        "Hapus draft laporan",
+        "Cari objek pajak berdasarkan NOP atau nama wajib pajak.",
+        "Lihat histori SPPT, tagihan, dan tunggakan.",
+        "Simpan pengingat lokal untuk jatuh tempo pembayaran.",
+        "Buat draft laporan perubahan bangunan sebagai prototipe.",
     )
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             Column(
-                modifier = Modifier.padding(bottom = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.padding(bottom = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = "Pengaturan",
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = "PBB-Ku",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = "Akses informasi PBB-P2 dari satu aplikasi Android.",
+                    style = MaterialTheme.typography.bodyLarge,
                 )
             }
         }
         items(items) { item ->
             Card(
-                modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
@@ -66,10 +64,12 @@ fun SettingsScreen(
         }
         item {
             Button(
-                onClick = onLogout,
-                modifier = Modifier.fillMaxWidth(),
+                onClick = onContinue,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
             ) {
-                Text("Logout")
+                Text("Masuk")
             }
         }
     }

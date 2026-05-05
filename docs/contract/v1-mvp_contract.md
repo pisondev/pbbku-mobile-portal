@@ -137,7 +137,7 @@ Progress Tahap 1:
 - Build command terverifikasi dari MSYS2 zsh: `cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android` lalu `./gradlew :app:assembleDebug`.
 - Build offline terverifikasi dari MSYS2 zsh: `./gradlew :app:assembleDebug --offline`.
 - Hasil verifikasi build: `BUILD SUCCESSFUL`, menghasilkan APK debug di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
-- Runtime test belum dilakukan karena `adb devices` tidak menemukan emulator/perangkat tersambung.
+- Runtime test awal Tahap 1 belum dilakukan saat itu; runtime dasar kemudian berhasil pada Tahap 4 menggunakan emulator headless `Pixel_6_API_35`.
 
 ## 7. Tahap 2 - Fondasi Domain, Local State, dan Security
 
@@ -228,23 +228,38 @@ Progress Tahap 3:
 
 ## 9. Tahap 4 - Onboarding, Login Simulatif, dan Navigasi Utama
 
-- [ ] Buat splash screen yang memeriksa session simulatif.
-- [ ] Buat onboarding ringkas untuk pengguna baru.
-- [ ] Buat form input NIK.
-- [ ] Validasi NIK hanya angka dan panjang 16 digit.
-- [ ] Buat flow kirim OTP simulatif.
-- [ ] Buat screen verifikasi OTP simulatif.
-- [ ] Tentukan OTP demo tetap atau mekanisme dummy lain yang konsisten.
-- [ ] Setelah OTP valid, simpan session lokal simulatif.
-- [ ] Setelah login, tampilkan NIK dalam bentuk masked.
-- [ ] Buat bottom navigation atau navigation utama untuk Beranda, Cari, Notifikasi, dan Pengaturan.
-- [ ] Buat logout di Pengaturan.
+- [x] Buat splash screen yang memeriksa session simulatif.
+- [x] Buat onboarding ringkas untuk pengguna baru.
+- [x] Buat form input NIK.
+- [x] Validasi NIK hanya angka dan panjang 16 digit.
+- [x] Buat flow kirim OTP simulatif.
+- [x] Buat screen verifikasi OTP simulatif.
+- [x] Tentukan OTP demo tetap atau mekanisme dummy lain yang konsisten.
+- [x] Setelah OTP valid, simpan session lokal simulatif.
+- [x] Setelah login, tampilkan NIK dalam bentuk masked.
+- [x] Buat bottom navigation atau navigation utama untuk Beranda, Cari, Notifikasi, dan Pengaturan.
+- [x] Buat logout di Pengaturan.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat login dan logout.
-- [ ] Session bertahan sesuai aturan lokal.
-- [ ] Pengguna diarahkan ke beranda setelah login.
+- [x] Pengguna dapat login dan logout.
+- [x] Session bertahan sesuai aturan lokal.
+- [x] Pengguna diarahkan ke beranda setelah login.
+
+Progress Tahap 4:
+
+- App navigation sekarang memakai flow `splash -> onboarding -> login -> OTP -> main`.
+- Splash membaca `SessionDataStore`; jika session aktif, pengguna langsung masuk ke main tabs.
+- Onboarding menampilkan ringkasan fungsi PBB-Ku dan tombol `Masuk`.
+- Login menerima NIK 16 digit angka dan menolak input non-angka/kurang digit.
+- OTP simulatif memakai kode tetap `123456`.
+- Setelah OTP valid, `SessionDataStore.saveLogin()` menyimpan session token, timestamp, dan NIK masked.
+- NIK asli tidak ditampilkan setelah login; Beranda dan Pengaturan menampilkan bentuk masked seperti `34************12`.
+- Main tabs tersedia untuk `Beranda`, `Cari`, `Notifikasi`, dan `Pengaturan`.
+- Pengaturan memiliki tombol `Logout` yang memanggil `SessionDataStore.logout()` dan kembali ke Login.
+- Unit test validasi NIK ditambahkan.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 9 unit test lulus.
+- Verifikasi runtime emulator headless `Pixel_6_API_35`: install debug berhasil, fresh app membuka onboarding, login NIK demo berhasil, OTP demo berhasil masuk Beranda, NIK tampil masked, dan logout kembali ke Login.
 
 ## 10. Tahap 5 - Pencarian dan Daftar Objek Pajak
 

@@ -16,9 +16,10 @@ Status saat ini:
 - Tahap 1, yaitu setup project Android, sudah dieksekusi sampai build debug berhasil.
 - Tahap 2, yaitu fondasi domain, local state, dan security, sudah dieksekusi sampai unit test helper dan build debug berhasil.
 - Tahap 3, yaitu API client SIMPBB oRPC, sudah dieksekusi sampai unit test, build debug, dan verifikasi live endpoint wilayah berhasil.
+- Tahap 4, yaitu onboarding, login simulatif, OTP, navigation utama, dan logout, sudah dieksekusi sampai runtime test emulator berhasil.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
-- Runtime test di emulator/perangkat belum dilakukan karena belum ada device yang terdeteksi oleh `adb devices`.
+- Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, dan logout kembali ke Login.
 
 ## Ruang Lingkup MVP
 
@@ -207,10 +208,10 @@ Status verifikasi saat ini:
 - `./gradlew :app:assembleDebug` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
-- Unit test saat ini: 6 test lulus untuk parser NOP, masking NIK, dan wrapper oRPC.
+- Unit test saat ini: 9 test lulus untuk parser NOP, masking NIK, validasi NIK, dan wrapper oRPC.
 - Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
-- `adb devices` belum menampilkan emulator/perangkat, sehingga runtime dan navigasi UI belum teruji di device.
+- Runtime test dasar berhasil di emulator headless `Pixel_6_API_35`: install debug, fresh onboarding, login NIK demo `3404123456789012`, OTP demo `123456`, Beranda dengan masked NIK `34************12`, dan logout kembali ke Login.
 
 Untuk eksplorasi API, import file berikut ke Postman:
 
