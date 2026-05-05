@@ -30,6 +30,7 @@ import id.pbbku.mobileportal.feature.building.BuildingListScreen
 import id.pbbku.mobileportal.feature.home.HomeScreen
 import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
 import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailScreen
+import id.pbbku.mobileportal.feature.payment.PaymentInfoScreen
 import id.pbbku.mobileportal.feature.search.SearchScreen
 import id.pbbku.mobileportal.feature.settings.SettingsScreen
 import id.pbbku.mobileportal.feature.sppt.SpptHistoryScreen
@@ -248,11 +249,10 @@ private fun MainScaffold(
                 )
             }
             composable("${MainRoute.PAYMENT_INFO}/{nopDisplay}/{taxYear}") { backStackEntry ->
-                RelatedPlaceholderScreen(
-                    title = "Informasi Pembayaran",
+                PaymentInfoScreen(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
                     taxYear = backStackEntry.arguments?.getString("taxYear").orEmpty(),
-                    extraNote = "Aplikasi ini tidak memproses pembayaran. Informasi pembayaran non-transaksional dilanjutkan pada Tahap 10.",
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable("${MainRoute.REPORT}/{nopDisplay}") { backStackEntry ->

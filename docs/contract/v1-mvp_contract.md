@@ -443,20 +443,32 @@ Progress Tahap 9:
 
 ## 15. Tahap 10 - Informasi Pembayaran Non-Transaksional dan SSPD Prototipe
 
-- [ ] Buat halaman Informasi Pembayaran.
-- [ ] Tampilkan status tagihan berdasarkan data SPPT/tunggakan.
-- [ ] Tampilkan instruksi pembayaran umum/non-transaksional.
-- [ ] Beri label jelas bahwa aplikasi tidak memproses pembayaran.
-- [ ] Sediakan informasi kanal pembayaran sebagai konten statis/dummy jika tidak ada endpoint resmi.
-- [ ] Buat tampilan Bukti/SSPD Prototipe untuk tagihan lunas jika data memungkinkan.
-- [ ] Beri label jelas bahwa bukti/SSPD adalah prototipe jika bukan data resmi dari API.
-- [ ] Jangan membuat QR pembayaran nyata.
-- [ ] Jangan menyimpan bukti pembayaran resmi palsu tanpa label prototipe.
+- [x] Buat halaman Informasi Pembayaran.
+- [x] Tampilkan status tagihan berdasarkan data SPPT/tunggakan.
+- [x] Tampilkan instruksi pembayaran umum/non-transaksional.
+- [x] Beri label jelas bahwa aplikasi tidak memproses pembayaran.
+- [x] Sediakan informasi kanal pembayaran sebagai konten statis/dummy jika tidak ada endpoint resmi.
+- [x] Buat tampilan Bukti/SSPD Prototipe untuk tagihan lunas jika data memungkinkan.
+- [x] Beri label jelas bahwa bukti/SSPD adalah prototipe jika bukan data resmi dari API.
+- [x] Jangan membuat QR pembayaran nyata.
+- [x] Jangan menyimpan bukti pembayaran resmi palsu tanpa label prototipe.
 
 Output tahap ini:
 
-- [ ] Pengguna mendapat arahan pembayaran tanpa transaksi nyata.
-- [ ] Status pembayaran tetap bersumber dari data SPPT/tunggakan.
+- [x] Pengguna mendapat arahan pembayaran tanpa transaksi nyata.
+- [x] Status pembayaran tetap bersumber dari data SPPT/tunggakan.
+
+Progress Tahap 10:
+
+- Placeholder Informasi Pembayaran diganti dengan `PaymentInfoScreen`.
+- `PaymentInfoViewModel` memuat status tagihan dari `sppt/get`; jika detail kosong/gagal, ViewModel mencoba fallback `sppt/listByNop` untuk mencari tahun pajak yang sama.
+- UI menampilkan status, nominal tagihan, jatuh tempo, denda, dan tanggal pembayaran jika tersedia dari data SPPT.
+- UI menampilkan arahan pembayaran non-transaksional dan label tegas bahwa aplikasi tidak memproses pembayaran atau membuat transaksi.
+- Kanal pembayaran ditampilkan sebagai konten informasi umum/demo karena tidak ada endpoint pembayaran resmi pada MVP.
+- SSPD/Bukti prototipe hanya ditampilkan ketika status tagihan dari data SPPT adalah `Lunas`, dengan label `PROTOTIPE - bukan bukti pembayaran resmi`.
+- Tidak ada QR pembayaran, virtual account, payment gateway, atau bukti resmi palsu yang dibuat aplikasi.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 16. Tahap 11 - Notifikasi Lokal Pengingat Jatuh Tempo
 
