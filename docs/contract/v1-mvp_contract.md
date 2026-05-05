@@ -291,34 +291,47 @@ Progress Tahap 5:
 - Mapper `ObjekPajakMapper` menjaga seluruh segmen NOP sebagai `String` dan membentuk domain `ObjekPajakSummary`.
 - Empty state, loading state, error message, dan tombol `Retry` tersedia di screen pencarian.
 - Tombol `Daftar demo` memanggil `objekPajak/listDetails` dengan parameter demo aman dan mendukung tombol `Muat berikutnya` berbasis `limit` dan `offset`.
-- Memilih hasil pencarian membuka route `object_detail/{nopDisplay}` dan menampilkan placeholder Detail Objek Pajak untuk Tahap 6.
+- Memilih hasil pencarian membuka route `object_detail/{nopDisplay}` dan menampilkan Detail Objek Pajak.
 - Unit test mapper objek pajak ditambahkan untuk response `search` dan `listDetails`.
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 11 unit test lulus.
-- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `BUDI` menampilkan hasil API seperti `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka placeholder Detail Objek Pajak.
+- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `BUDI` menampilkan hasil API seperti `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka Detail Objek Pajak.
 
 ## 11. Tahap 6 - Detail Objek Pajak dan Subjek Pajak
 
-- [ ] Buat halaman Detail Objek Pajak.
-- [ ] Panggil `objekPajak/getByNop` memakai `NOP_OBJECT`.
-- [ ] Tampilkan NOP lengkap.
-- [ ] Tambahkan tombol salin NOP jika memungkinkan.
-- [ ] Tampilkan alamat objek pajak.
-- [ ] Tampilkan luas bumi.
-- [ ] Tampilkan nilai sistem bumi/NJOP bumi jika tersedia.
-- [ ] Tampilkan jenis bumi dan status wajib pajak jika tersedia.
-- [ ] Tampilkan nama wajib pajak.
-- [ ] Tampilkan alamat wajib pajak dengan perhatian khusus pada keamanan demo.
-- [ ] Tampilkan status pekerjaan wajib pajak jika tersedia.
-- [ ] Tampilkan `Data tidak tersedia` untuk field kosong/null.
-- [ ] Simpan detail terakhir berhasil dimuat ke cache read-only.
-- [ ] Tampilkan timestamp cache jika memakai data cache.
-- [ ] Sediakan shortcut ke Bangunan, Histori SPPT, Tunggakan, dan Laporan Perubahan Bangunan.
+- [x] Buat halaman Detail Objek Pajak.
+- [x] Panggil `objekPajak/getByNop` memakai `NOP_OBJECT`.
+- [x] Tampilkan NOP lengkap.
+- [x] Tambahkan tombol salin NOP jika memungkinkan.
+- [x] Tampilkan alamat objek pajak.
+- [x] Tampilkan luas bumi.
+- [x] Tampilkan nilai sistem bumi/NJOP bumi jika tersedia.
+- [x] Tampilkan jenis bumi dan status wajib pajak jika tersedia.
+- [x] Tampilkan nama wajib pajak.
+- [x] Tampilkan alamat wajib pajak dengan perhatian khusus pada keamanan demo.
+- [x] Tampilkan status pekerjaan wajib pajak jika tersedia.
+- [x] Tampilkan `Data tidak tersedia` untuk field kosong/null.
+- [x] Simpan detail terakhir berhasil dimuat ke cache read-only.
+- [x] Tampilkan timestamp cache jika memakai data cache.
+- [x] Sediakan shortcut ke Bangunan, Histori SPPT, Tunggakan, dan Laporan Perubahan Bangunan.
 
 Output tahap ini:
 
-- [ ] Detail NOP dapat dibuka dari hasil pencarian.
-- [ ] Data objek dan subjek pajak tampil rapi.
-- [ ] Data null/parsial tidak menyebabkan crash.
+- [x] Detail NOP dapat dibuka dari hasil pencarian.
+- [x] Data objek dan subjek pajak tampil rapi.
+- [x] Data null/parsial tidak menyebabkan crash.
+
+Progress Tahap 6:
+
+- Placeholder Detail Objek Pajak diganti menjadi `ObjectDetailScreen` dengan state loading, empty, error, retry, success, dan cache.
+- `ObjectDetailViewModel` memanggil `objekPajak/getByNop` memakai `NopRequest` dari domain `Nop`, sehingga seluruh segmen NOP tetap `String`.
+- Mapper `toObjekPajakDetailOrNull` membaca field objek dari root response `json` dan field subjek dari `json.subjekPajak`.
+- UI menampilkan NOP lengkap, alamat objek, luas bumi, nilai sistem bumi/NJOP bumi, jenis bumi, status WP, nama WP, alamat WP, dan status pekerjaan WP.
+- Field kosong/null ditampilkan sebagai `Data tidak tersedia`.
+- Tombol `Salin NOP` tersedia di halaman detail.
+- Response detail yang berhasil dimuat disimpan ke cache read-only `object_detail:{nop}`; ketika cache dipakai, timestamp terakhir diperbarui ditampilkan.
+- Shortcut Bangunan, Histori SPPT, Tunggakan, dan Laporan Perubahan Bangunan tersedia dari halaman detail dan diarahkan ke placeholder tahap berikutnya.
+- Unit test mapper detail ditambahkan untuk memastikan leading zero NOP tetap aman dan field objek/subjek terbaca benar.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 12. Tahap 7 - Data Bangunan dan Fasilitas LSPOP
 

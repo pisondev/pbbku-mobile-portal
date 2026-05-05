@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import id.pbbku.mobileportal.data.session.SimulatedSession
+import id.pbbku.mobileportal.domain.model.Nop
 import id.pbbku.mobileportal.feature.auth.AuthViewModel
 import id.pbbku.mobileportal.feature.auth.LoginScreen
 import id.pbbku.mobileportal.feature.auth.OnboardingScreen
@@ -26,9 +27,10 @@ import id.pbbku.mobileportal.feature.auth.OtpScreen
 import id.pbbku.mobileportal.feature.auth.SplashScreen
 import id.pbbku.mobileportal.feature.home.HomeScreen
 import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
-import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailPlaceholderScreen
+import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailScreen
 import id.pbbku.mobileportal.feature.search.SearchScreen
 import id.pbbku.mobileportal.feature.settings.SettingsScreen
+import id.pbbku.mobileportal.ui.screen.PlaceholderScreen
 
 private data class TopLevelRoute(
     val route: String,
@@ -47,6 +49,10 @@ private object MainRoute {
     const val HOME = "home"
     const val SEARCH = "search"
     const val OBJECT_DETAIL = "object_detail"
+    const val BUILDINGS = "buildings"
+    const val SPPT_HISTORY = "sppt_history"
+    const val TUNGGAKAN = "tunggakan"
+    const val REPORT = "report"
     const val NOTIFICATIONS = "notifications"
     const val SETTINGS = "settings"
 }
@@ -166,9 +172,38 @@ private fun MainScaffold(
                 )
             }
             composable("${MainRoute.OBJECT_DETAIL}/{nopDisplay}") { backStackEntry ->
-                ObjectDetailPlaceholderScreen(
-                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                val nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty()
+                ObjectDetailScreen(
+                    nopDisplay = nopDisplay,
                     onBack = { navController.popBackStack() },
+                    onOpenBuilding = { navController.navigate("${MainRoute.BUILDINGS}/$it") },
+                    onOpenSpptHistory = { navController.navigate("${MainRoute.SPPT_HISTORY}/$it") },
+                    onOpenTunggakan = { navController.navigate("${MainRoute.TUNGGAKAN}/$it") },
+                    onOpenReport = { navController.navigate("${MainRoute.REPORT}/$it") },
+                )
+            }
+            composable("${MainRoute.BUILDINGS}/{nopDisplay}") { backStackEntry ->
+                RelatedPlaceholderScreen(
+                    title = "Bangunan",
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                )
+            }
+            composable("${MainRoute.SPPT_HISTORY}/{nopDisplay}") { backStackEntry ->
+                RelatedPlaceholderScreen(
+                    title = "Histori SPPT",
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                )
+            }
+            composable("${MainRoute.TUNGGAKAN}/{nopDisplay}") { backStackEntry ->
+                RelatedPlaceholderScreen(
+                    title = "Tunggakan",
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                )
+            }
+            composable("${MainRoute.REPORT}/{nopDisplay}") { backStackEntry ->
+                RelatedPlaceholderScreen(
+                    title = "Laporan Perubahan Bangunan",
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
                 )
             }
             composable(MainRoute.NOTIFICATIONS) { NotificationsScreen() }
@@ -180,6 +215,20 @@ private fun MainScaffold(
             }
         }
     }
+}
+
+@Composable
+private fun RelatedPlaceholderScreen(
+    title: String,
+    nopDisplay: String,
+) {
+    PlaceholderScreen(
+        title = title,
+        items = listOf(
+            "NOP: ${Nop.parseOrNull(nopDisplay)?.asGroupedText() ?: nopDisplay}",
+            "Fitur ini akan dilanjutkan pada tahap kontrak berikutnya.",
+        ),
+    )
 }
 
 private fun NavController.navigateAndClear(route: String) {
