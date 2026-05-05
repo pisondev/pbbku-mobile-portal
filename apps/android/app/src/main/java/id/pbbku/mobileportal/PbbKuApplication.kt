@@ -6,6 +6,7 @@ import id.pbbku.mobileportal.data.api.SimpbbApiService
 import id.pbbku.mobileportal.data.local.PbbKuDatabase
 import id.pbbku.mobileportal.data.repository.LocalCacheRepository
 import id.pbbku.mobileportal.data.repository.SimpbbRepository
+import id.pbbku.mobileportal.data.repository.WilayahRepository
 import id.pbbku.mobileportal.data.session.SessionDataStore
 
 class PbbKuApplication : Application() {
@@ -15,6 +16,10 @@ class PbbKuApplication : Application() {
 
     val simpbbRepository: SimpbbRepository by lazy {
         SimpbbRepository(simpbbApiService)
+    }
+
+    val wilayahRepository: WilayahRepository by lazy {
+        WilayahRepository(simpbbRepository)
     }
 
     val database: PbbKuDatabase by lazy {

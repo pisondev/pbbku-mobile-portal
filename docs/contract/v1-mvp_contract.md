@@ -370,48 +370,76 @@ Progress Tahap 7:
 
 ## 13. Tahap 8 - Histori SPPT, Detail Tagihan, dan Tunggakan
 
-- [ ] Buat halaman Histori SPPT.
-- [ ] Panggil `sppt/listByNop` atau `objekPajak/getSpptHistory`.
-- [ ] Tampilkan daftar tahun pajak.
-- [ ] Tampilkan nominal tagihan dengan format rupiah.
-- [ ] Tampilkan status pembayaran dengan label mudah dipahami.
-- [ ] Tampilkan tanggal jatuh tempo dengan format Indonesia jika tersedia.
-- [ ] Buat halaman Detail Tagihan.
-- [ ] Panggil `sppt/get` dengan `thnPajakSppt`.
-- [ ] Tampilkan rincian tagihan: tahun pajak, status, nominal, jatuh tempo, denda jika tersedia.
-- [ ] Tampilkan rincian NJOP tanah, NJOP bangunan, NJOP total, NJOPTKP, tarif, dan total PBB jika tersedia.
-- [ ] Buat fallback jika rincian perhitungan tidak tersedia.
-- [ ] Buat halaman Tunggakan.
-- [ ] Panggil `objekPajak/getTunggakan`.
-- [ ] Tampilkan daftar SPPT belum lunas.
-- [ ] Hitung dan tampilkan total tunggakan aktif jika data nominal tersedia.
-- [ ] Sediakan tombol `Lihat Cara Bayar` untuk tagihan belum lunas.
-- [ ] Jangan sediakan tombol bayar nyata.
+- [x] Buat halaman Histori SPPT.
+- [x] Panggil `sppt/listByNop` atau `objekPajak/getSpptHistory`.
+- [x] Tampilkan daftar tahun pajak.
+- [x] Tampilkan nominal tagihan dengan format rupiah.
+- [x] Tampilkan status pembayaran dengan label mudah dipahami.
+- [x] Tampilkan tanggal jatuh tempo dengan format Indonesia jika tersedia.
+- [x] Buat halaman Detail Tagihan.
+- [x] Panggil `sppt/get` dengan `thnPajakSppt`.
+- [x] Tampilkan rincian tagihan: tahun pajak, status, nominal, jatuh tempo, denda jika tersedia.
+- [x] Tampilkan rincian NJOP tanah, NJOP bangunan, NJOP total, NJOPTKP, tarif, dan total PBB jika tersedia.
+- [x] Buat fallback jika rincian perhitungan tidak tersedia.
+- [x] Buat halaman Tunggakan.
+- [x] Panggil `objekPajak/getTunggakan`.
+- [x] Tampilkan daftar SPPT belum lunas.
+- [x] Hitung dan tampilkan total tunggakan aktif jika data nominal tersedia.
+- [x] Sediakan tombol `Lihat Cara Bayar` untuk tagihan belum lunas.
+- [x] Jangan sediakan tombol bayar nyata.
 
 Output tahap ini:
 
-- [ ] Pengguna dapat melihat histori SPPT.
-- [ ] Pengguna dapat membuka detail tagihan per tahun.
-- [ ] Pengguna dapat melihat daftar dan total tunggakan.
-- [ ] Tidak ada klaim transaksi pembayaran nyata.
+- [x] Pengguna dapat melihat histori SPPT.
+- [x] Pengguna dapat membuka detail tagihan per tahun.
+- [x] Pengguna dapat melihat daftar dan total tunggakan.
+- [x] Tidak ada klaim transaksi pembayaran nyata.
+
+Progress Tahap 8:
+
+- Route Histori SPPT dari Detail Objek Pajak sekarang membuka `SpptHistoryScreen`.
+- Route Tunggakan dari Detail Objek Pajak sekarang membuka `TunggakanScreen`.
+- `SpptHistoryViewModel` memanggil `sppt/listByNop`; jika hasil kosong, mencoba fallback `objekPajak/getSpptHistory`.
+- `TaxBillDetailViewModel` memanggil `sppt/get` memakai `NOP_OBJECT` dan `thnPajakSppt`.
+- `TunggakanViewModel` memanggil `objekPajak/getTunggakan` dan menghitung total tunggakan aktif jika nominal tersedia.
+- Mapper `SpptMapper` dibuat toleran terhadap payload array langsung, `rows`, `data`, atau `list`, serta beberapa alias field umum untuk tahun pajak, nominal, status bayar, jatuh tempo, denda, NJOP, NJOPTKP, tarif, dan PBB terutang.
+- UI histori dan tunggakan menampilkan tahun pajak, nominal rupiah, status `Lunas`/`Belum Lunas`/`Jatuh Tempo`/`Tidak Diketahui`, tanggal jatuh tempo format Indonesia, denda, loading, empty, error, dan retry state.
+- UI detail tagihan menampilkan tahun pajak, status, nominal, jatuh tempo, denda, tanggal pembayaran, NJOP tanah, NJOP bangunan, NJOP total, NJOPTKP, tarif, dan PBB terutang dengan fallback `Data tidak tersedia`.
+- Tombol `Lihat Cara Bayar` tersedia hanya untuk tagihan belum lunas/jatuh tempo dan diarahkan ke placeholder Informasi Pembayaran non-transaksional Tahap 10; tidak ada tombol bayar nyata.
+- Live check API pada NOP demo `32.04.010.001.001.0001.0` menghasilkan `[]` untuk `sppt/listByNop` dan `objekPajak/getTunggakan`, serta `null` untuk `sppt/get` tahun 2024, sehingga empty state sudah menjadi jalur penting.
+- Verifikasi build: `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Unit test `SpptMapperTest` ditambahkan untuk payload `rows`, array langsung, status jatuh tempo, parsing tanggal, nominal, denda, NJOP, NJOPTKP, tarif, dan fallback tahun pajak detail.
 
 ## 14. Tahap 9 - Referensi Wilayah dan Filter
 
-- [ ] Buat repository wilayah.
-- [ ] Ambil daftar provinsi dari `wilayah/listPropinsi`.
-- [ ] Ambil daftar kabupaten/kota dari `wilayah/listDati2`.
-- [ ] Ambil daftar kecamatan dari `wilayah/listKecamatan`.
-- [ ] Ambil daftar kelurahan dari `wilayah/listKelurahan`.
-- [ ] Ambil daftar blok dari `wilayah/listBlok`.
-- [ ] Buat UI filter wilayah bertingkat jika dipakai di daftar objek pajak.
-- [ ] Pastikan pilihan wilayah mempertahankan kode sebagai string.
-- [ ] Cache referensi wilayah secara lokal jika perlu.
-- [ ] Tambahkan empty/error state untuk tiap level wilayah.
+- [x] Buat repository wilayah.
+- [x] Ambil daftar provinsi dari `wilayah/listPropinsi`.
+- [x] Ambil daftar kabupaten/kota dari `wilayah/listDati2`.
+- [x] Ambil daftar kecamatan dari `wilayah/listKecamatan`.
+- [x] Ambil daftar kelurahan dari `wilayah/listKelurahan`.
+- [x] Ambil daftar blok dari `wilayah/listBlok`.
+- [x] Buat UI filter wilayah bertingkat jika dipakai di daftar objek pajak.
+- [x] Pastikan pilihan wilayah mempertahankan kode sebagai string.
+- [x] Cache referensi wilayah secara lokal jika perlu.
+- [x] Tambahkan empty/error state untuk tiap level wilayah.
 
 Output tahap ini:
 
-- [ ] Filter wilayah dapat dipakai untuk membantu pencarian/daftar.
-- [ ] Kode wilayah tidak kehilangan leading zero.
+- [x] Filter wilayah dapat dipakai untuk membantu pencarian/daftar.
+- [x] Kode wilayah tidak kehilangan leading zero.
+
+Progress Tahap 9:
+
+- Domain `WilayahItem` dan `WilayahLevel` ditambahkan untuk menyimpan kode wilayah sebagai `String`.
+- `WilayahMapper` membaca payload wilayah dari array langsung, `rows`, `data`, `list`, atau `result`, serta mendukung alias field kode/nama untuk provinsi, kabupaten/kota, kecamatan, kelurahan, dan blok.
+- `WilayahRepository` dibuat di layer repository untuk mengambil referensi wilayah dari endpoint `wilayah/listPropinsi`, `wilayah/listDati2`, `wilayah/listKecamatan`, `wilayah/listKelurahan`, dan `wilayah/listBlok`.
+- Repository wilayah menyimpan cache in-memory per session aplikasi agar pilihan bertingkat yang sudah dimuat tidak selalu memanggil API ulang.
+- Halaman `Cari Objek Pajak` sekarang memiliki filter wilayah bertingkat: provinsi, kabupaten/kota, kecamatan, kelurahan, dan blok.
+- Daftar objek pajak memakai kode provinsi/kabupaten terpilih pada `objekPajak/listDetails`, sesuai parameter endpoint yang terdokumentasi; level kecamatan sampai blok tetap tersedia sebagai referensi bertingkat.
+- UI filter menampilkan loading dan error/empty state referensi wilayah, serta tombol reset pilihan wilayah.
+- Unit test `WilayahMapperTest` memastikan leading zero kode wilayah tetap dipertahankan.
+- Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
+- Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 
 ## 15. Tahap 10 - Informasi Pembayaran Non-Transaksional dan SSPD Prototipe
 

@@ -32,6 +32,9 @@ import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
 import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailScreen
 import id.pbbku.mobileportal.feature.search.SearchScreen
 import id.pbbku.mobileportal.feature.settings.SettingsScreen
+import id.pbbku.mobileportal.feature.sppt.SpptHistoryScreen
+import id.pbbku.mobileportal.feature.sppt.TaxBillDetailScreen
+import id.pbbku.mobileportal.feature.sppt.TunggakanScreen
 import id.pbbku.mobileportal.ui.screen.PlaceholderScreen
 
 private data class TopLevelRoute(
@@ -54,7 +57,9 @@ private object MainRoute {
     const val BUILDINGS = "buildings"
     const val BUILDING_DETAIL = "building_detail"
     const val SPPT_HISTORY = "sppt_history"
+    const val TAX_BILL_DETAIL = "tax_bill_detail"
     const val TUNGGAKAN = "tunggakan"
+    const val PAYMENT_INFO = "payment_info"
     const val REPORT = "report"
     const val NOTIFICATIONS = "notifications"
     const val SETTINGS = "settings"
@@ -207,15 +212,47 @@ private fun MainScaffold(
                 )
             }
             composable("${MainRoute.SPPT_HISTORY}/{nopDisplay}") { backStackEntry ->
-                RelatedPlaceholderScreen(
-                    title = "Histori SPPT",
+                SpptHistoryScreen(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onOpenDetail = { detailNopDisplay, taxYear ->
+                        navController.navigate("${MainRoute.TAX_BILL_DETAIL}/$detailNopDisplay/$taxYear")
+                    },
+                    onOpenPayment = { paymentNopDisplay, taxYear ->
+                        navController.navigate("${MainRoute.PAYMENT_INFO}/$paymentNopDisplay/$taxYear")
+                    },
                 )
             }
             composable("${MainRoute.TUNGGAKAN}/{nopDisplay}") { backStackEntry ->
-                RelatedPlaceholderScreen(
-                    title = "Tunggakan",
+                TunggakanScreen(
                     nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onOpenDetail = { detailNopDisplay, taxYear ->
+                        navController.navigate("${MainRoute.TAX_BILL_DETAIL}/$detailNopDisplay/$taxYear")
+                    },
+                    onOpenPayment = { paymentNopDisplay, taxYear ->
+                        navController.navigate("${MainRoute.PAYMENT_INFO}/$paymentNopDisplay/$taxYear")
+                    },
+                )
+            }
+            composable("${MainRoute.TAX_BILL_DETAIL}/{nopDisplay}/{taxYear}") { backStackEntry ->
+                val nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty()
+                val taxYear = backStackEntry.arguments?.getString("taxYear").orEmpty()
+                TaxBillDetailScreen(
+                    nopDisplay = nopDisplay,
+                    taxYear = taxYear,
+                    onBack = { navController.popBackStack() },
+                    onOpenPayment = { paymentNopDisplay, paymentTaxYear ->
+                        navController.navigate("${MainRoute.PAYMENT_INFO}/$paymentNopDisplay/$paymentTaxYear")
+                    },
+                )
+            }
+            composable("${MainRoute.PAYMENT_INFO}/{nopDisplay}/{taxYear}") { backStackEntry ->
+                RelatedPlaceholderScreen(
+                    title = "Informasi Pembayaran",
+                    nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty(),
+                    taxYear = backStackEntry.arguments?.getString("taxYear").orEmpty(),
+                    extraNote = "Aplikasi ini tidak memproses pembayaran. Informasi pembayaran non-transaksional dilanjutkan pada Tahap 10.",
                 )
             }
             composable("${MainRoute.REPORT}/{nopDisplay}") { backStackEntry ->
@@ -247,11 +284,14 @@ private fun RelatedPlaceholderScreen(
     title: String,
     nopDisplay: String,
     noBng: String? = null,
+    taxYear: String? = null,
+    extraNote: String = "Fitur ini akan dilanjutkan pada tahap kontrak berikutnya.",
 ) {
     val items = buildList {
         add("NOP: ${Nop.parseOrNull(nopDisplay)?.asGroupedText() ?: nopDisplay}")
         noBng?.takeIf { it.isNotBlank() }?.let { add("Bangunan: $it") }
-        add("Fitur ini akan dilanjutkan pada tahap kontrak berikutnya.")
+        taxYear?.takeIf { it.isNotBlank() }?.let { add("Tahun pajak: $it") }
+        add(extraNote)
     }
     PlaceholderScreen(
         title = title,

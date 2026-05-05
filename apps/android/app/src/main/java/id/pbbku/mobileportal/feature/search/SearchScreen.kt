@@ -1,6 +1,7 @@
 package id.pbbku.mobileportal.feature.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,20 +16,28 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.ObjekPajakSummary
+import id.pbbku.mobileportal.domain.model.WilayahItem
 
 @Composable
 fun SearchScreen(
@@ -36,6 +45,10 @@ fun SearchScreen(
     viewModel: SearchViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadPropinsiIfNeeded()
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -79,6 +92,18 @@ fun SearchScreen(
         }
 
         item {
+            WilayahFilter(
+                filter = uiState.wilayahFilter,
+                onSelectPropinsi = viewModel::selectPropinsi,
+                onSelectDati2 = viewModel::selectDati2,
+                onSelectKecamatan = viewModel::selectKecamatan,
+                onSelectKelurahan = viewModel::selectKelurahan,
+                onSelectBlok = viewModel::selectBlok,
+                onClear = viewModel::clearWilayahFilter,
+            )
+        }
+
+        item {
             SearchStatus(uiState)
         }
 
@@ -100,6 +125,137 @@ fun SearchScreen(
                 ) {
                     Text("Muat berikutnya")
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WilayahFilter(
+    filter: WilayahFilterUiState,
+    onSelectPropinsi: (WilayahItem?) -> Unit,
+    onSelectDati2: (WilayahItem?) -> Unit,
+    onSelectKecamatan: (WilayahItem?) -> Unit,
+    onSelectKelurahan: (WilayahItem?) -> Unit,
+    onSelectBlok: (WilayahItem?) -> Unit,
+    onClear: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Filter wilayah",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                OutlinedButton(
+                    onClick = onClear,
+                    enabled = filter.hasAnySelection,
+                ) {
+                    Text("Reset")
+                }
+            }
+            WilayahDropdown(
+                label = "Provinsi",
+                selectedText = filter.selectedPropinsi?.displayText ?: "Pilih provinsi",
+                items = filter.propinsi,
+                enabled = filter.propinsi.isNotEmpty(),
+                onSelected = onSelectPropinsi,
+            )
+            WilayahDropdown(
+                label = "Kabupaten/Kota",
+                selectedText = filter.selectedDati2?.displayText ?: "Pilih kabupaten/kota",
+                items = filter.dati2,
+                enabled = filter.selectedPropinsi != null && filter.dati2.isNotEmpty(),
+                onSelected = onSelectDati2,
+            )
+            WilayahDropdown(
+                label = "Kecamatan",
+                selectedText = filter.selectedKecamatan?.displayText ?: "Pilih kecamatan",
+                items = filter.kecamatan,
+                enabled = filter.selectedDati2 != null && filter.kecamatan.isNotEmpty(),
+                onSelected = onSelectKecamatan,
+            )
+            WilayahDropdown(
+                label = "Kelurahan",
+                selectedText = filter.selectedKelurahan?.displayText ?: "Pilih kelurahan",
+                items = filter.kelurahan,
+                enabled = filter.selectedKecamatan != null && filter.kelurahan.isNotEmpty(),
+                onSelected = onSelectKelurahan,
+            )
+            WilayahDropdown(
+                label = "Blok",
+                selectedText = filter.selectedBlok?.displayText ?: "Pilih blok",
+                items = filter.blok,
+                enabled = filter.selectedKelurahan != null && filter.blok.isNotEmpty(),
+                onSelected = onSelectBlok,
+            )
+            when {
+                filter.isLoading -> Text(
+                    text = "Memuat referensi wilayah...",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                filter.errorMessage != null -> Text(
+                    text = filter.errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WilayahDropdown(
+    label: String,
+    selectedText: String,
+    items: List<WilayahItem>,
+    enabled: Boolean,
+    onSelected: (WilayahItem?) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = { expanded = true },
+            enabled = enabled,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = "$label: $selectedText",
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text("Kosongkan pilihan") },
+                onClick = {
+                    expanded = false
+                    onSelected(null)
+                },
+            )
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item.displayText) },
+                    onClick = {
+                        expanded = false
+                        onSelected(item)
+                    },
+                )
             }
         }
     }
