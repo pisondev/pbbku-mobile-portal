@@ -78,7 +78,7 @@ fun HomeScreen(
                         contentColor = MaterialTheme.colorScheme.primary,
                     )
                     PageHeader(
-                        title = "Beranda",
+                        title = "Halo, ${session?.displayName ?: "Wajib Pajak Demo"}",
                         subtitle = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
                     )
                     Text(
@@ -86,6 +86,26 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.surface,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(
+                                text = "Informasi penting",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Text(
+                                text = "Data pembayaran dan laporan pada aplikasi ini bersifat demo read-only. Pembayaran resmi tetap dilakukan melalui kanal pemerintah daerah atau mitra yang ditunjuk.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
             }
             item {

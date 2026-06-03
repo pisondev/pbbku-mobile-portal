@@ -29,6 +29,7 @@ class SessionDataStore(
         } else {
             SimulatedSession(
                 isLoggedIn = true,
+                displayName = preferences[Keys.DISPLAY_NAME] ?: DEMO_DISPLAY_NAME,
                 maskedNik = preferences[Keys.MASKED_NIK],
                 sessionToken = preferences[Keys.SESSION_TOKEN],
                 createdAtEpochMillis = preferences[Keys.CREATED_AT_EPOCH_MILLIS],
@@ -39,6 +40,7 @@ class SessionDataStore(
     suspend fun saveLogin(nik: String) {
         dataStore.edit { preferences ->
             preferences[Keys.IS_LOGGED_IN] = true
+            preferences[Keys.DISPLAY_NAME] = DEMO_DISPLAY_NAME
             preferences[Keys.MASKED_NIK] = nik.maskNik()
             preferences[Keys.SESSION_TOKEN] = UUID.randomUUID().toString()
             preferences[Keys.CREATED_AT_EPOCH_MILLIS] = System.currentTimeMillis()
@@ -53,8 +55,13 @@ class SessionDataStore(
 
     private object Keys {
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+        val DISPLAY_NAME = stringPreferencesKey("display_name")
         val MASKED_NIK = stringPreferencesKey("masked_nik")
         val SESSION_TOKEN = stringPreferencesKey("session_token")
         val CREATED_AT_EPOCH_MILLIS = longPreferencesKey("created_at_epoch_millis")
+    }
+
+    private companion object {
+        const val DEMO_DISPLAY_NAME = "Wajib Pajak Demo"
     }
 }

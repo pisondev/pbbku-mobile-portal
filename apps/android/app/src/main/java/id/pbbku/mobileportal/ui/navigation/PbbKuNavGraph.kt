@@ -1,6 +1,7 @@
 package id.pbbku.mobileportal.ui.navigation
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -12,7 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -22,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.data.session.SimulatedSession
 import id.pbbku.mobileportal.feature.auth.AuthViewModel
 import id.pbbku.mobileportal.feature.auth.LoginScreen
@@ -44,7 +46,7 @@ import id.pbbku.mobileportal.feature.sppt.TunggakanScreen
 private data class TopLevelRoute(
     val route: String,
     val label: String,
-    val iconText: String,
+    val iconRes: Int,
 )
 
 private object AppRoute {
@@ -71,10 +73,10 @@ private object MainRoute {
 }
 
 private val topLevelRoutes = listOf(
-    TopLevelRoute(MainRoute.HOME, "Beranda", "B"),
-    TopLevelRoute(MainRoute.SEARCH, "Cari", "C"),
-    TopLevelRoute(MainRoute.NOTIFICATIONS, "Notif", "N"),
-    TopLevelRoute(MainRoute.SETTINGS, "Setelan", "S"),
+    TopLevelRoute(MainRoute.HOME, "Beranda", R.drawable.ic_nav_home),
+    TopLevelRoute(MainRoute.SEARCH, "Cari", R.drawable.ic_nav_search),
+    TopLevelRoute(MainRoute.NOTIFICATIONS, "Notif", R.drawable.ic_nav_notifications),
+    TopLevelRoute(MainRoute.SETTINGS, "Setelan", R.drawable.ic_nav_settings),
 )
 
 @Composable
@@ -168,10 +170,9 @@ private fun MainScaffold(
                             },
                             label = { Text(destination.label) },
                             icon = {
-                                Text(
-                                    text = destination.iconText,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold,
+                                Icon(
+                                    painter = painterResource(destination.iconRes),
+                                    contentDescription = destination.label,
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
@@ -201,6 +202,7 @@ private fun MainScaffold(
             }
             composable(MainRoute.SEARCH) {
                 SearchScreen(
+                    session = session,
                     onOpenDetail = { nopDisplay ->
                         navController.navigate("${MainRoute.OBJECT_DETAIL}/$nopDisplay")
                     },

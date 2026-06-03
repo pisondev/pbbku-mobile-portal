@@ -1,8 +1,10 @@
 package id.pbbku.mobileportal.feature.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -20,8 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
 import id.pbbku.mobileportal.ui.component.PageHeader
@@ -60,6 +67,15 @@ fun LoginScreen(
             AppCard(
                 containerColor = MaterialTheme.colorScheme.surface,
             ) {
+                Image(
+                    painter = painterResource(R.drawable.login),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1.45f)
+                        .clip(RoundedCornerShape(14.dp)),
+                    contentScale = ContentScale.Crop,
+                )
                 InfoPill(text = "Login demo")
                 PageHeader(
                     title = "Masuk",
