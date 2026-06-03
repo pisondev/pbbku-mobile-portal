@@ -88,6 +88,50 @@ class NonFunctionalContractTest {
     }
 
     @Test
+    fun nf_androidRpcEndpointsMatchInternalApiRoutes() {
+        val endpoints = listOf(
+            "objekPajak/search",
+            "objekPajak/listDetails",
+            "objekPajak/getByNop",
+            "objekPajak/getSpptHistory",
+            "objekPajak/getTunggakan",
+            "lspop/listByNop",
+            "lspop/getBuilding",
+            "lspop/listFasilitas",
+            "sppt/listByNop",
+            "sppt/get",
+            "sppt/list",
+            "wilayah/listPropinsi",
+            "wilayah/listDati2",
+            "wilayah/listKecamatan",
+            "wilayah/listKelurahan",
+            "wilayah/listBlok",
+        )
+
+        assertEquals(
+            endpoints,
+            listOf(
+                SimpbbApiConfig.Endpoint.OBJEK_PAJAK_SEARCH,
+                SimpbbApiConfig.Endpoint.OBJEK_PAJAK_LIST_DETAILS,
+                SimpbbApiConfig.Endpoint.OBJEK_PAJAK_GET_BY_NOP,
+                SimpbbApiConfig.Endpoint.OBJEK_PAJAK_GET_SPPT_HISTORY,
+                SimpbbApiConfig.Endpoint.OBJEK_PAJAK_GET_TUNGGAKAN,
+                SimpbbApiConfig.Endpoint.LSPOP_LIST_BY_NOP,
+                SimpbbApiConfig.Endpoint.LSPOP_GET_BUILDING,
+                SimpbbApiConfig.Endpoint.LSPOP_LIST_FASILITAS,
+                SimpbbApiConfig.Endpoint.SPPT_LIST_BY_NOP,
+                SimpbbApiConfig.Endpoint.SPPT_GET,
+                SimpbbApiConfig.Endpoint.SPPT_LIST,
+                SimpbbApiConfig.Endpoint.WILAYAH_LIST_PROPINSI,
+                SimpbbApiConfig.Endpoint.WILAYAH_LIST_DATI2,
+                SimpbbApiConfig.Endpoint.WILAYAH_LIST_KECAMATAN,
+                SimpbbApiConfig.Endpoint.WILAYAH_LIST_KELURAHAN,
+                SimpbbApiConfig.Endpoint.WILAYAH_LIST_BLOK,
+            ),
+        )
+    }
+
+    @Test
     fun nf_debugLoggingNeverUsesBodyLevel() {
         assertEquals(HttpLoggingInterceptor.Level.BASIC, SimpbbApiClient.loggingLevelFor(debug = true))
         assertEquals(HttpLoggingInterceptor.Level.NONE, SimpbbApiClient.loggingLevelFor(debug = false))

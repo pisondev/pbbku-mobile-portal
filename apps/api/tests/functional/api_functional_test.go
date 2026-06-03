@@ -66,6 +66,9 @@ func TestPbbKuApiFunctionalFlow(t *testing.T) {
 	history := postJSON(t, router, "/api/rpc/sppt/listByNop", nop)
 	assertArrayLenAtLeast(t, history["json"], 4)
 
+	legacyHistory := postJSON(t, router, "/api/rpc/objekPajak/getSpptHistory", nop)
+	assertArrayLenAtLeast(t, legacyHistory["json"], 4)
+
 	spptReq := copyMap(nop)
 	spptReq["thnPajakSppt"] = 2026
 	sppt := postJSON(t, router, "/api/rpc/sppt/get", spptReq)

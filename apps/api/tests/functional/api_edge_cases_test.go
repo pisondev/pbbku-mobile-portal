@@ -47,6 +47,46 @@ func TestSecurityAndBadRequestEdgeCases(t *testing.T) {
 	assertStatus(t, router, http.MethodGet, "/api/rpc/wilayah/listPropinsi", nil, http.StatusMethodNotAllowed)
 }
 
+func TestCorsAndBodyLimitEdgeCases(t *testing.T) {
+	router, _ := newFunctionalRouterWithOptions(t, api.Options{
+		AllowedOrigins: []string{"https://pbbku-api.tierratie.com"},
+		MaxBodyBytes:   32,
+	})
+
+	preflight := httptestRequest(
+		router,
+		http.MethodOptions,
+		"/api/rpc/wilayah/listPropinsi",
+		nil,
+		"",
+		map[string]string{"Origin": "https://pbbku-api.tierratie.com"},
+	)
+	if preflight.Code != http.StatusNoContent {
+		t.Fatalf("preflight status = %d, want 204", preflight.Code)
+	}
+	if origin := preflight.Header().Get("Access-Control-Allow-Origin"); origin != "https://pbbku-api.tierratie.com" {
+		t.Fatalf("allow-origin = %q, want configured origin", origin)
+	}
+
+	rejectedOrigin := httptestRequest(
+		router,
+		http.MethodOptions,
+		"/api/rpc/wilayah/listPropinsi",
+		nil,
+		"",
+		map[string]string{"Origin": "https://evil.example"},
+	)
+	if origin := rejectedOrigin.Header().Get("Access-Control-Allow-Origin"); origin != "" {
+		t.Fatalf("unexpected allow-origin for rejected origin: %q", origin)
+	}
+
+	oversizedBody := []byte(`{"json":{"query":"payload larger than configured request body limit"}}`)
+	oversized := httptestRequest(router, http.MethodPost, "/api/rpc/objekPajak/search", oversizedBody, "application/json", nil)
+	if oversized.Code != http.StatusBadRequest {
+		t.Fatalf("oversized body status = %d, want 400; body=%s", oversized.Code, oversized.Body.String())
+	}
+}
+
 func TestAdminSaveRequiresKeyAndRunsInTransaction(t *testing.T) {
 	router, _ := newFunctionalRouterWithOptions(t, api.Options{AdminAPIKey: "secret", MaxBodyBytes: 1_048_576})
 
