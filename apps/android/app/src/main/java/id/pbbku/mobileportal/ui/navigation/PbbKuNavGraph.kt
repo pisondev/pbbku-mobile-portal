@@ -168,6 +168,11 @@ private fun MainScaffold(
                 displayName = session?.displayName,
                 maskedNik = session?.maskedNik,
                 breadcrumb = currentDestination?.route.toBreadcrumb(),
+                onBack = if (currentDestination.isMainTab()) {
+                    null
+                } else {
+                    { navController.popBackStack() }
+                },
             )
         },
         bottomBar = {
@@ -363,6 +368,11 @@ private fun String?.toBreadcrumb(): String {
         else -> "Beranda"
     }
     return "PBB-Ku / $page"
+}
+
+private fun androidx.navigation.NavDestination?.isMainTab(): Boolean {
+    val route = this?.route ?: return true
+    return topLevelRoutes.any { it.route == route }
 }
 
 private fun NavController.navigateAndClear(route: String) {

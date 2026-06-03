@@ -52,9 +52,6 @@ fun ReportDraftScreen(
             AppCard(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
-                OutlinedButton(onClick = onBack) {
-                    Text("Kembali")
-                }
                 InfoPill(
                     text = "Draft perubahan",
                     containerColor = MaterialTheme.colorScheme.surface,

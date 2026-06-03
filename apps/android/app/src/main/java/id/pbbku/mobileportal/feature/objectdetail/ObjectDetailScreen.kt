@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,7 +63,6 @@ fun ObjectDetailScreen(
     viewModel: ObjectDetailViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val clipboardManager = LocalClipboardManager.current
     val tutorialTargetState = rememberTutorialTargetState()
     val tutorialVisibility = rememberTutorialVisibilityState(
         pageKey = "object_detail",
@@ -97,9 +100,6 @@ fun ObjectDetailScreen(
         ) {
             item {
                 PrimaryGradientCard {
-                    OutlinedButton(onClick = onBack) {
-                        Text("Kembali")
-                    }
                     InfoPill(
                         text = "Data resmi SIMPBB",
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -149,9 +149,6 @@ fun ObjectDetailScreen(
                     ObjectInfoCard(
                         detail = detail,
                         modifier = Modifier.tutorialTarget(tutorialTargetState, "object-info"),
-                        onCopyNop = {
-                            clipboardManager.setText(AnnotatedString(detail.nopDisplay))
-                        },
                     )
                 }
                 item {
@@ -177,7 +174,7 @@ fun ObjectDetailScreen(
             onClick = onRequestHelp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp),
+                .padding(top = 28.dp, end = 28.dp),
         )
     }
 }
@@ -219,24 +216,20 @@ private fun DetailStatus(
 private fun ObjectInfoCard(
     detail: ObjekPajakDetail,
     modifier: Modifier = Modifier,
-    onCopyNop: () -> Unit,
 ) {
     DetailCard(
         title = "Objek Pajak",
         modifier = modifier,
     ) {
-        DetailRow("NOP", detail.nop.asGroupedText())
+        DetailRow(
+            label = "NOP",
+            value = detail.nop.asGroupedText(),
+        )
         DetailRow("Alamat objek", detail.alamatObjekPajak)
         DetailRow("Luas bumi", detail.luasBumi?.let { "${it.toLong()} m2" })
         DetailRow("NJOP bumi", detail.nilaiSistemBumi?.toRupiahText())
         DetailRow("Jenis bumi", detail.jenisBumi)
         DetailRow("Status WP", detail.statusWajibPajak)
-        OutlinedButton(
-            onClick = onCopyNop,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Salin NOP")
-        }
     }
 }
 
@@ -300,7 +293,7 @@ private fun ShortcutCard(
         title = "Menu Terkait",
         subtitle = "Pilih fitur lanjutan untuk objek pajak ini.",
         columns = 2,
-        tileMinHeightDp = 132,
+        tileMinHeightDp = 108,
         modifier = Modifier.tutorialTarget(tutorialTargetState, "object-shortcuts"),
         items = listOf(
             ShortcutMenuItem(
@@ -350,16 +343,53 @@ private fun DetailCard(
 private fun DetailRow(
     label: String,
     value: String?,
+    copyable: Boolean = true,
 ) {
+    val clipboardManager = LocalClipboardManager.current
+    val displayValue = value?.takeIf { it.isNotBlank() } ?: "Data tidak tersedia"
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(
-            text = value?.takeIf { it.isNotBlank() } ?: "Data tidak tersedia",
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp),
+            shape = MaterialTheme.shapes.small,
+            color = Color(0xFFE0E7F0),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 42.dp)
+                    .padding(start = 12.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = displayValue,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                if (copyable && !value.isNullOrBlank()) {
+                    IconButton(
+                        onClick = {
+                            clipboardManager.setText(AnnotatedString(displayValue))
+                        },
+                        modifier = Modifier.size(34.dp),
+                    ) {
+                        Icon(
+                            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_copy),
+                            contentDescription = "Salin $label",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
+            }
+        }
     }
 }

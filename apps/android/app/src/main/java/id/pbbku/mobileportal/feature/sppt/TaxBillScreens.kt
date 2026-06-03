@@ -193,9 +193,6 @@ private fun HeaderBlock(
     AppCard(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
     ) {
-        OutlinedButton(onClick = onBack) {
-            Text("Kembali")
-        }
         InfoPill(
             text = "Tagihan PBB-P2",
             containerColor = MaterialTheme.colorScheme.surface,

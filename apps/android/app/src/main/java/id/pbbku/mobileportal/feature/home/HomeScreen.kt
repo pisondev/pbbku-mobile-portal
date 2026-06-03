@@ -167,7 +167,7 @@ fun HomeScreen(
             onClick = onRequestHelp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp),
+                .padding(top = 28.dp, end = 28.dp),
         )
     }
 }

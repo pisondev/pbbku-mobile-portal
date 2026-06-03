@@ -89,9 +89,6 @@ private fun HeaderBlock(
     AppCard(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
     ) {
-        OutlinedButton(onClick = onBack) {
-            Text("Kembali")
-        }
         InfoPill(
             text = "Non-transaksional",
             containerColor = MaterialTheme.colorScheme.surface,

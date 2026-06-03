@@ -51,9 +51,6 @@ fun BuildingListScreen(
             AppCard(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
-                OutlinedButton(onClick = onBack) {
-                    Text("Kembali")
-                }
                 InfoPill(
                     text = "Data LSPOP",
                     containerColor = MaterialTheme.colorScheme.surface,

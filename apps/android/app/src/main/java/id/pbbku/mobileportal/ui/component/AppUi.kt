@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -67,12 +68,14 @@ fun FloatingAppHeader(
     maskedNik: String?,
     breadcrumb: String,
     modifier: Modifier = Modifier,
+    onBack: (() -> Unit)? = null,
 ) {
     var showNik by rememberSaveable { mutableStateOf(false) }
     val name = when (displayName) {
         null, "Wajib Pajak Demo" -> "Pak Blangkon"
         else -> displayName
     }
+    val compactNik = maskedNik.toCompactNikMask()
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
@@ -86,6 +89,23 @@ fun FloatingAppHeader(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            onBack?.let {
+                Surface(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable(onClick = it),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "<",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                }
+            }
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -113,7 +133,7 @@ fun FloatingAppHeader(
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
                 Text(
-                    text = if (showNik) maskedNik ?: "Tidak tersedia" else "NIK",
+                    text = if (showNik) maskedNik ?: "Tidak tersedia" else compactNik,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
@@ -124,6 +144,13 @@ fun FloatingAppHeader(
     }
 }
 
+private fun String?.toCompactNikMask(): String {
+    val value = this?.takeIf { it.isNotBlank() } ?: return "--***--"
+    val prefix = value.takeWhile(Char::isDigit).take(2).ifBlank { value.take(2) }
+    val suffix = value.takeLastWhile(Char::isDigit).takeLast(2).ifBlank { value.takeLast(2) }
+    return "$prefix***$suffix"
+}
+
 @Composable
 fun PageHelpButton(
     onClick: () -> Unit,
@@ -131,7 +158,7 @@ fun PageHelpButton(
 ) {
     Surface(
         modifier = modifier
-            .size(42.dp)
+            .size(38.dp)
             .clickable(onClick = onClick),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surface,
@@ -141,7 +168,7 @@ fun PageHelpButton(
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = "?",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
             )
         }
@@ -198,10 +225,11 @@ fun SectionTitleWithIcon(
             shape = CircleShape,
             color = Color.White.copy(alpha = 0.18f),
         ) {
-            Image(
+            Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,
                 modifier = Modifier.padding(9.dp),
+                tint = contentColor,
             )
         }
         Text(
@@ -297,25 +325,16 @@ private fun ShortcutTile(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surface,
-            ) {
-                Image(
-                    painter = painterResource(item.iconRes),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize()
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                )
-            }
+            Image(
+                painter = painterResource(item.iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(62.dp),
+                contentScale = ContentScale.Fit,
+            )
             Text(
                 text = item.title,
-                modifier = Modifier.padding(top = 8.dp),
-                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(top = 6.dp),
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
