@@ -1,5 +1,6 @@
 package id.pbbku.mobileportal.feature.objectdetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -21,29 +19,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.ObjekPajakDetail
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
-import id.pbbku.mobileportal.ui.component.PageHeader
+import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
+import id.pbbku.mobileportal.ui.component.PageHelpButton
+import id.pbbku.mobileportal.ui.component.PrimaryGradientCard
+import id.pbbku.mobileportal.ui.component.SectionTitleWithIcon
+import id.pbbku.mobileportal.ui.component.ShortcutMenuCard
+import id.pbbku.mobileportal.ui.component.ShortcutMenuItem
 import id.pbbku.mobileportal.ui.tutorial.TutorialOverlay
 import id.pbbku.mobileportal.ui.tutorial.TutorialStep
 import id.pbbku.mobileportal.ui.tutorial.TutorialTargetState
+import id.pbbku.mobileportal.ui.tutorial.rememberTutorialVisibilityState
 import id.pbbku.mobileportal.ui.tutorial.rememberTutorialTargetState
 import id.pbbku.mobileportal.ui.tutorial.tutorialTarget
 
 @Composable
 fun ObjectDetailScreen(
     nopDisplay: String,
+    helpRequestId: Int,
+    onRequestHelp: () -> Unit,
     onBack: () -> Unit,
     onOpenBuilding: (String) -> Unit,
     onOpenSpptHistory: (String) -> Unit,
@@ -54,23 +61,26 @@ fun ObjectDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val clipboardManager = LocalClipboardManager.current
     val tutorialTargetState = rememberTutorialTargetState()
-    var showTutorial by rememberSaveable { mutableStateOf(true) }
+    val tutorialVisibility = rememberTutorialVisibilityState(
+        pageKey = "object_detail",
+        helpRequestId = helpRequestId,
+    )
     val tutorialSteps = listOf(
         TutorialStep(
             targetId = "object-info",
             title = "Periksa identitas objek pajak",
-            message = "Bagian ini menampilkan NOP, alamat, luas bumi, NJOP, dan status wajib pajak dengan fallback saat field API kosong.",
+            message = "Bagian ini menampilkan NOP, alamat, luas bumi, NJOP, dan status wajib pajak bila datanya tersedia.",
         ),
         TutorialStep(
-            targetId = "shortcut-sppt",
+            targetId = "object-shortcuts",
             title = "Lanjut ke histori SPPT",
             message = "Tekan Histori SPPT untuk melihat tagihan per tahun, status bayar, jatuh tempo, dan akses ke informasi pembayaran.",
             actionLabel = "Buka SPPT",
         ),
         TutorialStep(
-            targetId = "shortcut-report",
+            targetId = "object-shortcuts",
             title = "Siapkan laporan perubahan",
-            message = "Fitur laporan hanya membuat draft prototipe lokal. Data resmi SIMPBB tidak diubah dari aplikasi MVP.",
+            message = "Fitur laporan membantu menyiapkan draft perubahan tanpa langsung mengubah data resmi SIMPBB.",
             actionLabel = "Buat Laporan",
         ),
     )
@@ -82,13 +92,11 @@ fun ObjectDetailScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
-                AppCard(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                ) {
+                PrimaryGradientCard {
                     OutlinedButton(onClick = onBack) {
                         Text("Kembali")
                     }
@@ -97,15 +105,21 @@ fun ObjectDetailScreen(
                         containerColor = MaterialTheme.colorScheme.surface,
                         contentColor = MaterialTheme.colorScheme.primary,
                     )
-                    PageHeader(
-                        title = "Detail Objek Pajak",
-                        subtitle = "Profil objek pajak, subjek pajak, dan shortcut fitur terkait.",
+                    SectionTitleWithIcon(
+                        title = "Detail Objek",
+                        iconRes = R.drawable.ic_nav_search,
+                        contentColor = Color.White,
+                    )
+                    Text(
+                        text = "Profil subjek, data objek, dan fitur lanjutan untuk NOP yang dipilih.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.88f),
                     )
                     uiState.nop?.let { nop ->
                         Text(
                             text = nop.asGroupedText(),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = Color.White,
                         )
                     }
                 }
@@ -129,6 +143,9 @@ fun ObjectDetailScreen(
                     }
                 }
                 item {
+                    SubjectInfoCard(detail = detail)
+                }
+                item {
                     ObjectInfoCard(
                         detail = detail,
                         modifier = Modifier.tutorialTarget(tutorialTargetState, "object-info"),
@@ -136,9 +153,6 @@ fun ObjectDetailScreen(
                             clipboardManager.setText(AnnotatedString(detail.nopDisplay))
                         },
                     )
-                }
-                item {
-                    SubjectInfoCard(detail = detail)
                 }
                 item {
                     ShortcutCard(
@@ -153,11 +167,17 @@ fun ObjectDetailScreen(
             }
         }
         TutorialOverlay(
-            visible = showTutorial && uiState.detail != null,
+            visible = tutorialVisibility.visible && uiState.detail != null,
             steps = tutorialSteps,
             targetState = tutorialTargetState,
             modifier = Modifier.align(Alignment.BottomCenter),
-            onDismiss = { showTutorial = false },
+            onDismiss = tutorialVisibility.dismiss,
+        )
+        PageHelpButton(
+            onClick = onRequestHelp,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
         )
     }
 }
@@ -169,13 +189,7 @@ private fun DetailStatus(
 ) {
     when {
         uiState.isLoading -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                CircularProgressIndicator()
-                Text("Memuat detail...")
-            }
+            LoadingSkeletonCard()
         }
 
         uiState.errorMessage != null -> {
@@ -229,6 +243,44 @@ private fun ObjectInfoCard(
 @Composable
 private fun SubjectInfoCard(detail: ObjekPajakDetail) {
     DetailCard(title = "Subjek Pajak") {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                Color(0xFF2DD4BF),
+                            ),
+                        ),
+                        shape = CircleShape,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "WP",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = detail.namaWajibPajak?.takeIf { it.isNotBlank() }
+                        ?: "Nama WP tidak tersedia",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = "Profil wajib pajak",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         DetailRow("Nama WP", detail.namaWajibPajak)
         DetailRow("Alamat WP", detail.alamatWajibPajak)
         DetailRow("Pekerjaan", detail.statusPekerjaanWajibPajak)
@@ -244,36 +296,39 @@ private fun ShortcutCard(
     onOpenTunggakan: (String) -> Unit,
     onOpenReport: (String) -> Unit,
 ) {
-    DetailCard(title = "Menu Terkait") {
-        Button(
-            onClick = { onOpenBuilding(nopDisplay) },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Bangunan")
-        }
-        OutlinedButton(
-            onClick = { onOpenSpptHistory(nopDisplay) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .tutorialTarget(tutorialTargetState, "shortcut-sppt"),
-        ) {
-            Text("Histori SPPT")
-        }
-        OutlinedButton(
-            onClick = { onOpenTunggakan(nopDisplay) },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Tunggakan")
-        }
-        OutlinedButton(
-            onClick = { onOpenReport(nopDisplay) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .tutorialTarget(tutorialTargetState, "shortcut-report"),
-        ) {
-            Text("Laporan Perubahan")
-        }
-    }
+    ShortcutMenuCard(
+        title = "Menu Terkait",
+        subtitle = "Pilih fitur lanjutan untuk objek pajak ini.",
+        columns = 2,
+        tileMinHeightDp = 132,
+        modifier = Modifier.tutorialTarget(tutorialTargetState, "object-shortcuts"),
+        items = listOf(
+            ShortcutMenuItem(
+                title = "Bangunan",
+                description = "Data bangunan",
+                iconRes = R.drawable.shortcut_bangunan,
+                onClick = { onOpenBuilding(nopDisplay) },
+            ),
+            ShortcutMenuItem(
+                title = "Histori SPPT",
+                description = "Tagihan tahunan",
+                iconRes = R.drawable.shortcut_histori_sppt,
+                onClick = { onOpenSpptHistory(nopDisplay) },
+            ),
+            ShortcutMenuItem(
+                title = "Tunggakan",
+                description = "Belum lunas",
+                iconRes = R.drawable.shortcut_tunggakan,
+                onClick = { onOpenTunggakan(nopDisplay) },
+            ),
+            ShortcutMenuItem(
+                title = "Laporan",
+                description = "Perubahan data",
+                iconRes = R.drawable.shortcut_laporan_perubahan,
+                onClick = { onOpenReport(nopDisplay) },
+            ),
+        ),
+    )
 }
 
 @Composable

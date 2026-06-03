@@ -76,10 +76,10 @@ fun LoginScreen(
                         .clip(RoundedCornerShape(14.dp)),
                     contentScale = ContentScale.Crop,
                 )
-                InfoPill(text = "Login demo")
+                InfoPill(text = "Login Wajib Pajak")
                 PageHeader(
                     title = "Masuk",
-                    subtitle = "Gunakan NIK demo 16 digit. Setelah login, UI hanya menampilkan NIK tersamarkan.",
+                    subtitle = "Gunakan NIK 16 digit. Setelah masuk, NIK disembunyikan dan hanya tampil saat kamu menekannya.",
                 )
                 OutlinedTextField(
                     value = nik,

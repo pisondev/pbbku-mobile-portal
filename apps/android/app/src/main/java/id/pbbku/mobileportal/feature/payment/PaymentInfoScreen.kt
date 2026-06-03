@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -23,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.PaymentStatus
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
 import id.pbbku.mobileportal.ui.component.PageHeader
 import id.pbbku.mobileportal.ui.component.PaymentStatusLabel
 import id.pbbku.mobileportal.ui.component.statusColor
@@ -46,7 +47,7 @@ fun PaymentInfoScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
@@ -99,6 +100,8 @@ private fun HeaderBlock(
         PageHeader(
             title = "Informasi Pembayaran",
             subtitle = "Arahan pembayaran umum tanpa memproses transaksi di aplikasi.",
+            iconRes = R.drawable.shortcut_tunggakan,
+            titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
         Text(
             text = "NOP: $nopText",
@@ -119,13 +122,7 @@ private fun StatusBlock(
     onRetry: () -> Unit,
 ) {
     when {
-        uiState.isLoading -> Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            CircularProgressIndicator()
-            Text("Memuat status tagihan...")
-        }
+        uiState.isLoading -> LoadingSkeletonCard()
         uiState.errorMessage != null -> ErrorBlock(uiState.errorMessage, onRetry)
         uiState.emptyMessage != null -> Text(
             text = uiState.emptyMessage,
@@ -170,7 +167,7 @@ private fun PaymentInstructionCard() {
         )
         BulletText("Gunakan NOP dan tahun pajak yang tertera saat melakukan pembayaran melalui kanal resmi pemerintah daerah atau bank/mitra pembayaran yang ditunjuk.")
         BulletText("Pastikan nominal dan status tagihan sesuai dengan data pada kanal resmi sebelum membayar.")
-        BulletText("Simpan bukti pembayaran dari kanal resmi. Bukti di aplikasi ini hanya prototipe bila ditampilkan.")
+        BulletText("Simpan bukti pembayaran dari kanal resmi sebagai arsip pribadi.")
     }
 }
 
@@ -178,7 +175,7 @@ private fun PaymentInstructionCard() {
 private fun PaymentChannelCard() {
     DetailCard(title = "Kanal Pembayaran") {
         Text(
-            text = "Konten kanal berikut bersifat informasi umum/demo karena tidak ada endpoint pembayaran resmi pada MVP.",
+            text = "Kanal berikut bersifat informasi umum. Pastikan ketersediaannya melalui pengumuman resmi daerah.",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
         )
@@ -191,9 +188,9 @@ private fun PaymentChannelCard() {
 @Composable
 private fun SspdPrototypeCard(uiState: PaymentInfoUiState) {
     val detail = uiState.detail ?: return
-    DetailCard(title = "Bukti/SSPD Prototipe") {
+    DetailCard(title = "Ringkasan Pembayaran") {
         Text(
-            text = "PROTOTIPE - bukan bukti pembayaran resmi.",
+            text = "Ringkasan ini bukan bukti pembayaran resmi.",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.titleSmall,
         )

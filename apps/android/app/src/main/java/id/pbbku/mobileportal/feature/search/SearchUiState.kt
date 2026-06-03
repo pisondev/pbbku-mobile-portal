@@ -9,7 +9,7 @@ data class SearchUiState(
     val results: List<ObjekPajakSummary> = emptyList(),
     val errorMessage: String? = null,
     val emptyMessage: String? = null,
-    val modeLabel: String = "Search",
+    val modeLabel: String = "Pencarian",
     val totalRows: Int? = null,
     val canLoadMore: Boolean = false,
     val wilayahFilter: WilayahFilterUiState = WilayahFilterUiState(),

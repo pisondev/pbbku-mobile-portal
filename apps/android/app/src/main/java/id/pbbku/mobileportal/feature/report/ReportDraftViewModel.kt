@@ -249,8 +249,8 @@ class ReportDraftViewModel(
     private fun ReportDraftStatus.toSaveMessage(): String {
         return when (this) {
             ReportDraftStatus.DRAFT -> "Draft laporan disimpan lokal."
-            ReportDraftStatus.READY_TO_SUBMIT -> "Ringkasan siap diajukan secara simulasi."
-            ReportDraftStatus.SENT_SIMULATION -> "Laporan ditandai terkirim simulasi."
+            ReportDraftStatus.READY_TO_SUBMIT -> "Ringkasan siap diajukan."
+            ReportDraftStatus.SENT_SIMULATION -> "Laporan ditandai sudah diajukan."
         }
     }
 

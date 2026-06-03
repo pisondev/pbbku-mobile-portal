@@ -1,6 +1,7 @@
 package id.pbbku.mobileportal.feature.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,19 +10,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -34,20 +40,28 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.data.session.SimulatedSession
 import id.pbbku.mobileportal.domain.model.ObjekPajakSummary
 import id.pbbku.mobileportal.domain.model.WilayahItem
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
-import id.pbbku.mobileportal.ui.component.PageHeader
+import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
+import id.pbbku.mobileportal.ui.component.PageHelpButton
+import id.pbbku.mobileportal.ui.component.PrimaryGradientCard
+import id.pbbku.mobileportal.ui.component.SectionTitleWithIcon
 import id.pbbku.mobileportal.ui.component.StateCard
 import id.pbbku.mobileportal.ui.tutorial.TutorialOverlay
 import id.pbbku.mobileportal.ui.tutorial.TutorialStep
+import id.pbbku.mobileportal.ui.tutorial.rememberTutorialVisibilityState
 import id.pbbku.mobileportal.ui.tutorial.rememberTutorialTargetState
 import id.pbbku.mobileportal.ui.tutorial.tutorialTarget
 
@@ -55,22 +69,27 @@ import id.pbbku.mobileportal.ui.tutorial.tutorialTarget
 fun SearchScreen(
     onOpenDetail: (String) -> Unit,
     session: SimulatedSession? = null,
+    helpRequestId: Int,
+    onRequestHelp: () -> Unit,
     viewModel: SearchViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val tutorialTargetState = rememberTutorialTargetState()
-    var showTutorial by rememberSaveable { mutableStateOf(true) }
+    val tutorialVisibility = rememberTutorialVisibilityState(
+        pageKey = "search",
+        helpRequestId = helpRequestId,
+    )
     val tutorialSteps = listOf(
         TutorialStep(
             targetId = "search-input",
             title = "Ketik NOP atau nama wajib pajak",
-            message = "Input minimal 3 karakter. Sistem akan mencari lewat endpoint objekPajak/search dengan wrapper json.",
+            message = "Masukkan minimal 3 karakter agar aplikasi dapat menampilkan objek pajak yang sesuai.",
         ),
         TutorialStep(
             targetId = "demo-list",
-            title = "Gunakan daftar demo bila perlu",
-            message = "Tombol ini memuat daftar objek pajak demo dengan pagination, berguna saat reviewer ingin melihat variasi data.",
-            actionLabel = "Muat Demo",
+            title = "Lihat daftar objek pajak",
+            message = "Tombol ini memuat daftar objek pajak yang tersedia agar kamu bisa memilih data yang ingin diperiksa.",
+            actionLabel = "Muat Daftar",
         ),
         TutorialStep(
             targetId = "search-result",
@@ -90,35 +109,39 @@ fun SearchScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
-                AppCard(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                ) {
+                PrimaryGradientCard {
                     InfoPill(
                         text = "Pencarian SIMPBB",
                         containerColor = MaterialTheme.colorScheme.surface,
                         contentColor = MaterialTheme.colorScheme.primary,
                     )
-                    PageHeader(
-                        title = "Halo, ${session?.displayName ?: "Wajib Pajak Demo"}",
-                        subtitle = "Cari NOP atau nama wajib pajak. Hasil detail tetap dibaca dari data resmi SIMPBB OP API.",
+                    SectionTitleWithIcon(
+                        title = "Cari Objek",
+                        iconRes = R.drawable.ic_nav_search,
+                        contentColor = Color.White,
+                    )
+                    Text(
+                        text = "Masukkan NOP atau nama wajib pajak. Hasil detail tetap dibaca dari data resmi SIMPBB OP API.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.88f),
                     )
                     Surface(
                         shape = MaterialTheme.shapes.small,
-                        color = MaterialTheme.colorScheme.surface,
+                        color = Color(0xFFE0F2FE).copy(alpha = 0.94f),
                     ) {
                         Column(
                             modifier = Modifier.padding(12.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Text(
-                                text = "Informasi penting",
+                                text = "Informasi Penting",
                                 style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = Color(0xFF075985),
                             )
                             Text(
-                                text = "Gunakan minimal 3 karakter untuk pencarian cepat. Filter wilayah bisa dibuka jika perlu mempersempit daftar demo.",
+                                text = "Gunakan minimal 3 karakter untuk pencarian cepat. Filter wilayah bisa dibuka untuk mempersempit daftar objek pajak.",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = Color(0xFF0F172A),
                             )
                         }
                     }
@@ -129,9 +152,31 @@ fun SearchScreen(
                             .fillMaxWidth()
                             .tutorialTarget(tutorialTargetState, "search-input"),
                         label = { Text("NOP atau nama wajib pajak") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_nav_search),
+                                contentDescription = null,
+                            )
+                        },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        supportingText = { Text("Pencarian otomatis setelah minimal 3 karakter.") },
+                        supportingText = {
+                            Text(
+                                text = "Pencarian otomatis setelah minimal 3 karakter.",
+                                color = Color.White.copy(alpha = 0.86f),
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.White,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -142,13 +187,21 @@ fun SearchScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .tutorialTarget(tutorialTargetState, "demo-list"),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White,
+                                disabledContentColor = Color.White.copy(alpha = 0.48f),
+                            ),
                         ) {
-                            Text("Daftar demo")
+                            Text("Daftar Objek")
                         }
                         OutlinedButton(
                             onClick = viewModel::retry,
                             enabled = uiState.errorMessage != null,
                             modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White,
+                                disabledContentColor = Color.White.copy(alpha = 0.48f),
+                            ),
                         ) {
                             Text("Coba Lagi")
                         }
@@ -203,11 +256,17 @@ fun SearchScreen(
             }
         }
         TutorialOverlay(
-            visible = showTutorial,
+            visible = tutorialVisibility.visible,
             steps = tutorialSteps,
             targetState = tutorialTargetState,
             modifier = Modifier.align(Alignment.BottomCenter),
-            onDismiss = { showTutorial = false },
+            onDismiss = tutorialVisibility.dismiss,
+        )
+        PageHelpButton(
+            onClick = onRequestHelp,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
         )
     }
 }
@@ -236,9 +295,9 @@ private fun WilayahFilter(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                Text("Filter wilayah", style = MaterialTheme.typography.titleSmall)
+                Text("Filter Wilayah", style = MaterialTheme.typography.titleSmall)
                 Text(
-                    text = if (filter.hasAnySelection) "Filter aktif" else "Opsional untuk mempersempit hasil",
+                    text = if (filter.hasAnySelection) "Filter aktif" else "Persempit hasil berdasarkan wilayah",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -293,28 +352,43 @@ private fun WilayahFilter(
                     modifier = Modifier.weight(1f),
                     onSelected = onSelectBlok,
                 )
-                OutlinedButton(
-                    onClick = onClear,
-                    enabled = filter.hasAnySelection,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                ) {
-                    Text("Reset Filter")
-                }
+                Box(modifier = Modifier.weight(1f))
+            }
+            OutlinedButton(
+                onClick = onClear,
+                enabled = filter.hasAnySelection,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Reset Filter")
             }
             when {
-                filter.isLoading -> Text(
-                    text = "Memuat referensi wilayah...",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                filter.isLoading -> FilterLoadingPlaceholder()
                 filter.errorMessage != null -> Text(
                     text = filter.errorMessage,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun FilterLoadingPlaceholder() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        repeat(2) { index ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(if (index == 0) 0.72f else 0.48f)
+                    .height(14.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small,
+                    ),
+            )
         }
     }
 }
@@ -339,37 +413,47 @@ private fun WilayahDropdown(
     onSelected: (WilayahItem?) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    Box(modifier = modifier.fillMaxWidth()) {
-        OutlinedButton(
-            onClick = { expanded = true },
-            enabled = enabled,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = "$label: $selectedText",
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text("Kosongkan pilihan") },
-                onClick = {
-                    expanded = false
-                    onSelected(null)
-                },
-            )
-            items.forEach { item ->
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = { expanded = true },
+                enabled = enabled,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = selectedText,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
                 DropdownMenuItem(
-                    text = { Text(item.displayText) },
+                    text = { Text("Kosongkan pilihan") },
                     onClick = {
                         expanded = false
-                        onSelected(item)
+                        onSelected(null)
                     },
                 )
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(item.displayText) },
+                        onClick = {
+                            expanded = false
+                            onSelected(item)
+                        },
+                    )
+                }
             }
         }
     }
@@ -382,13 +466,7 @@ private fun SearchStatus(
 ) {
     when {
         uiState.isLoading -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                CircularProgressIndicator()
-                Text("Memuat data...")
-            }
+            LoadingSkeletonCard()
         }
 
         uiState.errorMessage != null -> {
@@ -429,32 +507,80 @@ private fun SearchResultCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.28f),
         ),
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top,
         ) {
-            Text(
-                text = result.namaWajibPajak ?: "Nama WP tidak tersedia",
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = "NOP: ${result.nop.asGroupedText()}",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                text = result.alamatObjekPajak ?: "Alamat objek tidak tersedia",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            result.njopBumi?.let {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                Color(0xFF2DD4BF),
+                            ),
+                        ),
+                        shape = CircleShape,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
                 Text(
-                    text = "NJOP bumi: ${it.toRupiahText()}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = (result.namaWajibPajak ?: "W").first().uppercaseChar().toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
                 )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Text(
+                        text = result.namaWajibPajak ?: "Nama WP tidak tersedia",
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    InfoPill(
+                        text = "Detail",
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    )
+                }
+                Text(
+                    text = result.nop.asGroupedText(),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = result.alamatObjekPajak ?: "Alamat objek tidak tersedia",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                result.njopBumi?.let {
+                    Text(
+                        text = "NJOP bumi ${it.toRupiahText()}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                    )
+                }
             }
         }
     }

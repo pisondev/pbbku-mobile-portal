@@ -15,15 +15,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toIndonesianDateTimeText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.PaymentReminder
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
-import id.pbbku.mobileportal.ui.component.PageHeader
+import id.pbbku.mobileportal.ui.component.PrimaryGradientCard
+import id.pbbku.mobileportal.ui.component.SectionTitleWithIcon
 
 @Composable
 fun NotificationsScreen(
@@ -40,17 +43,21 @@ fun NotificationsScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            AppCard(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ) {
+            PrimaryGradientCard {
                 InfoPill(
                     text = if (uiState.reminderEnabled) "Reminder aktif" else "Reminder nonaktif",
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.primary,
                 )
-                PageHeader(
+                SectionTitleWithIcon(
                     title = "Notifikasi",
-                    subtitle = "Daftar reminder lokal untuk jatuh tempo SPPT.",
+                    iconRes = R.drawable.ic_nav_notifications,
+                    contentColor = Color.White,
+                )
+                Text(
+                    text = "Daftar pengingat lokal untuk jatuh tempo SPPT.",
+                    color = Color.White.copy(alpha = 0.9f),
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(
                     text = if (uiState.reminderEnabled) {
@@ -58,7 +65,7 @@ fun NotificationsScreen(
                     } else {
                         "Pengingat lokal nonaktif. Aktifkan dari Pengaturan."
                     },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.82f),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -83,7 +90,7 @@ fun NotificationsScreen(
 private fun EmptyCard() {
     AppCard {
             Text(
-                text = "Belum ada reminder",
+                    text = "Belum Ada Reminder",
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(

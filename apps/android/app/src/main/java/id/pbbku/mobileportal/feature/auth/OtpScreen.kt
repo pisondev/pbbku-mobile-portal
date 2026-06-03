@@ -57,10 +57,10 @@ fun OtpScreen(
                         .clip(RoundedCornerShape(14.dp)),
                     contentScale = ContentScale.Crop,
                 )
-                InfoPill(text = "OTP demo ${AuthViewModel.DEMO_OTP}")
+                InfoPill(text = "Kode OTP ${AuthViewModel.DEMO_OTP}")
                 PageHeader(
                     title = "Verifikasi",
-                    subtitle = "Masukkan kode OTP simulatif untuk membuka Beranda.",
+                    subtitle = "Masukkan kode OTP untuk membuka Beranda.",
                 )
                 OutlinedTextField(
                     value = otp,

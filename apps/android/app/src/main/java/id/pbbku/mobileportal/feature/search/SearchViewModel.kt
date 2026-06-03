@@ -40,7 +40,7 @@ class SearchViewModel(
                 } else {
                     null
                 },
-                modeLabel = "Search",
+                modeLabel = "Pencarian",
                 totalRows = null,
                 canLoadMore = false,
             )
@@ -57,7 +57,7 @@ class SearchViewModel(
     }
 
     fun retry() {
-        if (_uiState.value.modeLabel == "Daftar demo") {
+        if (_uiState.value.modeLabel == "Daftar Objek") {
             loadDemoList(reset = true)
         } else {
             search()
@@ -186,7 +186,7 @@ class SearchViewModel(
                     isLoading = true,
                     errorMessage = null,
                     emptyMessage = null,
-                    modeLabel = "Daftar demo",
+                    modeLabel = "Daftar Objek",
                     query = query,
                 )
             }
@@ -210,7 +210,7 @@ class SearchViewModel(
                     showRows(
                         rows = merged,
                         emptyMessage = "Data objek pajak tidak ditemukan.",
-                        modeLabel = "Daftar demo",
+                        modeLabel = "Daftar Objek",
                         totalRows = page.total,
                         canLoadMore = page.total?.let { merged.size < it } ?: page.rows.size == SearchConfig.PAGE_SIZE,
                     )
@@ -319,7 +319,7 @@ class SearchViewModel(
                     isLoading = true,
                     errorMessage = null,
                     emptyMessage = null,
-                    modeLabel = "Search",
+                    modeLabel = "Pencarian",
                     totalRows = null,
                     canLoadMore = false,
                 )
@@ -332,7 +332,7 @@ class SearchViewModel(
                     showRows(
                         rows = result.data.json.toObjekPajakSearchRows(),
                         emptyMessage = "Hasil pencarian tidak ditemukan.",
-                        modeLabel = "Search",
+                        modeLabel = "Pencarian",
                         totalRows = null,
                         canLoadMore = false,
                     )

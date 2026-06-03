@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -23,13 +24,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.data.session.SimulatedSession
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
-import id.pbbku.mobileportal.ui.component.PageHeader
+import id.pbbku.mobileportal.ui.component.PrimaryGradientCard
+import id.pbbku.mobileportal.ui.component.SectionTitleWithIcon
 
 @Composable
 fun SettingsScreen(
@@ -52,22 +56,21 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            AppCard(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ) {
+            PrimaryGradientCard {
                 InfoPill(
                     text = "Kontrol data lokal",
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.primary,
                 )
-                PageHeader(
+                SectionTitleWithIcon(
                     title = "Pengaturan",
-                    subtitle = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
+                    iconRes = R.drawable.ic_nav_settings,
+                    contentColor = Color.White,
                 )
                 Text(
-                    text = "Kelola reminder, cache, draft laporan, informasi aplikasi, dan session simulatif.",
+                    text = "Kelola pengingat, cache, draft laporan, informasi aplikasi, dan sesi pengguna.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = Color.White.copy(alpha = 0.9f),
                 )
             }
         }
@@ -92,7 +95,7 @@ fun SettingsScreen(
         }
         item {
             LocalDataCard(
-                title = "Cache data terakhir",
+                title = "Cache Data Terakhir",
                 description = "Menghapus cache read-only yang dipakai saat data detail berhasil dimuat.",
                 actionText = "Hapus Cache",
                 message = uiState.cacheMessage,
@@ -101,7 +104,7 @@ fun SettingsScreen(
         }
         item {
             LocalDataCard(
-                title = "Draft laporan",
+                title = "Draft Laporan",
                 description = "Menghapus semua draft laporan perubahan bangunan yang tersimpan lokal.",
                 actionText = "Hapus Draft Laporan",
                 message = uiState.draftMessage,
@@ -120,6 +123,10 @@ fun SettingsScreen(
             Button(
                 onClick = onLogout,
                 modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
                 Text("Keluar")
             }
@@ -144,7 +151,7 @@ private fun ReminderCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = "Pengingat jatuh tempo",
+                    text = "Pengingat Jatuh Tempo",
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
@@ -199,7 +206,7 @@ private fun LocalDataCard(
 private fun AppInfoCard(versionText: String) {
     AppCard {
             Text(
-                text = "Informasi aplikasi",
+                text = "Informasi Aplikasi",
                 style = MaterialTheme.typography.bodyLarge,
             )
             Text(
@@ -208,7 +215,7 @@ private fun AppInfoCard(versionText: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "Aplikasi Android MVP portal wajib pajak PBB-P2.",
+                text = "Aplikasi Android portal wajib pajak PBB-P2.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

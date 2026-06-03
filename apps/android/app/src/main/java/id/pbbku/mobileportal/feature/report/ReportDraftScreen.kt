@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -24,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.data.local.report.ReportDraftStatus
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
 import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
@@ -44,7 +45,7 @@ fun ReportDraftScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
@@ -55,12 +56,14 @@ fun ReportDraftScreen(
                     Text("Kembali")
                 }
                 InfoPill(
-                    text = "Draft prototipe lokal",
+                    text = "Draft perubahan",
                     containerColor = MaterialTheme.colorScheme.surface,
                 )
                 PageHeader(
                     title = "Laporan Perubahan Bangunan",
                     subtitle = "Susun laporan perubahan LSPOP tanpa mengubah data resmi SIMPBB.",
+                    iconRes = R.drawable.shortcut_laporan_perubahan,
+                    titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
                     text = "Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda.",
@@ -121,13 +124,7 @@ private fun ReportStatusCard(uiState: ReportDraftUiState) {
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Status", uiState.status.toDisplayText())
         if (uiState.isLoadingBuilding) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                CircularProgressIndicator()
-                Text("Memuat data lama LSPOP...")
-            }
+            LoadingSkeletonCard()
         }
         uiState.buildingMessage?.let {
             Text(
@@ -250,7 +247,7 @@ private fun DescriptionForm(
             minLines = 4,
             isError = uiState.validation.descriptionError != null,
             supportingText = {
-                Text(uiState.validation.descriptionError ?: "Wajib diisi sebelum submit simulasi.")
+                Text(uiState.validation.descriptionError ?: "Wajib diisi sebelum pengajuan.")
             },
         )
     }
@@ -258,7 +255,7 @@ private fun DescriptionForm(
 
 @Composable
 private fun ReportSummaryCard(uiState: ReportDraftUiState) {
-    DetailCard(title = "Ringkasan Sebelum Pengajuan Simulasi") {
+    DetailCard(title = "Ringkasan Sebelum Pengajuan") {
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Bangunan", uiState.noBng.takeIf { it.isNotBlank() })
         DetailRow("Jenis perubahan", uiState.changeType)
@@ -268,7 +265,7 @@ private fun ReportSummaryCard(uiState: ReportDraftUiState) {
         DetailRow("Lantai baru", uiState.newFloorCountText.takeIf { it.isNotBlank() })
         DetailRow("Deskripsi", uiState.description)
         Text(
-            text = "Ringkasan ini belum dikirim ke data resmi SIMPBB dan hanya tersimpan sebagai data prototipe lokal.",
+            text = "Ringkasan ini belum dikirim ke petugas dan masih tersimpan di perangkat.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -300,7 +297,7 @@ private fun ActionButtons(
             onClick = onSendSimulation,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Tandai Terkirim Simulasi")
+            Text("Tandai Sudah Diajukan")
         }
         OutlinedButton(
             onClick = onDeleteDraft,
@@ -350,6 +347,6 @@ private fun ReportDraftStatus.toDisplayText(): String {
     return when (this) {
         ReportDraftStatus.DRAFT -> "Draft"
         ReportDraftStatus.READY_TO_SUBMIT -> "Siap Diajukan"
-        ReportDraftStatus.SENT_SIMULATION -> "Terkirim Simulasi"
+        ReportDraftStatus.SENT_SIMULATION -> "Sudah Diajukan"
     }
 }

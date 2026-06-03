@@ -47,23 +47,23 @@ fun OnboardingScreen(
     val pages = listOf(
         OnboardingPage(
             imageRes = R.drawable.onboarding_1,
-            title = "Cari objek pajak",
+            title = "Cari Objek Pajak",
             description = "Temukan objek PBB berdasarkan NOP atau nama wajib pajak, lalu buka detail data yang tersedia.",
         ),
         OnboardingPage(
             imageRes = R.drawable.onboarding_2,
-            title = "Lihat SPPT dan tunggakan",
+            title = "Lihat SPPT Dan Tunggakan",
             description = "Pantau histori SPPT, nominal tagihan, status pembayaran, jatuh tempo, dan tunggakan aktif.",
         ),
         OnboardingPage(
             imageRes = R.drawable.onboarding_3,
-            title = "Aktifkan pengingat lokal",
+            title = "Aktifkan Pengingat Lokal",
             description = "Simpan reminder di perangkat untuk membantu mengingat jatuh tempo pembayaran PBB.",
         ),
         OnboardingPage(
             imageRes = R.drawable.onboarding_4,
-            title = "Buat draft laporan",
-            description = "Susun draft perubahan data bangunan sebagai prototipe lokal tanpa mengubah data resmi SIMPBB.",
+            title = "Buat Draft Laporan",
+            description = "Susun draft perubahan data bangunan tanpa mengubah data resmi SIMPBB.",
         ),
     )
     var pageIndex by rememberSaveable { mutableStateOf(0) }
@@ -139,7 +139,7 @@ fun OnboardingScreen(
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (isLastPage) "Masuk" else "Next")
+            Text(if (isLastPage) "Masuk" else "Lanjut")
         }
     }
 }

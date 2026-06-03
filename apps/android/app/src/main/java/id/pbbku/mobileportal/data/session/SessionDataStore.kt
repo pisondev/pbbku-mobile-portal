@@ -62,6 +62,6 @@ class SessionDataStore(
     }
 
     private companion object {
-        const val DEMO_DISPLAY_NAME = "Wajib Pajak Demo"
+        const val DEMO_DISPLAY_NAME = "Pak Blangkon"
     }
 }

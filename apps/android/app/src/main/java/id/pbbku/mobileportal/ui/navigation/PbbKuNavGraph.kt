@@ -1,6 +1,12 @@
 package id.pbbku.mobileportal.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.draw.scale
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,7 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,6 +52,7 @@ import id.pbbku.mobileportal.feature.settings.SettingsScreen
 import id.pbbku.mobileportal.feature.sppt.SpptHistoryScreen
 import id.pbbku.mobileportal.feature.sppt.TaxBillDetailScreen
 import id.pbbku.mobileportal.feature.sppt.TunggakanScreen
+import id.pbbku.mobileportal.ui.component.FloatingAppHeader
 
 private data class TopLevelRoute(
     val route: String,
@@ -141,9 +152,8 @@ private fun MainScaffold(
     val navController = rememberNavController()
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination
-    val showBottomBar = currentDestination?.hierarchy?.any { destination ->
-        topLevelRoutes.any { it.route == destination.route }
-    } != false
+    var helpRequestId by remember { mutableIntStateOf(0) }
+    val showBottomBar = true
 
     LaunchedEffect(session?.isLoggedIn) {
         if (session?.isLoggedIn == false) {
@@ -152,7 +162,14 @@ private fun MainScaffold(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Color.Transparent,
+        topBar = {
+            FloatingAppHeader(
+                displayName = session?.displayName,
+                maskedNik = session?.maskedNik,
+                breadcrumb = currentDestination?.route.toBreadcrumb(),
+            )
+        },
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(
@@ -163,6 +180,14 @@ private fun MainScaffold(
                         val selected = currentDestination?.hierarchy?.any {
                             it.route == destination.route
                         } == true
+                        val itemScale by animateFloatAsState(
+                            targetValue = if (selected) 1.12f else 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                            label = "navScale",
+                        )
                         NavigationBarItem(
                             selected = selected,
                             onClick = {
@@ -173,6 +198,7 @@ private fun MainScaffold(
                                 Icon(
                                     painter = painterResource(destination.iconRes),
                                     contentDescription = destination.label,
+                                    modifier = Modifier.scale(itemScale),
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
@@ -188,21 +214,30 @@ private fun MainScaffold(
             }
         },
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = MainRoute.HOME,
-            modifier = Modifier.padding(innerPadding),
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
         ) {
-            composable(MainRoute.HOME) {
-                HomeScreen(
-                    session = session,
-                    onOpenSearch = { navController.navigate(MainRoute.SEARCH) },
-                    onOpenNotifications = { navController.navigate(MainRoute.NOTIFICATIONS) },
-                )
-            }
+            NavHost(
+                navController = navController,
+                startDestination = MainRoute.HOME,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                composable(MainRoute.HOME) {
+                    HomeScreen(
+                        session = session,
+                        onOpenSearch = { navController.navigate(MainRoute.SEARCH) },
+                        onOpenNotifications = { navController.navigate(MainRoute.NOTIFICATIONS) },
+                        helpRequestId = helpRequestId,
+                        onRequestHelp = { helpRequestId += 1 },
+                    )
+                }
             composable(MainRoute.SEARCH) {
                 SearchScreen(
                     session = session,
+                    helpRequestId = helpRequestId,
+                    onRequestHelp = { helpRequestId += 1 },
                     onOpenDetail = { nopDisplay ->
                         navController.navigate("${MainRoute.OBJECT_DETAIL}/$nopDisplay")
                     },
@@ -212,6 +247,8 @@ private fun MainScaffold(
                 val nopDisplay = backStackEntry.arguments?.getString("nopDisplay").orEmpty()
                 ObjectDetailScreen(
                     nopDisplay = nopDisplay,
+                    helpRequestId = helpRequestId,
+                    onRequestHelp = { helpRequestId += 1 },
                     onBack = { navController.popBackStack() },
                     onOpenBuilding = { navController.navigate("${MainRoute.BUILDINGS}/$it") },
                     onOpenSpptHistory = { navController.navigate("${MainRoute.SPPT_HISTORY}/$it") },
@@ -297,15 +334,35 @@ private fun MainScaffold(
                     onBack = { navController.popBackStack() },
                 )
             }
-            composable(MainRoute.NOTIFICATIONS) { NotificationsScreen() }
-            composable(MainRoute.SETTINGS) {
-                SettingsScreen(
-                    session = session,
-                    onLogout = onLogout,
-                )
+                composable(MainRoute.NOTIFICATIONS) { NotificationsScreen() }
+                composable(MainRoute.SETTINGS) {
+                    SettingsScreen(
+                        session = session,
+                        onLogout = onLogout,
+                    )
+                }
             }
         }
     }
+}
+
+private fun String?.toBreadcrumb(): String {
+    val page = when {
+        this == MainRoute.HOME -> "Beranda"
+        this == MainRoute.SEARCH -> "Cari Objek"
+        this?.startsWith(MainRoute.OBJECT_DETAIL) == true -> "Cari Objek / Detail"
+        this?.startsWith(MainRoute.BUILDINGS) == true -> "Cari Objek / Detail / Bangunan"
+        this?.startsWith(MainRoute.BUILDING_DETAIL) == true -> "Cari Objek / Detail / Bangunan"
+        this?.startsWith(MainRoute.SPPT_HISTORY) == true -> "Cari Objek / Detail / Histori SPPT"
+        this?.startsWith(MainRoute.TAX_BILL_DETAIL) == true -> "Cari Objek / Detail / SPPT"
+        this?.startsWith(MainRoute.TUNGGAKAN) == true -> "Cari Objek / Detail / Tunggakan"
+        this?.startsWith(MainRoute.PAYMENT_INFO) == true -> "Cari Objek / Detail / Pembayaran"
+        this?.startsWith(MainRoute.REPORT) == true -> "Cari Objek / Detail / Laporan"
+        this == MainRoute.NOTIFICATIONS -> "Notifikasi"
+        this == MainRoute.SETTINGS -> "Setelan"
+        else -> "Beranda"
+    }
+    return "PBB-Ku / $page"
 }
 
 private fun NavController.navigateAndClear(route: String) {

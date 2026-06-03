@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -23,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.BuildingDetail
 import id.pbbku.mobileportal.domain.model.BuildingFacility
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
 import id.pbbku.mobileportal.ui.component.PageHeader
 
 @Composable
@@ -46,7 +47,7 @@ fun BuildingDetailScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
@@ -63,6 +64,8 @@ fun BuildingDetailScreen(
                 PageHeader(
                     title = "Detail Bangunan",
                     subtitle = "Periksa data bangunan sebelum membuat laporan perubahan.",
+                    iconRes = R.drawable.shortcut_bangunan,
+                    titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 uiState.nop?.let {
                     Text(
@@ -120,13 +123,7 @@ private fun BuildingDetailStatus(
 ) {
     when {
         uiState.isLoading -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                CircularProgressIndicator()
-                Text("Memuat detail bangunan...")
-            }
+            LoadingSkeletonCard()
         }
 
         uiState.errorMessage != null -> {

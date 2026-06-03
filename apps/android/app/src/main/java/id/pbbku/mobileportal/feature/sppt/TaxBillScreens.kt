@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -26,12 +25,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.TaxBillDetail
 import id.pbbku.mobileportal.domain.model.TaxBillSummary
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
+import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
 import id.pbbku.mobileportal.ui.component.PageHeader
 import id.pbbku.mobileportal.ui.component.PaymentStatusLabel
 
@@ -49,6 +50,7 @@ fun SpptHistoryScreen(
     }
     TaxBillListScreenContent(
         title = "Histori SPPT",
+        iconRes = R.drawable.shortcut_histori_sppt,
         uiState = uiState,
         onBack = onBack,
         onRetry = viewModel::retry,
@@ -72,6 +74,7 @@ fun TunggakanScreen(
     }
     TaxBillListScreenContent(
         title = "Tunggakan",
+        iconRes = R.drawable.shortcut_tunggakan,
         uiState = uiState,
         onBack = onBack,
         onRetry = viewModel::retry,
@@ -96,12 +99,13 @@ fun TaxBillDetailScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
             HeaderBlock(
                 title = "Detail Tagihan",
+                iconRes = R.drawable.shortcut_histori_sppt,
                 nopText = uiState.nop?.asGroupedText(),
                 onBack = onBack,
             )
@@ -128,6 +132,7 @@ fun TaxBillDetailScreen(
 @Composable
 private fun TaxBillListScreenContent(
     title: String,
+    iconRes: Int,
     uiState: TaxBillListUiState,
     onBack: () -> Unit,
     onRetry: () -> Unit,
@@ -137,12 +142,13 @@ private fun TaxBillListScreenContent(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
             HeaderBlock(
                 title = title,
+                iconRes = iconRes,
                 nopText = uiState.nop?.asGroupedText(),
                 onBack = onBack,
             )
@@ -180,6 +186,7 @@ private fun TaxBillListScreenContent(
 @Composable
 private fun HeaderBlock(
     title: String,
+    iconRes: Int,
     nopText: String?,
     onBack: () -> Unit,
 ) {
@@ -197,6 +204,8 @@ private fun HeaderBlock(
         PageHeader(
             title = title,
             subtitle = "Status, nominal, jatuh tempo, dan rincian perhitungan bila tersedia.",
+            iconRes = iconRes,
+            titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
         nopText?.let {
             Text(
@@ -379,13 +388,7 @@ private fun DetailRow(
 
 @Composable
 private fun LoadingRow(text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        CircularProgressIndicator()
-        Text(text)
-    }
+    LoadingSkeletonCard()
 }
 
 @Composable

@@ -18,19 +18,20 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import id.pbbku.mobileportal.R
 import id.pbbku.mobileportal.data.session.SimulatedSession
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
-import id.pbbku.mobileportal.ui.component.PageHeader
+import id.pbbku.mobileportal.ui.component.PageHelpButton
+import id.pbbku.mobileportal.ui.component.PrimaryGradientCard
+import id.pbbku.mobileportal.ui.component.SectionTitleWithIcon
 import id.pbbku.mobileportal.ui.tutorial.TutorialOverlay
 import id.pbbku.mobileportal.ui.tutorial.TutorialStep
+import id.pbbku.mobileportal.ui.tutorial.rememberTutorialVisibilityState
 import id.pbbku.mobileportal.ui.tutorial.rememberTutorialTargetState
 import id.pbbku.mobileportal.ui.tutorial.tutorialTarget
 
@@ -39,14 +40,19 @@ fun HomeScreen(
     session: SimulatedSession?,
     onOpenSearch: () -> Unit,
     onOpenNotifications: () -> Unit,
+    helpRequestId: Int,
+    onRequestHelp: () -> Unit,
 ) {
     val tutorialTargetState = rememberTutorialTargetState()
-    var showTutorial by rememberSaveable { mutableStateOf(true) }
+    val tutorialVisibility = rememberTutorialVisibilityState(
+        pageKey = "home",
+        helpRequestId = helpRequestId,
+    )
     val tutorialSteps = listOf(
         TutorialStep(
             targetId = "dashboard-guide",
-            title = "Ikuti alur demo dari dashboard",
-            message = "Checklist ini menyusun flow sesuai SRS dan kontrak: cari objek, baca detail, cek tagihan, lalu gunakan fitur pendukung.",
+            title = "Ikuti alur dari beranda",
+            message = "Ikuti langkah utama untuk mencari objek pajak, membaca detail, mengecek tagihan, dan memakai fitur pendukung.",
         ),
         TutorialStep(
             targetId = "home-search-action",
@@ -69,38 +75,37 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
-                AppCard(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                ) {
+                PrimaryGradientCard {
                     InfoPill(
-                        text = "Session simulatif aktif",
+                        text = "Sesi aktif",
                         containerColor = MaterialTheme.colorScheme.surface,
                         contentColor = MaterialTheme.colorScheme.primary,
                     )
-                    PageHeader(
-                        title = "Halo, ${session?.displayName ?: "Wajib Pajak Demo"}",
-                        subtitle = "NIK: ${session?.maskedNik ?: "Tidak tersedia"}",
+                    SectionTitleWithIcon(
+                        title = "Beranda",
+                        iconRes = R.drawable.ic_nav_home,
+                        contentColor = Color.White,
                     )
                     Text(
-                        text = "Portal wajib pajak untuk melihat objek PBB, SPPT, tunggakan, reminder, dan draft laporan perubahan bangunan.",
+                        text = "NOP, SPPT, tunggakan, reminder, dan draft laporan perubahan bangunan tersedia dalam satu alur.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        color = Color.White.copy(alpha = 0.88f),
                     )
                     Surface(
                         shape = MaterialTheme.shapes.small,
-                        color = MaterialTheme.colorScheme.surface,
+                        color = Color(0xFFE0F2FE).copy(alpha = 0.94f),
                     ) {
                         Column(
                             modifier = Modifier.padding(12.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Text(
-                                text = "Informasi penting",
+                                text = "Informasi Penting",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.primary,
                             )
                             Text(
-                                text = "Data pembayaran dan laporan pada aplikasi ini bersifat demo read-only. Pembayaran resmi tetap dilakukan melalui kanal pemerintah daerah atau mitra yang ditunjuk.",
+                                text = "Gunakan aplikasi ini untuk memantau data PBB-P2. Pembayaran resmi tetap dilakukan melalui kanal pemerintah daerah atau mitra yang ditunjuk.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -117,9 +122,9 @@ fun HomeScreen(
             }
             item {
                 ActionCard(
-                    title = "Mulai dari NOP atau nama wajib pajak",
+                    title = "Mulai Dari NOP Atau Nama Wajib Pajak",
                     description = "Cari objek pajak, lalu buka detail, SPPT, tunggakan, bangunan, atau laporan perubahan.",
-                    label = "Alur utama",
+                    label = "Alur Utama",
                 ) {
                     Button(
                         onClick = onOpenSearch,
@@ -133,9 +138,9 @@ fun HomeScreen(
             }
             item {
                 ActionCard(
-                    title = "Pengingat jatuh tempo",
+                    title = "Pengingat Jatuh Tempo",
                     description = "Reminder bersifat lokal di perangkat dan tidak berasal dari server Bapenda.",
-                    label = "Notifikasi lokal",
+                    label = "Notifikasi Lokal",
                 ) {
                     OutlinedButton(
                         onClick = onOpenNotifications,
@@ -152,11 +157,17 @@ fun HomeScreen(
             }
         }
         TutorialOverlay(
-            visible = showTutorial,
+            visible = tutorialVisibility.visible,
             steps = tutorialSteps,
             targetState = tutorialTargetState,
             modifier = Modifier.align(Alignment.BottomCenter),
-            onDismiss = { showTutorial = false },
+            onDismiss = tutorialVisibility.dismiss,
+        )
+        PageHelpButton(
+            onClick = onRequestHelp,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
         )
     }
 }
@@ -177,13 +188,13 @@ private fun DashboardGuideCard(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                InfoPill(text = "Panduan pemula")
+                InfoPill(text = "Panduan Pemula")
                 Text(
-                    text = "Langkah utama demo PBB-Ku",
+                    text = "Langkah Utama PBB-Ku",
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = "Urutan ini mengikuti kebutuhan SRS dan kontrak MVP agar pengguna baru tidak tersesat saat mencoba aplikasi.",
+                    text = "Gunakan urutan ini agar proses cek objek pajak sampai tagihan terasa lebih mudah.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -210,7 +221,7 @@ private fun DashboardGuideCard(
         GuideStepRow(
             number = 4,
             title = "Buat draft laporan perubahan bangunan",
-            description = "Laporan hanya prototipe lokal dan tidak mengubah data resmi SIMPBB.",
+            description = "Laporan tersimpan di perangkat dan tidak mengubah data resmi SIMPBB.",
             onClick = onOpenSearch,
         )
         GuideStepRow(
@@ -309,12 +320,12 @@ private fun TermsCard() {
     ActionCard(
         title = "Istilah PBB",
         description = "Ringkasan istilah yang sering muncul di aplikasi.",
-        label = "Bantuan cepat",
+        label = "Bantuan Cepat",
     ) {
         TermText("NOP", "Nomor Objek Pajak untuk mengenali tanah atau bangunan.")
         TermText("NJOP", "Nilai Jual Objek Pajak yang menjadi dasar perhitungan PBB.")
         TermText("SPPT", "Surat Pemberitahuan Pajak Terutang per tahun pajak.")
-        TermText("SSPD", "Bukti setoran pajak daerah. Pada MVP hanya ditampilkan sebagai prototipe bila tersedia.")
+        TermText("SSPD", "Bukti setoran pajak daerah dari kanal pembayaran resmi.")
         TermText("Tunggakan", "Tagihan PBB yang belum lunas atau melewati jatuh tempo.")
     }
 }
