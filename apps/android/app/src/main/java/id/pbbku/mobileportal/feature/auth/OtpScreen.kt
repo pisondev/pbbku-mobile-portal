@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -30,16 +32,19 @@ fun OtpScreen(
     var error by rememberSaveable { mutableStateOf<String?>(null) }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+            .navigationBarsPadding(),
+        contentPadding = PaddingValues(start = 16.dp, top = 28.dp, end = 16.dp, bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             AppCard {
-                InfoPill(text = "OTP demo: ${AuthViewModel.DEMO_OTP}")
+                InfoPill(text = "OTP demo ${AuthViewModel.DEMO_OTP}")
                 PageHeader(
-                    title = "Verifikasi OTP",
-                    subtitle = "Masukkan kode demo untuk melanjutkan ke Beranda.",
+                    title = "Verifikasi",
+                    subtitle = "Masukkan kode OTP simulatif untuk membuka Beranda.",
                 )
                 OutlinedTextField(
                     value = otp,

@@ -1,8 +1,8 @@
 package id.pbbku.mobileportal.feature.search
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,10 @@ import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
 import id.pbbku.mobileportal.ui.component.PageHeader
 import id.pbbku.mobileportal.ui.component.StateCard
+import id.pbbku.mobileportal.ui.tutorial.TutorialOverlay
+import id.pbbku.mobileportal.ui.tutorial.TutorialStep
+import id.pbbku.mobileportal.ui.tutorial.rememberTutorialTargetState
+import id.pbbku.mobileportal.ui.tutorial.tutorialTarget
 
 @Composable
 fun SearchScreen(
@@ -49,98 +54,141 @@ fun SearchScreen(
     viewModel: SearchViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val tutorialTargetState = rememberTutorialTargetState()
+    var showTutorial by rememberSaveable { mutableStateOf(true) }
+    val tutorialSteps = listOf(
+        TutorialStep(
+            targetId = "search-input",
+            title = "Ketik NOP atau nama wajib pajak",
+            message = "Input minimal 3 karakter. Sistem akan mencari lewat endpoint objekPajak/search dengan wrapper json.",
+        ),
+        TutorialStep(
+            targetId = "demo-list",
+            title = "Gunakan daftar demo bila perlu",
+            message = "Tombol ini memuat daftar objek pajak demo dengan pagination, berguna saat reviewer ingin melihat variasi data.",
+            actionLabel = "Muat Demo",
+        ),
+        TutorialStep(
+            targetId = "search-result",
+            title = "Pilih hasil untuk lanjut",
+            message = "Setelah hasil muncul, tekan salah satu kartu untuk membuka detail objek pajak, lalu lanjut ke bangunan, SPPT, tunggakan, atau laporan.",
+        ),
+    )
 
     LaunchedEffect(Unit) {
         viewModel.loadPropinsiIfNeeded()
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            AppCard(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ) {
-                InfoPill(
-                    text = "Pencarian SIMPBB",
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                )
-                PageHeader(
-                    title = "Cari Objek Pajak",
-                    subtitle = "Cari NOP atau nama wajib pajak. Hasil detail tetap dibaca dari data resmi SIMPBB OP API.",
-                )
-                OutlinedTextField(
-                    value = uiState.query,
-                    onValueChange = viewModel::onQueryChanged,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("NOP atau nama wajib pajak") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    supportingText = { Text("Pencarian otomatis setelah minimal 3 karakter.") },
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.loadDemoList(reset = true) },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("Daftar demo")
-                    }
-                    OutlinedButton(
-                        onClick = viewModel::retry,
-                        enabled = uiState.errorMessage != null,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("Coba Lagi")
-                    }
-                }
-            }
-        }
-
-        item {
-            WilayahFilter(
-                filter = uiState.wilayahFilter,
-                onSelectPropinsi = viewModel::selectPropinsi,
-                onSelectDati2 = viewModel::selectDati2,
-                onSelectKecamatan = viewModel::selectKecamatan,
-                onSelectKelurahan = viewModel::selectKelurahan,
-                onSelectBlok = viewModel::selectBlok,
-                onClear = viewModel::clearWilayahFilter,
-            )
-        }
-
-        item {
-            SearchStatus(
-                uiState = uiState,
-                onRetry = viewModel::retry,
-            )
-        }
-
-        items(
-            items = uiState.results,
-            key = { it.nopDisplay },
-        ) { result ->
-            SearchResultCard(
-                result = result,
-                onClick = { onOpenDetail(result.nopDisplay) },
-            )
-        }
-
-        if (uiState.canLoadMore) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             item {
-                Button(
-                    onClick = { viewModel.loadDemoList(reset = false) },
-                    modifier = Modifier.fillMaxWidth(),
+                AppCard(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                 ) {
-                    Text("Muat berikutnya")
+                    InfoPill(
+                        text = "Pencarian SIMPBB",
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    )
+                    PageHeader(
+                        title = "Cari Objek Pajak",
+                        subtitle = "Cari NOP atau nama wajib pajak. Hasil detail tetap dibaca dari data resmi SIMPBB OP API.",
+                    )
+                    OutlinedTextField(
+                        value = uiState.query,
+                        onValueChange = viewModel::onQueryChanged,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .tutorialTarget(tutorialTargetState, "search-input"),
+                        label = { Text("NOP atau nama wajib pajak") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        supportingText = { Text("Pencarian otomatis setelah minimal 3 karakter.") },
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        OutlinedButton(
+                            onClick = { viewModel.loadDemoList(reset = true) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .tutorialTarget(tutorialTargetState, "demo-list"),
+                        ) {
+                            Text("Daftar demo")
+                        }
+                        OutlinedButton(
+                            onClick = viewModel::retry,
+                            enabled = uiState.errorMessage != null,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text("Coba Lagi")
+                        }
+                    }
+                }
+            }
+
+            item {
+                WilayahFilter(
+                    filter = uiState.wilayahFilter,
+                    onSelectPropinsi = viewModel::selectPropinsi,
+                    onSelectDati2 = viewModel::selectDati2,
+                    onSelectKecamatan = viewModel::selectKecamatan,
+                    onSelectKelurahan = viewModel::selectKelurahan,
+                    onSelectBlok = viewModel::selectBlok,
+                    onClear = viewModel::clearWilayahFilter,
+                )
+            }
+
+            item {
+                SearchStatus(
+                    uiState = uiState,
+                    onRetry = viewModel::retry,
+                )
+            }
+
+            itemsIndexed(
+                items = uiState.results,
+                key = { _, item -> item.nopDisplay },
+            ) { index, result ->
+                val targetModifier = if (index == 0) {
+                    Modifier.tutorialTarget(tutorialTargetState, "search-result")
+                } else {
+                    Modifier
+                }
+                SearchResultCard(
+                    result = result,
+                    modifier = targetModifier,
+                    onClick = { onOpenDetail(result.nopDisplay) },
+                )
+            }
+
+            if (uiState.canLoadMore) {
+                item {
+                    Button(
+                        onClick = { viewModel.loadDemoList(reset = false) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Muat berikutnya")
+                    }
                 }
             }
         }
+        TutorialOverlay(
+            visible = showTutorial,
+            steps = tutorialSteps,
+            targetState = tutorialTargetState,
+            onDismiss = { showTutorial = false },
+            onStepAction = { step ->
+                if (step.targetId == "demo-list") {
+                    viewModel.loadDemoList(reset = true)
+                }
+            },
+        )
     }
 }
 
@@ -315,10 +363,11 @@ private fun SearchStatus(
 @Composable
 private fun SearchResultCard(
     result: ObjekPajakSummary,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(

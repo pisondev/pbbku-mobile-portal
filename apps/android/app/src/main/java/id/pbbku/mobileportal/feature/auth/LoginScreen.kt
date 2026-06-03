@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,16 +35,35 @@ fun LoginScreen(
     var error by rememberSaveable { mutableStateOf<String?>(null) }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+            .navigationBarsPadding(),
+        contentPadding = PaddingValues(start = 16.dp, top = 28.dp, end = 16.dp, bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            AppCard {
-                InfoPill(text = "Masuk aman simulatif")
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "PBB-Ku",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "Portal PBB-P2 untuk cek objek, tagihan, tunggakan, dan laporan perubahan.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        item {
+            AppCard(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ) {
+                InfoPill(text = "Login demo")
                 PageHeader(
-                    title = "Login Simulatif",
-                    subtitle = "Masukkan NIK 16 digit. NIK asli tidak ditampilkan setelah login dan hanya session masked yang digunakan di UI.",
+                    title = "Masuk",
+                    subtitle = "Gunakan NIK demo 16 digit. Setelah login, UI hanya menampilkan NIK tersamarkan.",
                 )
                 OutlinedTextField(
                     value = nik,
@@ -69,7 +90,7 @@ fun LoginScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Kirim OTP")
+                    Text("Lanjut ke OTP")
                 }
             }
         }

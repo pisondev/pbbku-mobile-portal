@@ -27,23 +27,25 @@ Catatan: query `BUDI` dan NOP contoh berasal dari eksplorasi API/runtest sebelum
 3. Input NIK demo `3404123456789012`.
 4. Input OTP demo `123456`.
 5. Pastikan Beranda tampil dengan NIK masked `34************12`.
-6. Buka tab `Cari`.
-7. Input query `BUDI`.
-8. Pastikan hasil pencarian tampil dengan NOP, nama wajib pajak, dan alamat bila tersedia.
-9. Pilih salah satu hasil untuk membuka `Detail Objek Pajak`.
-10. Pastikan detail objek pajak menampilkan NOP, alamat objek, luas/NJOP bila tersedia, dan data subjek pajak dengan fallback `Data tidak tersedia`.
-11. Buka `Bangunan`, lalu buka salah satu detail bangunan jika tersedia.
-12. Dari detail bangunan, pilih `Buat Laporan Perubahan`.
-13. Isi luas/jumlah lantai baru dan deskripsi, lalu simpan draft atau tampilkan ringkasan simulasi.
-14. Kembali ke detail objek pajak, buka `Histori SPPT`.
-15. Buka salah satu detail tagihan jika tersedia.
-16. Jika tagihan belum lunas, pilih `Lihat Cara Bayar`.
-17. Pastikan halaman pembayaran menyatakan aplikasi tidak memproses pembayaran nyata.
-18. Buka `Tunggakan` dan pastikan empty/error/success state tampil tanpa crash sesuai data API.
-19. Buka tab `Notifikasi`; jika belum ada data jatuh tempo, aplikasi dapat menampilkan reminder simulatif.
-20. Buka tab `Pengaturan`.
-21. Coba toggle pengingat, hapus cache, hapus draft laporan, dan logout.
-22. Pastikan logout kembali ke halaman login.
+6. Pada Beranda, perlihatkan checklist `Panduan pemula` dan overlay tutorial. Gunakan `Next` untuk menjelaskan langkah, atau `Skip` jika reviewer ingin langsung demo.
+7. Tekan tombol `Cari Objek Pajak` dari checklist/overlay atau buka tab `Cari`.
+8. Pada halaman pencarian, perlihatkan overlay yang menyorot input pencarian dan tombol `Daftar demo`.
+9. Input query `BUDI`.
+10. Pastikan hasil pencarian tampil dengan NOP, nama wajib pajak, dan alamat bila tersedia.
+11. Pilih salah satu hasil untuk membuka `Detail Objek Pajak`.
+12. Pastikan detail objek pajak menampilkan NOP, alamat objek, luas/NJOP bila tersedia, dan data subjek pajak dengan fallback `Data tidak tersedia`.
+13. Buka `Bangunan`, lalu buka salah satu detail bangunan jika tersedia.
+14. Dari detail bangunan, pilih `Buat Laporan Perubahan`.
+15. Isi luas/jumlah lantai baru dan deskripsi, lalu simpan draft atau tampilkan ringkasan simulasi.
+16. Kembali ke detail objek pajak, buka `Histori SPPT`.
+17. Buka salah satu detail tagihan jika tersedia.
+18. Jika tagihan belum lunas, pilih `Lihat Cara Bayar`.
+19. Pastikan halaman pembayaran menyatakan aplikasi tidak memproses pembayaran nyata.
+20. Buka `Tunggakan` dan pastikan empty/error/success state tampil tanpa crash sesuai data API.
+21. Buka tab `Notifikasi`; jika belum ada data jatuh tempo, aplikasi dapat menampilkan reminder simulatif.
+22. Buka tab `Pengaturan`.
+23. Coba toggle pengingat, hapus cache, hapus draft laporan, dan logout.
+24. Pastikan logout kembali ke halaman login.
 
 ## Batasan Demo
 

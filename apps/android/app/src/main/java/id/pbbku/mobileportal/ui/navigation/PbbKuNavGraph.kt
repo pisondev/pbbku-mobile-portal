@@ -73,8 +73,8 @@ private object MainRoute {
 private val topLevelRoutes = listOf(
     TopLevelRoute(MainRoute.HOME, "Beranda", "B"),
     TopLevelRoute(MainRoute.SEARCH, "Cari", "C"),
-    TopLevelRoute(MainRoute.NOTIFICATIONS, "Notifikasi", "N"),
-    TopLevelRoute(MainRoute.SETTINGS, "Pengaturan", "P"),
+    TopLevelRoute(MainRoute.NOTIFICATIONS, "Notif", "N"),
+    TopLevelRoute(MainRoute.SETTINGS, "Setelan", "S"),
 )
 
 @Composable
@@ -139,6 +139,9 @@ private fun MainScaffold(
     val navController = rememberNavController()
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination
+    val showBottomBar = currentDestination?.hierarchy?.any { destination ->
+        topLevelRoutes.any { it.route == destination.route }
+    } != false
 
     LaunchedEffect(session?.isLoggedIn) {
         if (session?.isLoggedIn == false) {
@@ -149,41 +152,43 @@ private fun MainScaffold(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 4.dp,
-            ) {
-                topLevelRoutes.forEach { destination ->
-                    val selected = currentDestination?.hierarchy?.any {
-                        it.route == destination.route
-                    } == true
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(destination.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 2.dp,
+                ) {
+                    topLevelRoutes.forEach { destination ->
+                        val selected = currentDestination?.hierarchy?.any {
+                            it.route == destination.route
+                        } == true
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = {
+                                navController.navigate(destination.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        label = { Text(destination.label) },
-                        icon = {
-                            Text(
-                                text = destination.iconText,
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            indicatorColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
-                    )
+                            },
+                            label = { Text(destination.label) },
+                            icon = {
+                                Text(
+                                    text = destination.iconText,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = MaterialTheme.colorScheme.primary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            ),
+                        )
+                    }
                 }
             }
         },
