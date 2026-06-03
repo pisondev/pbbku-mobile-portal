@@ -5,8 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toObjekPajakPage
-import id.pbbku.mobileportal.data.mapper.toObjekPajakSearchRows
 import id.pbbku.mobileportal.domain.model.ObjekPajakSummary
 import id.pbbku.mobileportal.domain.model.WilayahItem
 import kotlinx.coroutines.Job
@@ -21,7 +19,7 @@ class SearchViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
     private val pbbKuApplication = application as PbbKuApplication
-    private val simpbbRepository = pbbKuApplication.simpbbRepository
+    private val nikScopedDemoRepository = pbbKuApplication.nikScopedDemoRepository
     private val wilayahRepository = pbbKuApplication.wilayahRepository
     private val _uiState = MutableStateFlow(SearchUiState())
     private var searchJob: Job? = null
@@ -35,33 +33,26 @@ class SearchViewModel(
             it.copy(
                 query = normalized,
                 errorMessage = null,
-                emptyMessage = if (normalized.length < SearchConfig.MIN_QUERY_LENGTH) {
-                    "Ketik minimal ${SearchConfig.MIN_QUERY_LENGTH} karakter untuk mencari."
-                } else {
-                    null
-                },
-                modeLabel = "Pencarian",
+                emptyMessage = null,
+                modeLabel = "Daftar Objek",
                 totalRows = null,
                 canLoadMore = false,
             )
         }
         searchJob?.cancel()
-        if (normalized.length < SearchConfig.MIN_QUERY_LENGTH) {
-            _uiState.update { it.copy(isLoading = false, results = emptyList()) }
-            return
-        }
         searchJob = viewModelScope.launch {
             delay(SearchConfig.SEARCH_DEBOUNCE_MS)
-            search()
+            loadDemoList(reset = true)
         }
     }
 
     fun retry() {
-        if (_uiState.value.modeLabel == "Daftar Objek") {
-            loadDemoList(reset = true)
-        } else {
-            search()
-        }
+        loadDemoList(reset = true)
+    }
+
+    fun loadInitialListIfNeeded() {
+        if (_uiState.value.results.isNotEmpty() || _uiState.value.isLoading) return
+        loadDemoList(reset = true)
     }
 
     fun loadPropinsiIfNeeded() {
@@ -95,6 +86,7 @@ class SearchViewModel(
             )
         }
         if (item != null) loadDati2(item.code)
+        loadDemoList(reset = true)
     }
 
     fun selectDati2(item: WilayahItem?) {
@@ -114,6 +106,7 @@ class SearchViewModel(
             )
         }
         if (item != null) loadKecamatan(propinsi.code, item.code)
+        loadDemoList(reset = true)
     }
 
     fun selectKecamatan(item: WilayahItem?) {
@@ -133,6 +126,7 @@ class SearchViewModel(
             )
         }
         if (item != null) loadKelurahan(propinsi.code, dati2.code, item.code)
+        loadDemoList(reset = true)
     }
 
     fun selectKelurahan(item: WilayahItem?) {
@@ -151,6 +145,7 @@ class SearchViewModel(
             )
         }
         if (item != null) loadBlok(propinsi.code, dati2.code, kecamatan.code, item.code)
+        loadDemoList(reset = true)
     }
 
     fun selectBlok(item: WilayahItem?) {
@@ -162,6 +157,7 @@ class SearchViewModel(
                 ),
             )
         }
+        loadDemoList(reset = true)
     }
 
     fun clearWilayahFilter() {
@@ -170,16 +166,20 @@ class SearchViewModel(
                 wilayahFilter = WilayahFilterUiState(propinsi = it.wilayahFilter.propinsi),
             )
         }
+        loadDemoList(reset = true)
     }
 
     fun loadDemoList(reset: Boolean) {
         searchJob?.cancel()
         viewModelScope.launch {
-            val query = _uiState.value.query.takeIf { it.isNotBlank() } ?: SearchConfig.DEFAULT_DEMO_SEARCH
+            val query = _uiState.value.query.takeIf { it.isNotBlank() }
             val offset = if (reset) 0 else currentListOffset
             val filter = _uiState.value.wilayahFilter
             val selectedPropinsi = filter.selectedPropinsi?.code
             val selectedDati2 = filter.selectedDati2?.code
+            val selectedKecamatan = filter.selectedKecamatan?.code
+            val selectedKelurahan = filter.selectedKelurahan?.code
+            val selectedBlok = filter.selectedBlok?.code
             if (reset) currentListOffset = 0
             _uiState.update {
                 it.copy(
@@ -187,14 +187,17 @@ class SearchViewModel(
                     errorMessage = null,
                     emptyMessage = null,
                     modeLabel = "Daftar Objek",
-                    query = query,
+                    query = query.orEmpty(),
                 )
             }
 
             when (
-                val result = simpbbRepository.listObjekPajakDetails(
+                val result = nikScopedDemoRepository.listObjekPajak(
                     kdPropinsi = selectedPropinsi ?: SearchConfig.DEFAULT_KD_PROPINSI,
                     kdDati2 = selectedDati2 ?: if (selectedPropinsi == null) SearchConfig.DEFAULT_KD_DATI2 else null,
+                    kdKecamatan = selectedKecamatan,
+                    kdKelurahan = selectedKelurahan,
+                    kdBlok = selectedBlok,
                     limit = SearchConfig.PAGE_SIZE,
                     offset = offset,
                     search = query,
@@ -204,7 +207,7 @@ class SearchViewModel(
                 is AppResult.Error -> showError(result.message)
                 AppResult.Loading -> Unit
                 is AppResult.Success -> {
-                    val page = result.data.json.toObjekPajakPage()
+                    val page = result.data
                     val merged = if (reset) page.rows else _uiState.value.results + page.rows
                     currentListOffset = merged.size
                     showRows(
@@ -307,37 +310,6 @@ class SearchViewModel(
                     errorMessage = message,
                 ),
             )
-        }
-    }
-
-    private fun search() {
-        viewModelScope.launch {
-            val query = _uiState.value.query.trim()
-            if (query.length < SearchConfig.MIN_QUERY_LENGTH) return@launch
-            _uiState.update {
-                it.copy(
-                    isLoading = true,
-                    errorMessage = null,
-                    emptyMessage = null,
-                    modeLabel = "Pencarian",
-                    totalRows = null,
-                    canLoadMore = false,
-                )
-            }
-            when (val result = simpbbRepository.searchObjekPajak(query = query, limit = SearchConfig.PAGE_SIZE)) {
-                AppResult.Empty -> showEmpty("Hasil pencarian tidak ditemukan.")
-                is AppResult.Error -> showError(result.message)
-                AppResult.Loading -> Unit
-                is AppResult.Success -> {
-                    showRows(
-                        rows = result.data.json.toObjekPajakSearchRows(),
-                        emptyMessage = "Hasil pencarian tidak ditemukan.",
-                        modeLabel = "Pencarian",
-                        totalRows = null,
-                        canLoadMore = false,
-                    )
-                }
-            }
         }
     }
 

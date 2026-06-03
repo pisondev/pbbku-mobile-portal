@@ -281,25 +281,28 @@ private fun ActionButtons(
         Button(
             onClick = onSaveDraft,
             modifier = Modifier.fillMaxWidth(),
+            enabled = uiState.isAccessAllowed,
         ) {
             Text("Simpan Draft")
         }
         OutlinedButton(
             onClick = onPrepareSummary,
             modifier = Modifier.fillMaxWidth(),
+            enabled = uiState.isAccessAllowed,
         ) {
             Text("Tampilkan Ringkasan")
         }
         OutlinedButton(
             onClick = onSendSimulation,
             modifier = Modifier.fillMaxWidth(),
+            enabled = uiState.isAccessAllowed,
         ) {
             Text("Tandai Sudah Diajukan")
         }
         OutlinedButton(
             onClick = onDeleteDraft,
             modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isDeleting,
+            enabled = uiState.isAccessAllowed && !uiState.isDeleting,
         ) {
             Text("Hapus Draft")
         }

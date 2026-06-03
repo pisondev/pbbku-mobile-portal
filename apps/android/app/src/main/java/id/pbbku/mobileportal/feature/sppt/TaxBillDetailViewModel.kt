@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toTaxBillDetailOrNull
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 class TaxBillDetailViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
-    private val simpbbRepository = (application as PbbKuApplication).simpbbRepository
+    private val nikScopedDemoRepository = (application as PbbKuApplication).nikScopedDemoRepository
     private val _uiState = MutableStateFlow(TaxBillDetailUiState())
 
     val uiState: StateFlow<TaxBillDetailUiState> = _uiState.asStateFlow()
@@ -45,23 +44,18 @@ class TaxBillDetailViewModel(
             )
         }
         viewModelScope.launch {
-            when (val result = simpbbRepository.getSppt(nop, taxYear)) {
+            when (val result = nikScopedDemoRepository.getTaxBill(nop, taxYear)) {
                 AppResult.Empty -> showEmpty("Detail tagihan tahun $taxYear tidak tersedia.")
                 is AppResult.Error -> showError(result.message)
                 AppResult.Loading -> Unit
                 is AppResult.Success -> {
-                    val detail = result.data.json.toTaxBillDetailOrNull(nop, taxYear)
-                    if (detail == null) {
-                        showEmpty("Detail tagihan tahun $taxYear tidak tersedia.")
-                    } else {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                detail = detail,
-                                errorMessage = null,
-                                emptyMessage = null,
-                            )
-                        }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            detail = result.data,
+                            errorMessage = null,
+                            emptyMessage = null,
+                        )
                     }
                 }
             }

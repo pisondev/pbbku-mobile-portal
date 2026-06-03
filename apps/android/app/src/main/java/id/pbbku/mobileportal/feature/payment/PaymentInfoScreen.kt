@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.pbbku.mobileportal.R
+import id.pbbku.mobileportal.core.format.toIndonesianDateTimeText
 import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toRupiahText
+import id.pbbku.mobileportal.domain.model.PaymentAttempt
+import id.pbbku.mobileportal.domain.model.PaymentAttemptStatus
 import id.pbbku.mobileportal.domain.model.PaymentStatus
+import id.pbbku.mobileportal.domain.model.SspdReceipt
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
 import id.pbbku.mobileportal.ui.component.LoadingSkeletonCard
@@ -66,16 +71,27 @@ fun PaymentInfoScreen(
         item {
             PaymentStatusCard(uiState)
         }
-        item {
-            PaymentInstructionCard()
+        uiState.paymentFlow?.let { flow ->
+            if (flow.paymentAttempt != null && flow.taxBill.isPayable) {
+                item {
+                    PaymentAttemptCard(
+                        uiState = uiState,
+                        payment = flow.paymentAttempt,
+                        taxpayerName = flow.taxpayerName,
+                        maskedNik = flow.maskedNik,
+                        objectAddress = flow.objectAddress,
+                        onSimulateSuccess = viewModel::simulatePaymentSuccess,
+                    )
+                }
+            }
+            flow.receipt?.let { receipt ->
+                item {
+                    SspdReceiptCard(receipt = receipt)
+                }
+            }
         }
         item {
             PaymentChannelCard()
-        }
-        if (uiState.detail?.status == PaymentStatus.PAID) {
-            item {
-                SspdPrototypeCard(uiState)
-            }
         }
     }
 }
@@ -90,13 +106,13 @@ private fun HeaderBlock(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
     ) {
         InfoPill(
-            text = "Non-transaksional",
+            text = "Payment demo",
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
         )
         PageHeader(
-            title = "Informasi Pembayaran",
-            subtitle = "Arahan pembayaran umum tanpa memproses transaksi di aplikasi.",
+            title = "Pembayaran PBB Demo",
+            subtitle = "Simulasi payment attempt tanpa payment gateway asli.",
             iconRes = R.drawable.shortcut_tunggakan,
             titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
@@ -126,6 +142,11 @@ private fun StatusBlock(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
         )
+        uiState.actionMessage != null -> Text(
+            text = uiState.actionMessage,
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
@@ -144,6 +165,13 @@ private fun PaymentStatusCard(uiState: PaymentInfoUiState) {
         DetailRow("Jatuh tempo", dueDate?.toIndonesianDateText(), status.statusColor())
         DetailRow("Denda", fine?.toRupiahText())
         DetailRow("Tanggal pembayaran", detail?.paymentDate?.toIndonesianDateText())
+        if (detail?.isOverdue == true) {
+            InfoPill(
+                text = "Tunggakan",
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.error,
+            )
+        }
         if (!uiState.hasBillData) {
             Text(
                 text = "Status ini belum dapat diverifikasi dari API untuk tagihan yang dipilih.",
@@ -151,6 +179,65 @@ private fun PaymentStatusCard(uiState: PaymentInfoUiState) {
                 style = MaterialTheme.typography.bodySmall,
             )
         }
+    }
+}
+
+@Composable
+private fun PaymentAttemptCard(
+    uiState: PaymentInfoUiState,
+    payment: PaymentAttempt,
+    taxpayerName: String?,
+    maskedNik: String,
+    objectAddress: String?,
+    onSimulateSuccess: () -> Unit,
+) {
+    DetailCard(title = "Payment Attempt") {
+        DetailRow("Nama wajib pajak", taxpayerName)
+        DetailRow("NIK", maskedNik)
+        DetailRow("NOP", payment.nop.asGroupedText())
+        DetailRow("Tahun pajak", payment.taxYear.toString())
+        DetailRow("Alamat objek", objectAddress)
+        DetailRow("Pokok PBB", payment.principalAmount.toRupiahText())
+        DetailRow("Denda", payment.penaltyAmount.toRupiahText())
+        DetailRow("Total bayar", payment.totalAmount.toRupiahText(), MaterialTheme.colorScheme.primary)
+        DetailRow("Metode", payment.method)
+        DetailRow("Kode pembayaran", payment.paymentCode)
+        DetailRow("Status payment", payment.status.label)
+        if (payment.status == PaymentAttemptStatus.PENDING) {
+            Text(
+                text = "Tombol di bawah mensimulasikan callback sukses dari payment gateway.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Button(
+                onClick = onSimulateSuccess,
+                enabled = !uiState.isSimulatingPayment,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(if (uiState.isSimulatingPayment) "Memproses..." else "Simulate Payment Success")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SspdReceiptCard(receipt: SspdReceipt) {
+    DetailCard(title = "Bukti Pembayaran PBB / SSPD") {
+        InfoPill(
+            text = "LUNAS",
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.primary,
+        )
+        DetailRow("Nomor SSPD", receipt.sspdNumber)
+        DetailRow("Tanggal terbit", receipt.issuedAtEpochMillis.toIndonesianDateTimeText())
+        DetailRow("Nama wajib pajak", receipt.namaWajibPajak)
+        DetailRow("NIK", receipt.nik.takeLast(4).padStart(receipt.nik.length, '*'))
+        DetailRow("NOP", receipt.nop.asGroupedText())
+        DetailRow("Tahun pajak", receipt.taxYear.toString())
+        DetailRow("Pokok pajak", receipt.principalAmount.toRupiahText())
+        DetailRow("Denda", receipt.penaltyAmount.toRupiahText())
+        DetailRow("Total dibayar", receipt.totalPaid.toRupiahText(), MaterialTheme.colorScheme.primary)
+        DetailRow("Metode pembayaran", receipt.method)
     }
 }
 
@@ -172,35 +259,13 @@ private fun PaymentInstructionCard() {
 private fun PaymentChannelCard() {
     DetailCard(title = "Kanal Pembayaran") {
         Text(
-            text = "Kanal berikut bersifat informasi umum. Pastikan ketersediaannya melalui pengumuman resmi daerah.",
+            text = "Kanal berikut adalah dummy untuk demo. Tidak ada pembayaran asli yang diproses.",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
         )
-        BulletText("Loket atau kanal resmi Bapenda/pemerintah daerah.")
-        BulletText("Bank daerah atau mitra pembayaran yang diumumkan resmi oleh Bapenda.")
-        BulletText("ATM, mobile banking, atau marketplace hanya jika kanal tersebut terdaftar resmi untuk PBB-P2 daerah terkait.")
-    }
-}
-
-@Composable
-private fun SspdPrototypeCard(uiState: PaymentInfoUiState) {
-    val detail = uiState.detail ?: return
-    DetailCard(title = "Ringkasan Pembayaran") {
-        Text(
-            text = "Ringkasan ini bukan bukti pembayaran resmi.",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.titleSmall,
-        )
-        DetailRow("NOP", detail.nop.asGroupedText())
-        DetailRow("Tahun pajak", detail.taxYear.toString())
-        DetailRow("Nominal dibayar", detail.amount?.toRupiahText())
-        DetailRow("Tanggal pembayaran", detail.paymentDate?.toIndonesianDateText())
-        PaymentStatusLabel(status = detail.status)
-        Text(
-            text = "Tidak ada QR pembayaran, nomor virtual account, atau bukti resmi yang dibuat oleh aplikasi.",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
+        BulletText("QRIS Demo untuk tagihan berjalan.")
+        BulletText("Virtual Account Demo untuk tunggakan.")
+        BulletText("Bank Transfer Demo untuk riwayat pembayaran lunas.")
     }
 }
 

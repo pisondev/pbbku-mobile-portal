@@ -3,6 +3,7 @@ package id.pbbku.mobileportal
 import android.app.Application
 import id.pbbku.mobileportal.data.api.SimpbbApiClient
 import id.pbbku.mobileportal.data.api.SimpbbApiService
+import id.pbbku.mobileportal.data.demo.NikScopedDemoRepository
 import id.pbbku.mobileportal.data.local.PbbKuDatabase
 import id.pbbku.mobileportal.data.reminder.PaymentReminderRepository
 import id.pbbku.mobileportal.data.repository.LocalCacheRepository
@@ -42,5 +43,9 @@ class PbbKuApplication : Application() {
 
     val sessionDataStore: SessionDataStore by lazy {
         SessionDataStore(this)
+    }
+
+    val nikScopedDemoRepository: NikScopedDemoRepository by lazy {
+        NikScopedDemoRepository(sessionDataStore)
     }
 }

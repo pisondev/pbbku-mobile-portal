@@ -10,7 +10,11 @@ data class TaxBillSummary(
     val dueDate: LocalDate?,
     val fine: Double?,
 ) {
-    val isPayable: Boolean = status == PaymentStatus.UNPAID || status == PaymentStatus.OVERDUE
+    val isPaid: Boolean = status == PaymentStatus.PAID
+    val isUnpaid: Boolean = !isPaid
+    val isOverdue: Boolean = isUnpaid && (dueDate?.isBefore(LocalDate.now()) == true || status == PaymentStatus.OVERDUE)
+    val isCurrentUnpaid: Boolean = isUnpaid && !isOverdue
+    val isPayable: Boolean = isUnpaid
 }
 
 data class TaxBillDetail(
@@ -28,5 +32,9 @@ data class TaxBillDetail(
     val tarif: Double?,
     val pbbTerutang: Double?,
 ) {
-    val isPayable: Boolean = status == PaymentStatus.UNPAID || status == PaymentStatus.OVERDUE
+    val isPaid: Boolean = status == PaymentStatus.PAID
+    val isUnpaid: Boolean = !isPaid
+    val isOverdue: Boolean = isUnpaid && (dueDate?.isBefore(LocalDate.now()) == true || status == PaymentStatus.OVERDUE)
+    val isCurrentUnpaid: Boolean = isUnpaid && !isOverdue
+    val isPayable: Boolean = isUnpaid
 }

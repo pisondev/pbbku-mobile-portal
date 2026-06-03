@@ -7,7 +7,6 @@ import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
 import id.pbbku.mobileportal.data.local.report.ReportDraftEntity
 import id.pbbku.mobileportal.data.local.report.ReportDraftStatus
-import id.pbbku.mobileportal.data.mapper.toBuildingDetailOrNull
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +18,7 @@ class ReportDraftViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
     private val app = application as PbbKuApplication
-    private val simpbbRepository = app.simpbbRepository
+    private val nikScopedDemoRepository = app.nikScopedDemoRepository
     private val reportDraftRepository = app.reportDraftRepository
     private val _uiState = MutableStateFlow(ReportDraftUiState())
 
@@ -39,11 +38,21 @@ class ReportDraftViewModel(
             it.copy(
                 nop = nop,
                 noBng = cleanNoBng,
+                isAccessAllowed = true,
                 buildingMessage = null,
                 saveMessage = null,
             )
         }
         viewModelScope.launch {
+            if (!nikScopedDemoRepository.canAccess(nop)) {
+                _uiState.update {
+                    it.copy(
+                        isAccessAllowed = false,
+                        buildingMessage = "Akses ditolak. Laporan hanya dapat dibuat untuk NOP yang terhubung dengan NIK login.",
+                    )
+                }
+                return@launch
+            }
             loadExistingDraft(nop, cleanNoBng)
             loadBuildingDetailIfAvailable(nop, cleanNoBng)
         }
@@ -111,7 +120,20 @@ class ReportDraftViewModel(
     fun deleteDraft() {
         val state = _uiState.value
         val nop = state.nop ?: return
+        if (!state.isAccessAllowed) {
+            _uiState.update { it.copy(saveMessage = "Akses ditolak untuk NOP ini.") }
+            return
+        }
         viewModelScope.launch {
+            if (!nikScopedDemoRepository.canAccess(nop)) {
+                _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        saveMessage = "Akses ditolak untuk NOP ini.",
+                    )
+                }
+                return@launch
+            }
             _uiState.update { it.copy(isDeleting = true) }
             reportDraftRepository.deleteById(draftId(nop, state.noBng))
             _uiState.update {
@@ -159,7 +181,7 @@ class ReportDraftViewModel(
         }
 
         _uiState.update { it.copy(isLoadingBuilding = true, buildingMessage = null) }
-        when (val result = simpbbRepository.getBuilding(nop, noBng)) {
+        when (val result = nikScopedDemoRepository.getBuilding(nop, noBng)) {
             AppResult.Empty -> {
                 _uiState.update {
                     it.copy(
@@ -178,18 +200,14 @@ class ReportDraftViewModel(
             }
             AppResult.Loading -> Unit
             is AppResult.Success -> {
-                val detail = result.data.json.toBuildingDetailOrNull(nop, noBng)
+                val detail = result.data
                 _uiState.update {
                     it.copy(
                         isLoadingBuilding = false,
                         oldBuildingDetail = detail,
-                        oldBuildingAreaText = detail?.luasBangunan?.toCleanText().orEmpty(),
-                        oldFloorCountText = detail?.jumlahLantai?.toString().orEmpty(),
-                        buildingMessage = if (detail == null) {
-                            "Data lama LSPOP tidak tersedia. Form tetap dapat disimpan sebagai draft lokal."
-                        } else {
-                            null
-                        },
+                        oldBuildingAreaText = detail.luasBangunan?.toCleanText().orEmpty(),
+                        oldFloorCountText = detail.jumlahLantai?.toString().orEmpty(),
+                        buildingMessage = null,
                     )
                 }
             }
@@ -199,6 +217,10 @@ class ReportDraftViewModel(
     private fun save(status: ReportDraftStatus, requireDescription: Boolean) {
         val state = _uiState.value
         val nop = state.nop ?: return
+        if (!state.isAccessAllowed) {
+            _uiState.update { it.copy(saveMessage = "Akses ditolak untuk NOP ini.") }
+            return
+        }
         val validation = ReportDraftFormValidator.validate(
             newBuildingAreaText = state.newBuildingAreaText,
             newFloorCountText = state.newFloorCountText,
@@ -230,6 +252,15 @@ class ReportDraftViewModel(
             updatedAtEpochMillis = System.currentTimeMillis(),
         )
         viewModelScope.launch {
+            if (!nikScopedDemoRepository.canAccess(nop)) {
+                _uiState.update {
+                    it.copy(
+                        saveMessage = "Akses ditolak untuk NOP ini.",
+                        showSummary = false,
+                    )
+                }
+                return@launch
+            }
             reportDraftRepository.saveDraft(draft)
             _uiState.update {
                 it.copy(

@@ -293,13 +293,11 @@ private fun BillSummaryCard(
                 },
             )
             DetailRow("Denda", bill.fine?.toRupiahText())
-            if (bill.isPayable) {
-                OutlinedButton(
-                    onClick = onOpenPayment,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Lihat Cara Bayar")
-                }
+            OutlinedButton(
+                onClick = onOpenPayment,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(if (bill.isPayable) "Bayar" else "Lihat Bukti Bayar")
             }
         }
     }
@@ -343,7 +341,14 @@ private fun DetailBillCard(
                 onClick = { onOpenPayment(detail.nop.asDisplayText(), detail.taxYear) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Lihat Cara Bayar")
+                Text("Bayar")
+            }
+        } else {
+            OutlinedButton(
+                onClick = { onOpenPayment(detail.nop.asDisplayText(), detail.taxYear) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Lihat Bukti Bayar")
             }
         }
     }

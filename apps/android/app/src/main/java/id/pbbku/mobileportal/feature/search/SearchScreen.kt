@@ -88,7 +88,7 @@ fun SearchScreen(
         TutorialStep(
             targetId = "demo-list",
             title = "Lihat daftar objek pajak",
-            message = "Tombol ini memuat daftar objek pajak yang tersedia agar kamu bisa memilih data yang ingin diperiksa.",
+            message = "Tombol ini memuat ulang semua objek pajak yang terhubung dengan NIK login.",
             actionLabel = "Muat Daftar",
         ),
         TutorialStep(
@@ -100,6 +100,7 @@ fun SearchScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadPropinsiIfNeeded()
+        viewModel.loadInitialListIfNeeded()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -121,7 +122,7 @@ fun SearchScreen(
                         contentColor = Color.White,
                     )
                     Text(
-                        text = "Masukkan NOP atau nama wajib pajak. Hasil detail tetap dibaca dari data resmi SIMPBB OP API.",
+                        text = "Masukkan NOP atau nama wajib pajak. Hasil dibatasi ke objek yang terhubung dengan NIK login.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.88f),
                     )
@@ -139,7 +140,7 @@ fun SearchScreen(
                                 color = Color(0xFF075985),
                             )
                             Text(
-                                text = "Gunakan minimal 3 karakter untuk pencarian cepat. Filter wilayah bisa dibuka untuk mempersempit daftar objek pajak.",
+                                text = "Daftar di bawah memuat objek milik NIK session. Gunakan pencarian dan filter wilayah untuk menyaring hasil.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF0F172A),
                             )
@@ -162,7 +163,7 @@ fun SearchScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         supportingText = {
                             Text(
-                                text = "Pencarian otomatis setelah minimal 3 karakter.",
+                                text = "Daftar otomatis disaring sesuai teks yang diketik.",
                                 color = Color.White.copy(alpha = 0.86f),
                             )
                         },
@@ -192,7 +193,7 @@ fun SearchScreen(
                                 disabledContentColor = Color.White.copy(alpha = 0.48f),
                             ),
                         ) {
-                            Text("Daftar Objek")
+                            Text("Semua Objek")
                         }
                         OutlinedButton(
                             onClick = viewModel::retry,

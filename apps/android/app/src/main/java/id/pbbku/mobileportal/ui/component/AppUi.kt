@@ -28,10 +28,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,17 +61,20 @@ fun PatternBackground(modifier: Modifier = Modifier) {
 @Composable
 fun FloatingAppHeader(
     displayName: String?,
-    maskedNik: String?,
     breadcrumb: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
+    onOpenProfile: () -> Unit,
 ) {
-    var showNik by rememberSaveable { mutableStateOf(false) }
-    val name = when (displayName) {
-        null, "Wajib Pajak Demo" -> "Pak Blangkon"
-        else -> displayName
-    }
-    val compactNik = maskedNik.toCompactNikMask()
+    val name = displayName
+        ?.takeIf { it.isNotBlank() && it != "Wajib Pajak Demo" }
+        ?: "Warga Demo"
+    val initials = name
+        .split(" ")
+        .filter { it.isNotBlank() }
+        .take(2)
+        .joinToString("") { it.first().uppercaseChar().toString() }
+        .ifBlank { "WP" }
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
@@ -127,28 +126,23 @@ fun FloatingAppHeader(
             }
             Surface(
                 modifier = Modifier
-                    .clickable { showNik = !showNik },
-                shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                    .size(42.dp)
+                    .clickable(onClick = onOpenProfile),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
-                Text(
-                    text = if (showNik) maskedNik ?: "Tidak tersedia" else compactNik,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = initials,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
-}
-
-private fun String?.toCompactNikMask(): String {
-    val value = this?.takeIf { it.isNotBlank() } ?: return "--***--"
-    val prefix = value.takeWhile(Char::isDigit).take(2).ifBlank { value.take(2) }
-    val suffix = value.takeLastWhile(Char::isDigit).takeLast(2).ifBlank { value.takeLast(2) }
-    return "$prefix***$suffix"
 }
 
 @Composable

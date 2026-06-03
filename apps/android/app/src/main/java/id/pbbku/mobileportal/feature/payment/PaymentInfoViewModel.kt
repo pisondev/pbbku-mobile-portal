@@ -5,8 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toTaxBillDetailOrNull
-import id.pbbku.mobileportal.data.mapper.toTaxBillSummaries
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +15,7 @@ import kotlinx.coroutines.launch
 class PaymentInfoViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
-    private val simpbbRepository = (application as PbbKuApplication).simpbbRepository
+    private val nikScopedDemoRepository = (application as PbbKuApplication).nikScopedDemoRepository
     private val _uiState = MutableStateFlow(PaymentInfoUiState())
 
     val uiState: StateFlow<PaymentInfoUiState> = _uiState.asStateFlow()
@@ -41,14 +39,17 @@ class PaymentInfoViewModel(
                 nop = nop,
                 taxYear = taxYear,
                 isLoading = true,
+                isSimulatingPayment = false,
                 detail = null,
                 summary = null,
+                paymentFlow = null,
                 errorMessage = null,
                 emptyMessage = null,
+                actionMessage = null,
             )
         }
         viewModelScope.launch {
-            loadDetail(nop, taxYear)
+            loadPaymentFlow(nop, taxYear)
         }
     }
 
@@ -59,25 +60,33 @@ class PaymentInfoViewModel(
         load(nop.asDisplayText(), taxYear.toString())
     }
 
-    private suspend fun loadDetail(nop: Nop, taxYear: Int) {
-        when (val result = simpbbRepository.getSppt(nop, taxYear)) {
-            AppResult.Empty -> loadSummaryFallback(nop, taxYear)
-            is AppResult.Error -> {
-                loadSummaryFallback(nop, taxYear, fallbackError = result.message)
+    fun simulatePaymentSuccess() {
+        val paymentId = _uiState.value.paymentFlow?.paymentAttempt?.id ?: return
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(isSimulatingPayment = true, actionMessage = null, errorMessage = null)
             }
-            AppResult.Loading -> Unit
-            is AppResult.Success -> {
-                val detail = result.data.json.toTaxBillDetailOrNull(nop, taxYear)
-                if (detail == null) {
-                    loadSummaryFallback(nop, taxYear)
-                } else {
+            when (val result = nikScopedDemoRepository.simulatePaymentSuccess(paymentId)) {
+                AppResult.Empty -> showNoBillData(_uiState.value.taxYear ?: 0, "Payment tidak dapat diproses.")
+                is AppResult.Error -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
-                            detail = detail,
+                            isSimulatingPayment = false,
+                            errorMessage = result.message,
+                        )
+                    }
+                }
+                AppResult.Loading -> Unit
+                is AppResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isSimulatingPayment = false,
+                            detail = result.data.taxBill,
                             summary = null,
+                            paymentFlow = result.data,
                             errorMessage = null,
                             emptyMessage = null,
+                            actionMessage = "Pembayaran demo berhasil. SSPD sudah diterbitkan.",
                         )
                     }
                 }
@@ -85,31 +94,23 @@ class PaymentInfoViewModel(
         }
     }
 
-    private suspend fun loadSummaryFallback(
-        nop: Nop,
-        taxYear: Int,
-        fallbackError: String? = null,
-    ) {
-        when (val result = simpbbRepository.listSpptByNop(nop)) {
-            AppResult.Empty -> showNoBillData(taxYear, fallbackError)
-            is AppResult.Error -> showNoBillData(taxYear, fallbackError ?: result.message)
+    private suspend fun loadPaymentFlow(nop: Nop, taxYear: Int) {
+        when (val result = nikScopedDemoRepository.getOrCreatePaymentFlow(nop, taxYear)) {
+            AppResult.Empty -> showNoBillData(taxYear, null)
+            is AppResult.Error -> {
+                showNoBillData(taxYear, result.message)
+            }
             AppResult.Loading -> Unit
             is AppResult.Success -> {
-                val summary = result.data.json
-                    .toTaxBillSummaries(nop)
-                    .firstOrNull { it.taxYear == taxYear }
-                if (summary == null) {
-                    showNoBillData(taxYear, fallbackError)
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            detail = null,
-                            summary = summary,
-                            errorMessage = null,
-                            emptyMessage = null,
-                        )
-                    }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        detail = result.data.taxBill,
+                        summary = null,
+                        paymentFlow = result.data,
+                        errorMessage = null,
+                        emptyMessage = null,
+                    )
                 }
             }
         }
@@ -119,8 +120,10 @@ class PaymentInfoViewModel(
         _uiState.update {
             it.copy(
                 isLoading = false,
+                isSimulatingPayment = false,
                 detail = null,
                 summary = null,
+                paymentFlow = null,
                 errorMessage = null,
                 emptyMessage = fallbackError
                     ?: "Data tagihan tahun $taxYear tidak tersedia. Instruksi pembayaran umum tetap ditampilkan.",

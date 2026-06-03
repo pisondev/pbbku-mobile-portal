@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toTaxBillSummaries
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +16,7 @@ class TunggakanViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
     private val pbbKuApplication = application as PbbKuApplication
-    private val simpbbRepository = pbbKuApplication.simpbbRepository
+    private val nikScopedDemoRepository = pbbKuApplication.nikScopedDemoRepository
     private val reminderRepository = pbbKuApplication.paymentReminderRepository
     private val _uiState = MutableStateFlow(TaxBillListUiState())
 
@@ -38,12 +37,12 @@ class TunggakanViewModel(
             )
         }
         viewModelScope.launch {
-            when (val result = simpbbRepository.getTunggakanByNop(nop)) {
+            when (val result = nikScopedDemoRepository.listActiveTaxBills(nop)) {
                 AppResult.Empty -> showBills(emptyList())
                 is AppResult.Error -> showError(result.message)
                 AppResult.Loading -> Unit
                 is AppResult.Success -> {
-                    val bills = result.data.json.toTaxBillSummaries(nop)
+                    val bills = result.data
                     showBills(bills)
                     reminderRepository.scheduleForBills(bills)
                 }
@@ -57,7 +56,10 @@ class TunggakanViewModel(
     }
 
     private fun showBills(bills: List<id.pbbku.mobileportal.domain.model.TaxBillSummary>) {
-        val total = bills.mapNotNull { it.amount }.takeIf { it.isNotEmpty() }?.sum()
+        val total = bills
+            .map { (it.amount ?: 0.0) + (it.fine ?: 0.0) }
+            .takeIf { it.isNotEmpty() }
+            ?.sum()
         _uiState.update {
             it.copy(
                 isLoading = false,

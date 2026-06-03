@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toBuildingSummaries
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 class BuildingListViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
-    private val simpbbRepository = (application as PbbKuApplication).simpbbRepository
+    private val nikScopedDemoRepository = (application as PbbKuApplication).nikScopedDemoRepository
     private val _uiState = MutableStateFlow(BuildingListUiState())
 
     val uiState: StateFlow<BuildingListUiState> = _uiState.asStateFlow()
@@ -36,12 +35,12 @@ class BuildingListViewModel(
             )
         }
         viewModelScope.launch {
-            when (val result = simpbbRepository.listBangunanByNop(nop)) {
+            when (val result = nikScopedDemoRepository.listBangunan(nop)) {
                 AppResult.Empty -> showEmpty("Data bangunan tidak tersedia untuk NOP ini.")
                 is AppResult.Error -> showError(result.message)
                 AppResult.Loading -> Unit
                 is AppResult.Success -> {
-                    val buildings = result.data.json.toBuildingSummaries(nop)
+                    val buildings = result.data
                     if (buildings.isEmpty()) {
                         showEmpty("Data bangunan tidak tersedia untuk NOP ini.")
                     } else {

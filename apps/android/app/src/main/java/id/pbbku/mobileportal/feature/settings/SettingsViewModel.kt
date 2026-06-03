@@ -65,7 +65,8 @@ class SettingsViewModel(
             "Build: debug",
             "Base URL API: ${SimpbbApiConfig.BASE_URL}",
             "Log jaringan: BASIC tanpa body request/response",
-            "Data sensitif: NIK penuh tidak disimpan atau ditampilkan",
+            "Demo akses: objek, SPPT, pembayaran, dan laporan dibatasi oleh NIK session",
+            "Data demo: NIK penuh disimpan lokal agar pembatasan session bisa diuji",
         )
     }
 }

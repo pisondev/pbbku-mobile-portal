@@ -5,8 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toBuildingDetailOrNull
-import id.pbbku.mobileportal.data.mapper.toBuildingFacilities
 import id.pbbku.mobileportal.domain.model.BuildingFacility
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.async
@@ -19,7 +17,7 @@ import kotlinx.coroutines.launch
 class BuildingDetailViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
-    private val simpbbRepository = (application as PbbKuApplication).simpbbRepository
+    private val nikScopedDemoRepository = (application as PbbKuApplication).nikScopedDemoRepository
     private val _uiState = MutableStateFlow(BuildingDetailUiState())
 
     val uiState: StateFlow<BuildingDetailUiState> = _uiState.asStateFlow()
@@ -49,8 +47,8 @@ class BuildingDetailViewModel(
             )
         }
         viewModelScope.launch {
-            val detailDeferred = async { simpbbRepository.getBuilding(nop, noBng) }
-            val facilitiesDeferred = async { simpbbRepository.listFasilitas(nop, noBng) }
+            val detailDeferred = async { nikScopedDemoRepository.getBuilding(nop, noBng) }
+            val facilitiesDeferred = async { nikScopedDemoRepository.listFacilities(nop, noBng) }
             val detailResult = detailDeferred.await()
             val facilitiesResult = facilitiesDeferred.await()
 
@@ -61,7 +59,7 @@ class BuildingDetailViewModel(
                     return@launch
                 }
                 AppResult.Loading -> null
-                is AppResult.Success -> detailResult.data.json.toBuildingDetailOrNull(nop, noBng)
+                is AppResult.Success -> detailResult.data
             }
 
             if (detail == null) {
@@ -98,13 +96,13 @@ class BuildingDetailViewModel(
         load(nop.asDisplayText(), state.noBng)
     }
 
-    private fun mapFacilities(result: AppResult<id.pbbku.mobileportal.domain.model.ApiPayload>): FacilitiesState {
+    private fun mapFacilities(result: AppResult<List<BuildingFacility>>): FacilitiesState {
         return when (result) {
             AppResult.Empty -> FacilitiesState(emptyList(), "Fasilitas bangunan tidak tersedia.")
             is AppResult.Error -> FacilitiesState(emptyList(), result.message)
             AppResult.Loading -> FacilitiesState(emptyList(), null)
             is AppResult.Success -> {
-                val facilities = result.data.json.toBuildingFacilities()
+                val facilities = result.data
                 FacilitiesState(
                     facilities = facilities,
                     message = if (facilities.isEmpty()) "Fasilitas bangunan tidak tersedia." else null,

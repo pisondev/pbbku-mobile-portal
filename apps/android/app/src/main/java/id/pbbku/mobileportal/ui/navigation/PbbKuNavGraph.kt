@@ -34,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import id.pbbku.mobileportal.R
+import id.pbbku.mobileportal.data.demo.DemoTaxpayerDirectory
 import id.pbbku.mobileportal.data.session.SimulatedSession
 import id.pbbku.mobileportal.feature.auth.AuthViewModel
 import id.pbbku.mobileportal.feature.auth.LoginScreen
@@ -46,6 +47,7 @@ import id.pbbku.mobileportal.feature.home.HomeScreen
 import id.pbbku.mobileportal.feature.notifications.NotificationsScreen
 import id.pbbku.mobileportal.feature.objectdetail.ObjectDetailScreen
 import id.pbbku.mobileportal.feature.payment.PaymentInfoScreen
+import id.pbbku.mobileportal.feature.profile.ProfileScreen
 import id.pbbku.mobileportal.feature.report.ReportDraftScreen
 import id.pbbku.mobileportal.feature.search.SearchScreen
 import id.pbbku.mobileportal.feature.settings.SettingsScreen
@@ -78,6 +80,7 @@ private object MainRoute {
     const val TAX_BILL_DETAIL = "tax_bill_detail"
     const val TUNGGAKAN = "tunggakan"
     const val PAYMENT_INFO = "payment_info"
+    const val PROFILE = "profile"
     const val REPORT = "report"
     const val NOTIFICATIONS = "notifications"
     const val SETTINGS = "settings"
@@ -165,14 +168,14 @@ private fun MainScaffold(
         containerColor = Color.Transparent,
         topBar = {
             FloatingAppHeader(
-                displayName = session?.displayName,
-                maskedNik = session?.maskedNik,
+                displayName = session.headerDisplayName(),
                 breadcrumb = currentDestination?.route.toBreadcrumb(),
                 onBack = if (currentDestination.isMainTab()) {
                     null
                 } else {
                     { navController.popBackStack() }
                 },
+                onOpenProfile = { navController.navigate(MainRoute.PROFILE) },
             )
         },
         bottomBar = {
@@ -346,9 +349,18 @@ private fun MainScaffold(
                         onLogout = onLogout,
                     )
                 }
+                composable(MainRoute.PROFILE) {
+                    ProfileScreen(session = session)
+                }
             }
         }
     }
+}
+
+private fun SimulatedSession?.headerDisplayName(): String {
+    val explicitName = this?.displayName
+        ?.takeIf { it.isNotBlank() && it != "Wajib Pajak Demo" }
+    return explicitName ?: this?.nik?.let(DemoTaxpayerDirectory::displayNameForNik) ?: "Warga Demo"
 }
 
 private fun String?.toBreadcrumb(): String {
@@ -362,6 +374,7 @@ private fun String?.toBreadcrumb(): String {
         this?.startsWith(MainRoute.TAX_BILL_DETAIL) == true -> "Cari Objek / Detail / SPPT"
         this?.startsWith(MainRoute.TUNGGAKAN) == true -> "Cari Objek / Detail / Tunggakan"
         this?.startsWith(MainRoute.PAYMENT_INFO) == true -> "Cari Objek / Detail / Pembayaran"
+        this == MainRoute.PROFILE -> "Profil"
         this?.startsWith(MainRoute.REPORT) == true -> "Cari Objek / Detail / Laporan"
         this == MainRoute.NOTIFICATIONS -> "Notifikasi"
         this == MainRoute.SETTINGS -> "Setelan"

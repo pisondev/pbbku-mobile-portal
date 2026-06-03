@@ -16,6 +16,7 @@ data class ReportDraftUiState(
     val status: ReportDraftStatus = ReportDraftStatus.DRAFT,
     val isLoadingBuilding: Boolean = false,
     val oldBuildingDetail: BuildingDetail? = null,
+    val isAccessAllowed: Boolean = true,
     val buildingMessage: String? = null,
     val validation: ReportDraftValidationResult = ReportDraftValidationResult(),
     val saveMessage: String? = null,

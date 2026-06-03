@@ -11,6 +11,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import id.pbbku.mobileportal.data.demo.DemoTaxpayerDirectory
 import id.pbbku.mobileportal.domain.model.Nop
 import id.pbbku.mobileportal.domain.model.PaymentReminder
 import id.pbbku.mobileportal.domain.model.ReminderStatus
@@ -63,6 +64,40 @@ class PaymentReminderRepository(
 
     suspend fun ensureDemoReminderIfEmpty() {
         if (reminders.first().isNotEmpty()) return
+        val now = LocalDate.now()
+        val demoReminders = DemoTaxpayerDirectory.recordsForNik(DemoTaxpayerDirectory.NIK_SITI)
+            .flatMap { record -> record.taxBills }
+            .filter { it.isPayable }
+            .sortedWith(compareBy({ it.dueDate ?: LocalDate.MAX }, { it.taxYear }))
+            .take(5)
+            .mapIndexed { index, bill ->
+                val dueDate = bill.dueDate
+                val scheduledAt = dueDate
+                    ?.minusDays(30)
+                    ?.takeIf { it.isAfter(now) }
+                    ?.atStartOfDay(ZoneId.systemDefault())
+                    ?.toInstant()
+                    ?.toEpochMilli()
+                PaymentReminder(
+                    id = "demo-reminder-${index + 1}",
+                    nop = bill.nop,
+                    taxYear = bill.taxYear,
+                    amount = bill.amount,
+                    dueDate = dueDate,
+                    offsetDays = if (scheduledAt != null) 30 else null,
+                    scheduledAtEpochMillis = scheduledAt,
+                    status = if (scheduledAt != null) ReminderStatus.SCHEDULED else ReminderStatus.SIMULATION,
+                    note = if (scheduledAt != null) {
+                        "Contoh reminder 30 hari sebelum jatuh tempo SPPT."
+                    } else {
+                        "Contoh notifikasi prioritas untuk tagihan yang sudah melewati jatuh tempo."
+                    },
+                )
+            }
+        saveReminders(demoReminders.ifEmpty { listOf(fallbackDemoReminder()) })
+    }
+
+    private fun fallbackDemoReminder(): PaymentReminder {
         val demoNop = Nop(
             kdPropinsi = "32",
             kdDati2 = "04",
@@ -72,7 +107,7 @@ class PaymentReminderRepository(
             noUrut = "0001",
             kdJnsOp = "0",
         )
-        val demo = PaymentReminder(
+        return PaymentReminder(
             id = "demo-reminder",
             nop = demoNop,
             taxYear = LocalDate.now().year,
@@ -83,7 +118,6 @@ class PaymentReminderRepository(
             status = ReminderStatus.SIMULATION,
             note = "Contoh simulatif karena data jatuh tempo SPPT belum tersedia.",
         )
-        saveReminders(listOf(demo))
     }
 
     private fun buildReminders(bill: TaxBillSummary): List<PaymentReminder> {

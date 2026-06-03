@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import id.pbbku.mobileportal.PbbKuApplication
 import id.pbbku.mobileportal.core.result.AppResult
-import id.pbbku.mobileportal.data.mapper.toTaxBillSummaries
 import id.pbbku.mobileportal.domain.model.Nop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +16,7 @@ class SpptHistoryViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
     private val pbbKuApplication = application as PbbKuApplication
-    private val simpbbRepository = pbbKuApplication.simpbbRepository
+    private val nikScopedDemoRepository = pbbKuApplication.nikScopedDemoRepository
     private val reminderRepository = pbbKuApplication.paymentReminderRepository
     private val _uiState = MutableStateFlow(TaxBillListUiState())
 
@@ -38,28 +37,18 @@ class SpptHistoryViewModel(
             )
         }
         viewModelScope.launch {
-            val primary = simpbbRepository.listSpptByNop(nop)
-            val bills = when (primary) {
-                AppResult.Empty -> emptyList()
+            when (val result = nikScopedDemoRepository.listTaxBills(nop)) {
+                AppResult.Empty -> showBills(emptyList(), "Histori SPPT tidak tersedia untuk NOP ini.")
                 is AppResult.Error -> {
-                    showError(primary.message)
+                    showError(result.message)
                     return@launch
                 }
-                AppResult.Loading -> emptyList()
-                is AppResult.Success -> primary.data.json.toTaxBillSummaries(nop)
-            }
-            val finalBills = if (bills.isNotEmpty()) {
-                bills
-            } else {
-                when (val fallback = simpbbRepository.getSpptHistoryByNop(nop)) {
-                    AppResult.Empty -> emptyList()
-                    is AppResult.Error -> emptyList()
-                    AppResult.Loading -> emptyList()
-                    is AppResult.Success -> fallback.data.json.toTaxBillSummaries(nop)
+                AppResult.Loading -> Unit
+                is AppResult.Success -> {
+                    showBills(result.data, "Histori SPPT tidak tersedia untuk NOP ini.")
+                    reminderRepository.scheduleForBills(result.data)
                 }
             }
-            showBills(finalBills, "Histori SPPT tidak tersedia untuk NOP ini.")
-            reminderRepository.scheduleForBills(finalBills)
         }
     }
 

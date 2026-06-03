@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import id.pbbku.mobileportal.R
+import id.pbbku.mobileportal.data.demo.DemoTaxpayerDirectory
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
 import id.pbbku.mobileportal.ui.component.PageHeader
@@ -79,7 +80,12 @@ fun LoginScreen(
                 InfoPill(text = "Login Wajib Pajak")
                 PageHeader(
                     title = "Masuk",
-                    subtitle = "Gunakan NIK 16 digit. Setelah masuk, NIK disembunyikan dan hanya tampil saat kamu menekannya.",
+                    subtitle = "Gunakan NIK 16 digit. Data objek, tagihan, dan laporan demo dibatasi sesuai NIK session.",
+                )
+                Text(
+                    text = "NIK demo: ${DemoTaxpayerDirectory.sampleNiks.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = nik,
