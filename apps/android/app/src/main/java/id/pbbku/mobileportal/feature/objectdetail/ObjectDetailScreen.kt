@@ -156,15 +156,8 @@ fun ObjectDetailScreen(
             visible = showTutorial && uiState.detail != null,
             steps = tutorialSteps,
             targetState = tutorialTargetState,
+            modifier = Modifier.align(Alignment.BottomCenter),
             onDismiss = { showTutorial = false },
-            onStepAction = { step ->
-                val detail = uiState.detail ?: return@TutorialOverlay
-                showTutorial = false
-                when (step.targetId) {
-                    "shortcut-sppt" -> onOpenSpptHistory(detail.nopDisplay)
-                    "shortcut-report" -> onOpenReport(detail.nopDisplay)
-                }
-            },
         )
     }
 }

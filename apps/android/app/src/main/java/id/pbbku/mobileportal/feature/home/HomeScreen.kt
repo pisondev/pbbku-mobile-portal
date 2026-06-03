@@ -135,14 +135,8 @@ fun HomeScreen(
             visible = showTutorial,
             steps = tutorialSteps,
             targetState = tutorialTargetState,
+            modifier = Modifier.align(Alignment.BottomCenter),
             onDismiss = { showTutorial = false },
-            onStepAction = { step ->
-                showTutorial = false
-                when (step.targetId) {
-                    "home-search-action" -> onOpenSearch()
-                    "home-notification-action" -> onOpenNotifications()
-                }
-            },
         )
     }
 }

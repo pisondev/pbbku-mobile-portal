@@ -164,13 +164,7 @@ private fun MainScaffold(
                         NavigationBarItem(
                             selected = selected,
                             onClick = {
-                                navController.navigate(destination.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                                navController.navigateTopLevel(destination.route)
                             },
                             label = { Text(destination.label) },
                             icon = {
@@ -318,5 +312,17 @@ private fun NavController.navigateAndClear(route: String) {
             inclusive = true
         }
         launchSingleTop = true
+    }
+}
+
+private fun NavController.navigateTopLevel(route: String) {
+    if (currentDestination?.route == route) return
+    if (popBackStack(route, inclusive = false)) return
+    navigate(route) {
+        popUpTo(MainRoute.HOME) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }

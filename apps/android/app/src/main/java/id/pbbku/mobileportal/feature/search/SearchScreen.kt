@@ -182,12 +182,8 @@ fun SearchScreen(
             visible = showTutorial,
             steps = tutorialSteps,
             targetState = tutorialTargetState,
+            modifier = Modifier.align(Alignment.BottomCenter),
             onDismiss = { showTutorial = false },
-            onStepAction = { step ->
-                if (step.targetId == "demo-list") {
-                    viewModel.loadDemoList(reset = true)
-                }
-            },
         )
     }
 }
