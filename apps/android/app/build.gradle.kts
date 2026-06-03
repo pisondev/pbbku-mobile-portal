@@ -6,6 +6,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val pbbkuApiBaseUrl = providers
+    .gradleProperty("PBBKU_API_BASE_URL")
+    .orElse("https://pbbku-api.tierratie.com/api/rpc/")
+    .get()
+
 android {
     namespace = "id.pbbku.mobileportal"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -16,6 +21,7 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "0.1.0"
+        buildConfigField("String", "PBBKU_API_BASE_URL", "\"$pbbkuApiBaseUrl\"")
     }
 
     buildTypes {

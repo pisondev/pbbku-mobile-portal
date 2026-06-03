@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${PBBKU_POSTGRES_DB:-pbbku}
+      POSTGRES_USER: ${PBBKU_POSTGRES_USER:-pbbku}
+      POSTGRES_PASSWORD: ${PBBKU_POSTGRES_PASSWORD:-pbbku}
+    ports:
+      - "127.0.0.1:${PBBKU_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pbbku_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pbbku -d pbbku"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PBBKU_API_ADDR: ":8080"
+      PBBKU_DB_DRIVER: postgres
+      PBBKU_DATABASE_URL: ${PBBKU_DATABASE_URL:-postgres://pbbku:pbbku@postgres:5432/pbbku?sslmode=disable}
+      PBBKU_MIGRATIONS_PATH: migrations
+      PBBKU_SEED_FILE: seeds/demo.sql
+      PBBKU_ALLOWED_ORIGINS: ${PBBKU_ALLOWED_ORIGINS:-}
+      PBBKU_ADMIN_API_KEY: ${PBBKU_ADMIN_API_KEY:-}
+      PBBKU_MAX_BODY_BYTES: ${PBBKU_MAX_BODY_BYTES:-1048576}
+    ports:
+      - "127.0.0.1:${PBBKU_API_PORT:-8080}:8080"
+
+volumes:
+  pbbku_postgres_data:

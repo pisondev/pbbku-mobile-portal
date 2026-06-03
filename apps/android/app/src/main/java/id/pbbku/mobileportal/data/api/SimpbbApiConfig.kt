@@ -1,7 +1,11 @@
 package id.pbbku.mobileportal.data.api
 
+import id.pbbku.mobileportal.BuildConfig
+
 object SimpbbApiConfig {
-    const val BASE_URL = "https://simpbb.technosmart.id/api/rpc/"
+    const val DEFAULT_LOCAL_BASE_URL = "http://10.0.2.2:8080/api/rpc/"
+    const val DEFAULT_PRODUCTION_BASE_URL = "https://pbbku-api.tierratie.com/api/rpc/"
+    val BASE_URL: String = BuildConfig.PBBKU_API_BASE_URL
 
     object Endpoint {
         const val OBJEK_PAJAK_SEARCH = "objekPajak/search"

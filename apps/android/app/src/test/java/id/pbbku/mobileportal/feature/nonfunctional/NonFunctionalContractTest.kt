@@ -79,7 +79,9 @@ class NonFunctionalContractTest {
 
     @Test
     fun nf_baseUrlAndEndpointsAreCentralizedInConfig() {
-        assertEquals("https://simpbb.technosmart.id/api/rpc/", SimpbbApiConfig.BASE_URL)
+        assertTrue(SimpbbApiConfig.BASE_URL.endsWith("/api/rpc/"))
+        assertEquals("http://10.0.2.2:8080/api/rpc/", SimpbbApiConfig.DEFAULT_LOCAL_BASE_URL)
+        assertEquals("https://pbbku-api.tierratie.com/api/rpc/", SimpbbApiConfig.DEFAULT_PRODUCTION_BASE_URL)
         assertEquals("objekPajak/search", SimpbbApiConfig.Endpoint.OBJEK_PAJAK_SEARCH)
         assertEquals("sppt/get", SimpbbApiConfig.Endpoint.SPPT_GET)
         assertEquals("wilayah/listPropinsi", SimpbbApiConfig.Endpoint.WILAYAH_LIST_PROPINSI)

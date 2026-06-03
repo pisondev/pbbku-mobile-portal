@@ -12,3 +12,9 @@ local.properties
 
 # Generated captures
 captures/
+
+# Local API runtime artifacts
+apps/api/data/*.db
+apps/api/data/*.db-shm
+apps/api/data/*.db-wal
+apps/api/*.exe
