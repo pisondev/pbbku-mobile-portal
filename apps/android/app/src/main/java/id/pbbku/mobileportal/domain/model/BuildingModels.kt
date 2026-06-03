@@ -9,7 +9,15 @@ data class BuildingSummary(
     val jpb: String?,
     val nilaiSistemBangunan: Double?,
 ) {
-    val label: String = "Bangunan $noBng"
+    val label: String = jenisBangunan
+        ?.takeIf { it.isNotBlank() }
+        ?.replaceFirstChar { it.uppercaseChar() }
+        ?.let { "$it terdata" }
+        ?: jpb
+            ?.takeIf { it.isNotBlank() }
+            ?.replaceFirstChar { it.uppercaseChar() }
+            ?.let { "$it terdata" }
+        ?: "Unit bangunan terdata"
 }
 
 data class BuildingDetail(
@@ -28,7 +36,17 @@ data class BuildingDetail(
     val lantai: String?,
     val langitLangit: String?,
     val nilaiSistemBangunan: Double?,
-)
+) {
+    val label: String = jenisBangunan
+        ?.takeIf { it.isNotBlank() }
+        ?.replaceFirstChar { it.uppercaseChar() }
+        ?.let { "$it terdata" }
+        ?: jpb
+            ?.takeIf { it.isNotBlank() }
+            ?.replaceFirstChar { it.uppercaseChar() }
+            ?.let { "$it terdata" }
+        ?: "Unit bangunan terdata"
+}
 
 data class BuildingFacility(
     val name: String,

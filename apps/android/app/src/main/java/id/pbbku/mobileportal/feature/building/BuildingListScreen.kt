@@ -141,7 +141,7 @@ private fun BuildingSummaryCard(
             .clickable(onClick = onClick),
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        InfoPill(text = building.noBng)
+        InfoPill(text = "Nomor LSPOP ${building.noBng}")
         Text(
             text = building.label,
             style = MaterialTheme.typography.titleMedium,

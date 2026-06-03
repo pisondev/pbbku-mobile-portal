@@ -358,7 +358,7 @@ private fun DetailRow(
                 .fillMaxWidth()
                 .padding(start = 10.dp),
             shape = MaterialTheme.shapes.small,
-            color = Color(0xFFE0E7F0),
+            color = Color(0xFFF6F8FC),
             contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             Row(

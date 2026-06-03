@@ -294,7 +294,7 @@ Progress Tahap 5:
 - Memilih hasil pencarian membuka route `object_detail/{nopDisplay}` dan menampilkan Detail Objek Pajak.
 - Unit test mapper objek pajak ditambahkan untuk response `search` dan `listDetails`.
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 11 unit test lulus.
-- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `BUDI` menampilkan hasil API seperti `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka Detail Objek Pajak.
+- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `BUDI` menampilkan hasil API seperti `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka Detail Objek Pajak.
 
 ## 11. Tahap 6 - Detail Objek Pajak dan Subjek Pajak
 

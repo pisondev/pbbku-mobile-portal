@@ -19,7 +19,7 @@ class ObjekPajakMapperTest {
                 "kdBlok": "001",
                 "noUrut": "0001",
                 "kdJnsOp": "0",
-                "nmWp": "BUDI EMBER BOCOR",
+                "nmWp": "I WAYAN SUTARJA",
                 "jalanOp": "JL. KENANGAN PAHIT NO. 45"
               }
             ]
@@ -48,7 +48,7 @@ class ObjekPajakMapperTest {
                   "kdBlok": "001",
                   "noUrut": "0001",
                   "kdJnsOp": "0",
-                  "nmWp": "BUDI EMBER BOCOR",
+                  "nmWp": "I WAYAN SUTARJA",
                   "jalanOp": "JL. KENANGAN PAHIT NO. 45",
                   "luasBumi": 250,
                   "njopBumi": 500000000,
@@ -86,8 +86,8 @@ class ObjekPajakMapperTest {
               "kdStatusWp": "1",
               "jnsBumi": "1",
               "subjekPajak": {
-                "nmWp": "BUDI EMBER BOCOR",
-                "jalanWp": "JL. EMBER BOCOR NO. 12",
+                "nmWp": "I WAYAN SUTARJA",
+                "jalanWp": "JL. TERATAI RAYA NO. 12",
                 "statusPekerjaanWp": "1"
               }
             }
@@ -99,8 +99,8 @@ class ObjekPajakMapperTest {
         requireNotNull(detail)
         assertEquals("320401000100100010", detail.nopDisplay)
         assertEquals("JL. KENANGAN PAHIT NO. 45", detail.alamatObjekPajak)
-        assertEquals("BUDI EMBER BOCOR", detail.namaWajibPajak)
-        assertEquals("JL. EMBER BOCOR NO. 12", detail.alamatWajibPajak)
+        assertEquals("I WAYAN SUTARJA", detail.namaWajibPajak)
+        assertEquals("JL. TERATAI RAYA NO. 12", detail.alamatWajibPajak)
         assertEquals("Pemilik", detail.statusWajibPajak)
         assertEquals("Tanah dan bangunan", detail.jenisBumi)
         assertEquals("PNS/TNI/Polri", detail.statusPekerjaanWajibPajak)

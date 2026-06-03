@@ -53,23 +53,43 @@ class ReportDraftViewModel(
                 }
                 return@launch
             }
-            loadExistingDraft(nop, cleanNoBng)
-            loadBuildingDetailIfAvailable(nop, cleanNoBng)
+            loadBuildingListAndSelection(nop, cleanNoBng)
         }
     }
 
     fun onNoBngChange(value: String) {
+        val selectedNoBng = value.filter(Char::isDigit)
         _uiState.update {
             it.copy(
-                noBng = value.filter(Char::isDigit),
+                noBng = selectedNoBng,
+                oldBuildingDetail = null,
+                oldBuildingAreaText = "",
+                oldFloorCountText = "",
+                newBuildingAreaText = "",
+                newFloorCountText = "",
+                description = "",
+                status = ReportDraftStatus.DRAFT,
+                validation = ReportDraftValidationResult(),
                 saveMessage = null,
                 showSummary = false,
             )
         }
+        val nop = _uiState.value.nop ?: return
+        viewModelScope.launch {
+            loadExistingDraft(nop, selectedNoBng)
+            loadBuildingDetailIfAvailable(nop, selectedNoBng)
+        }
     }
 
     fun onChangeTypeChange(value: String) {
-        _uiState.update { it.copy(changeType = value, saveMessage = null, showSummary = false) }
+        _uiState.update {
+            it.copy(
+                changeType = value,
+                validation = ReportDraftValidationResult(),
+                saveMessage = null,
+                showSummary = false,
+            )
+        }
     }
 
     fun onNewBuildingAreaChange(value: String) {
@@ -166,11 +186,55 @@ class ReportDraftViewModel(
         }
     }
 
+    private suspend fun loadBuildingListAndSelection(nop: Nop, requestedNoBng: String) {
+        when (val result = nikScopedDemoRepository.listBangunan(nop)) {
+            AppResult.Empty -> {
+                _uiState.update {
+                    it.copy(
+                        availableBuildings = emptyList(),
+                        noBng = "",
+                        buildingMessage = "NOP ini belum memiliki data bangunan. Laporan perubahan bangunan belum dapat dibuat.",
+                    )
+                }
+            }
+            is AppResult.Error -> {
+                _uiState.update {
+                    it.copy(
+                        availableBuildings = emptyList(),
+                        buildingMessage = "${result.message} Daftar bangunan tidak dimuat.",
+                    )
+                }
+            }
+            AppResult.Loading -> Unit
+            is AppResult.Success -> {
+                val buildings = result.data
+                val selectedNoBng = requestedNoBng
+                    .takeIf { requested -> buildings.any { it.noBng == requested } }
+                    ?: buildings.firstOrNull()?.noBng.orEmpty()
+                _uiState.update {
+                    it.copy(
+                        availableBuildings = buildings,
+                        noBng = selectedNoBng,
+                        buildingMessage = if (buildings.isEmpty()) {
+                            "NOP ini belum memiliki data bangunan. Laporan perubahan bangunan belum dapat dibuat."
+                        } else {
+                            null
+                        },
+                    )
+                }
+                if (selectedNoBng.isNotBlank()) {
+                    loadExistingDraft(nop, selectedNoBng)
+                    loadBuildingDetailIfAvailable(nop, selectedNoBng)
+                }
+            }
+        }
+    }
+
     private suspend fun loadBuildingDetailIfAvailable(nop: Nop, noBng: String) {
         if (noBng.isBlank()) {
             _uiState.update {
                 it.copy(
-                    buildingMessage = "Nomor bangunan dapat diisi manual atau dibuka dari detail bangunan.",
+                    buildingMessage = "Pilih bangunan yang akan diajukan perubahannya.",
                 )
             }
             return
@@ -226,6 +290,8 @@ class ReportDraftViewModel(
             newFloorCountText = state.newFloorCountText,
             description = state.description,
             requireDescription = requireDescription,
+            validateArea = state.showsAreaFields,
+            validateFloor = state.showsFloorFields,
         )
         if (!validation.isValid) {
             _uiState.update {
@@ -243,10 +309,18 @@ class ReportDraftViewModel(
             nopDisplay = nop.asDisplayText(),
             noBng = state.noBng.takeIf { it.isNotBlank() },
             changeType = state.changeType,
-            oldBuildingArea = ReportDraftFormValidator.parseOptionalDouble(state.oldBuildingAreaText),
-            newBuildingArea = ReportDraftFormValidator.parseOptionalDouble(state.newBuildingAreaText),
-            oldFloorCount = ReportDraftFormValidator.parseOptionalInt(state.oldFloorCountText),
-            newFloorCount = ReportDraftFormValidator.parseOptionalInt(state.newFloorCountText),
+            oldBuildingArea = state.oldBuildingAreaText
+                .takeIf { state.showsAreaFields }
+                ?.let(ReportDraftFormValidator::parseOptionalDouble),
+            newBuildingArea = state.newBuildingAreaText
+                .takeIf { state.showsAreaFields }
+                ?.let(ReportDraftFormValidator::parseOptionalDouble),
+            oldFloorCount = state.oldFloorCountText
+                .takeIf { state.showsFloorFields }
+                ?.let(ReportDraftFormValidator::parseOptionalInt),
+            newFloorCount = state.newFloorCountText
+                .takeIf { state.showsFloorFields }
+                ?.let(ReportDraftFormValidator::parseOptionalInt),
             description = state.description.trim(),
             status = status,
             updatedAtEpochMillis = System.currentTimeMillis(),

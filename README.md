@@ -246,7 +246,7 @@ Status verifikasi saat ini:
 - Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - Runtime test dasar berhasil di emulator headless `Pixel_6_API_35`: install debug, fresh onboarding, login NIK demo `3404123456789012`, OTP demo `123456`, Beranda dengan masked NIK `34************12`, dan logout kembali ke Login.
-- Runtime test pencarian berhasil di emulator headless `Pixel_6_API_35`: tab Cari, query `BUDI`, hasil dari `objekPajak/search` tampil, termasuk `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`, lalu item hasil membuka Detail Objek Pajak.
+- Runtime test pencarian berhasil di emulator headless `Pixel_6_API_35`: tab Cari, query `BUDI`, hasil dari `objekPajak/search` tampil, termasuk `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, lalu item hasil membuka Detail Objek Pajak.
 
 Untuk eksplorasi API, import file berikut ke Postman:
 

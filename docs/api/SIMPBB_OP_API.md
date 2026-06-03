@@ -116,7 +116,7 @@ Router untuk akses data tagihan dan histori pembayaran pajak.
 ```bash
 curl -X POST {{base_url}}/objekPajak/search \
   -H "Content-Type: application/json" \
-  -d '{"json": {"query": "BUDI EMBER", "limit": 5}}'
+  -d '{"json": {"query": "WAYAN SUTARJA", "limit": 5}}'
 ```
 
 ### Detail NOP

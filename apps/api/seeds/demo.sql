@@ -34,13 +34,13 @@ ON CONFLICT DO NOTHING;
 INSERT INTO tax_subjects(subject_id, nm_wp, jalan_wp, blok_kav_no_wp, rt_wp, rw_wp, kelurahan_wp, kota_wp, kd_pos_wp, status_pekerjaan_wp) VALUES
 	('51710100010540032', 'I MADE BUDIARTA', 'JL. TUKAD BARITO NO. 18', 'A-7', '003', '004', 'SIDAKARYA', 'DENPASAR', '80224', '3'),
 	('51710100010550011', 'NI KADEK SARI', 'JL. SIDAKARYA INDAH NO. 9', NULL, '002', '003', 'SIDAKARYA', 'DENPASAR', '80224', '2'),
-	('32040100010010001', 'BUDI EMBER BOCOR', 'JL. EMBER BOCOR NO. 12', NULL, '001', '002', 'MARGAHAYU TENGAH', 'BANDUNG', '40225', '3')
+	('32040100010010001', 'I WAYAN SUTARJA', 'JL. TERATAI RAYA NO. 12', NULL, '001', '002', 'MARGAHAYU TENGAH', 'BANDUNG', '40225', '3')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO tax_objects(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, subject_id, nm_wp, jalan_op, blok_kav_no_op, rt_op, rw_op, kelurahan_op, luas_bumi, nilai_sistem_bumi, njop_bumi, kd_status_wp, jns_bumi, jns_transaksi_op) VALUES
 	('51', '71', '010', '001', '054', '0032', '0', '51710100010540032', 'I MADE BUDIARTA', 'JL. TUKAD BARITO NO. 18', 'A-7', '003', '004', 'SIDAKARYA', 320, 2380000000, 2380000000, '1', '1', '1'),
 	('51', '71', '010', '001', '055', '0011', '0', '51710100010550011', 'NI KADEK SARI', 'JL. SIDAKARYA INDAH NO. 9', NULL, '002', '003', 'SIDAKARYA', 180, 875000000, 875000000, '1', '1', '1'),
-	('32', '04', '010', '001', '001', '0001', '0', '32040100010010001', 'BUDI EMBER BOCOR', 'JL. KENANGAN PAHIT NO. 45', NULL, '001', '002', 'MARGAHAYU TENGAH', 250, 500000000, 500000000, '1', '1', '1')
+	('32', '04', '010', '001', '001', '0001', '0', '32040100010010001', 'I WAYAN SUTARJA', 'JL. TERATAI RAYA NO. 12', NULL, '001', '002', 'MARGAHAYU TENGAH', 250, 500000000, 500000000, '1', '1', '1')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO buildings(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, no_bng, luas_bng, jml_lantai_bng, jenis_bangunan, jpb, thn_dibangun_bng, thn_renovasi_bng, kondisi_bng, konstruksi_bng, atap_bng, dinding_bng, lantai_bng, langit_langit_bng, nilai_sistem_bng) VALUES

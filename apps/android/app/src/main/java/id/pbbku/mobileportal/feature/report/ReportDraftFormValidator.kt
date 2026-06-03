@@ -17,9 +17,11 @@ object ReportDraftFormValidator {
         newFloorCountText: String,
         description: String,
         requireDescription: Boolean,
+        validateArea: Boolean = true,
+        validateFloor: Boolean = true,
     ): ReportDraftValidationResult {
-        val areaError = validatePositiveDouble(newBuildingAreaText, "Luas baru")
-        val floorError = validatePositiveInt(newFloorCountText, "Jumlah lantai baru")
+        val areaError = if (validateArea) validatePositiveDouble(newBuildingAreaText, "Luas baru") else null
+        val floorError = if (validateFloor) validatePositiveInt(newFloorCountText, "Jumlah lantai baru") else null
         val descriptionError = if (requireDescription && description.isBlank()) {
             "Deskripsi perubahan wajib diisi."
         } else {

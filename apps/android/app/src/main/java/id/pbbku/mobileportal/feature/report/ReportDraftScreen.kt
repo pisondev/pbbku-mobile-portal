@@ -1,15 +1,18 @@
 package id.pbbku.mobileportal.feature.report
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -18,7 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -84,12 +89,14 @@ fun ReportDraftScreen(
                 onSelected = viewModel::onChangeTypeChange,
             )
         }
-        item {
-            BuildingComparisonForm(
-                uiState = uiState,
-                onNewBuildingAreaChange = viewModel::onNewBuildingAreaChange,
-                onNewFloorCountChange = viewModel::onNewFloorCountChange,
-            )
+        if (uiState.showsAreaFields || uiState.showsFloorFields) {
+            item {
+                BuildingComparisonForm(
+                    uiState = uiState,
+                    onNewBuildingAreaChange = viewModel::onNewBuildingAreaChange,
+                    onNewFloorCountChange = viewModel::onNewFloorCountChange,
+                )
+            }
         }
         item {
             DescriptionForm(
@@ -145,15 +152,52 @@ private fun BuildingIdentityForm(
     uiState: ReportDraftUiState,
     onNoBngChange: (String) -> Unit,
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedBuilding = uiState.selectedBuilding
     DetailCard(title = "Identitas Bangunan") {
-        OutlinedTextField(
-            value = uiState.noBng,
-            onValueChange = onNoBngChange,
-            label = { Text("Nomor bangunan") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = uiState.isAccessAllowed && uiState.availableBuildings.isNotEmpty(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            ) {
+                Text(
+                    text = selectedBuilding?.let {
+                        "${it.label} - Nomor LSPOP ${it.noBng}"
+                    } ?: "Pilih nomor bangunan",
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                uiState.availableBuildings.forEach { building ->
+                    DropdownMenuItem(
+                        text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(
+                                    text = building.label,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Text(
+                                    text = "Nomor LSPOP ${building.noBng}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        },
+                        onClick = {
+                            expanded = false
+                            onNoBngChange(building.noBng)
+                        },
+                    )
+                }
+            }
+        }
         DetailRow("JPB lama", uiState.oldBuildingDetail?.jpb)
         DetailRow("Jenis bangunan lama", uiState.oldBuildingDetail?.jenisBangunan)
     }
@@ -198,35 +242,39 @@ private fun BuildingComparisonForm(
     onNewFloorCountChange: (String) -> Unit,
 ) {
     DetailCard(title = "Perbandingan Data") {
-        DetailRow(
-            label = "Luas bangunan lama",
-            value = uiState.oldBuildingAreaText.takeIf { it.isNotBlank() }?.let { "$it m2" },
-        )
-        OutlinedTextField(
-            value = uiState.newBuildingAreaText,
-            onValueChange = onNewBuildingAreaChange,
-            label = { Text("Luas bangunan baru (m2)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            isError = uiState.validation.newBuildingAreaError != null,
-            supportingText = {
-                uiState.validation.newBuildingAreaError?.let { Text(it) }
-            },
-        )
-        DetailRow("Jumlah lantai lama", uiState.oldFloorCountText.takeIf { it.isNotBlank() })
-        OutlinedTextField(
-            value = uiState.newFloorCountText,
-            onValueChange = onNewFloorCountChange,
-            label = { Text("Jumlah lantai baru") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            isError = uiState.validation.newFloorCountError != null,
-            supportingText = {
-                uiState.validation.newFloorCountError?.let { Text(it) }
-            },
-        )
+        if (uiState.showsAreaFields) {
+            DetailRow(
+                label = "Luas bangunan lama",
+                value = uiState.oldBuildingAreaText.takeIf { it.isNotBlank() }?.let { "$it m2" },
+            )
+            OutlinedTextField(
+                value = uiState.newBuildingAreaText,
+                onValueChange = onNewBuildingAreaChange,
+                label = { Text("Luas bangunan baru (m2)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = uiState.validation.newBuildingAreaError != null,
+                supportingText = {
+                    uiState.validation.newBuildingAreaError?.let { Text(it) }
+                },
+            )
+        }
+        if (uiState.showsFloorFields) {
+            DetailRow("Jumlah lantai lama", uiState.oldFloorCountText.takeIf { it.isNotBlank() })
+            OutlinedTextField(
+                value = uiState.newFloorCountText,
+                onValueChange = onNewFloorCountChange,
+                label = { Text("Jumlah lantai baru") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = uiState.validation.newFloorCountError != null,
+                supportingText = {
+                    uiState.validation.newFloorCountError?.let { Text(it) }
+                },
+            )
+        }
     }
 }
 
@@ -256,10 +304,14 @@ private fun ReportSummaryCard(uiState: ReportDraftUiState) {
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Bangunan", uiState.noBng.takeIf { it.isNotBlank() })
         DetailRow("Jenis perubahan", uiState.changeType)
-        DetailRow("Luas lama", uiState.oldBuildingAreaText.takeIf { it.isNotBlank() }?.let { "$it m2" })
-        DetailRow("Luas baru", uiState.newBuildingAreaText.takeIf { it.isNotBlank() }?.let { "$it m2" })
-        DetailRow("Lantai lama", uiState.oldFloorCountText.takeIf { it.isNotBlank() })
-        DetailRow("Lantai baru", uiState.newFloorCountText.takeIf { it.isNotBlank() })
+        if (uiState.showsAreaFields) {
+            DetailRow("Luas lama", uiState.oldBuildingAreaText.takeIf { it.isNotBlank() }?.let { "$it m2" })
+            DetailRow("Luas baru", uiState.newBuildingAreaText.takeIf { it.isNotBlank() }?.let { "$it m2" })
+        }
+        if (uiState.showsFloorFields) {
+            DetailRow("Lantai lama", uiState.oldFloorCountText.takeIf { it.isNotBlank() })
+            DetailRow("Lantai baru", uiState.newFloorCountText.takeIf { it.isNotBlank() })
+        }
         DetailRow("Deskripsi", uiState.description)
         Text(
             text = "Ringkasan ini belum dikirim ke petugas dan masih tersimpan di perangkat.",
@@ -289,6 +341,10 @@ private fun ActionButtons(
             onClick = onPrepareSummary,
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.isAccessAllowed,
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
         ) {
             Text("Tampilkan Ringkasan")
         }
@@ -296,13 +352,21 @@ private fun ActionButtons(
             onClick = onSendSimulation,
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.isAccessAllowed,
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
         ) {
             Text("Tandai Sudah Diajukan")
         }
-        OutlinedButton(
+        Button(
             onClick = onDeleteDraft,
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.isAccessAllowed && !uiState.isDeleting,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
         ) {
             Text("Hapus Draft")
         }

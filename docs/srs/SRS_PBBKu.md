@@ -552,7 +552,7 @@ Aplikasi harus memperlakukan seluruh segmen NOP sebagai string agar leading zero
 ```bash
 curl -X POST https://simpbb.technosmart.id/api/rpc/objekPajak/search \
   -H "Content-Type: application/json" \
-  -d '{"json": {"query": "BUDI EMBER", "limit": 5}}'
+  -d '{"json": {"query": "WAYAN SUTARJA", "limit": 5}}'
 ```
 
 ### Detail NOP

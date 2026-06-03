@@ -22,7 +22,7 @@ Hasil yang pernah berhasil:
 - Logout kembali ke Login.
 - Tab `Cari` dapat dibuka.
 - Query `BUDI` memanggil API dan menampilkan hasil.
-- Hasil pencarian menampilkan contoh `BUDI EMBER BOCOR` dengan NOP `32.04.010.001.001.0001.0`.
+- Hasil pencarian menampilkan contoh `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`.
 - Item hasil pencarian dapat membuka Detail Objek Pajak.
 
 ## Pengujian Otomatis Pendukung

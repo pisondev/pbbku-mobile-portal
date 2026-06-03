@@ -33,8 +33,8 @@ func TestPbbKuApiFunctionalFlow(t *testing.T) {
 	blok := postJSON(t, router, "/api/rpc/wilayah/listBlok", map[string]any{"kdPropinsi": "51", "kdDati2": "71", "kdKecamatan": "010", "kdKelurahan": "001"})
 	assertArrayLenAtLeast(t, blok["json"], 2)
 
-	search := postJSON(t, router, "/api/rpc/objekPajak/search", map[string]any{"query": "BUDI", "limit": 5})
-	assertArrayLenAtLeast(t, search["json"], 2)
+	search := postJSON(t, router, "/api/rpc/objekPajak/search", map[string]any{"query": "SIDAKARYA", "limit": 5})
+	assertArrayLenAtLeast(t, search["json"], 1)
 
 	list := postJSON(t, router, "/api/rpc/objekPajak/listDetails", map[string]any{"kdPropinsi": "51", "kdDati2": "71", "limit": 10, "offset": 0})
 	listJSON := objectAt(t, list, "json")

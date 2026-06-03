@@ -93,7 +93,7 @@ Komponen request:
 | `wilayah/listDati2` | `kdPropinsi=32` | HTTP 200 tetapi `json: []`. Ini menunjukkan wilayah `32` tidak tersedia atau tidak aktif dalam dataset API saat pengujian. |
 | `wilayah/listKecamatan` | `kdPropinsi=32`, `kdDati2=04` | HTTP 200 tetapi kosong. |
 | `wilayah/listKelurahan` | `kdPropinsi=32`, `kdDati2=04`, `kdKecamatan=010` | HTTP 200 tetapi kosong. |
-| `objekPajak/search` | Query `DENPASAR` | HTTP 200 tetapi kosong. Search tampaknya tidak selalu bisa dipakai untuk pencarian berbasis nama wilayah/alamat umum. Query `BUDI EMBER` berhasil pada pengujian awal. |
+| `objekPajak/search` | Query `DENPASAR` | HTTP 200 tetapi kosong. Search tampaknya tidak selalu bisa dipakai untuk pencarian berbasis nama wilayah/alamat umum. Query nama wajib pajak spesifik berhasil pada pengujian awal. |
 | `lspop/listByNop` | NOP `32.04.010.001.001.0001.0` | HTTP 200 tetapi kosong. Masih wajar karena `objekPajak/listDetails` untuk NOP ini menunjukkan `totalLuasBng=0`. |
 | `lspop/getBuilding` | NOP `32.04.010.001.001.0001.0`, `noBng=1` | HTTP 200 tetapi `json: null`. Wajar jika NOP tersebut memang tidak punya bangunan. |
 | `lspop/listFasilitas` | NOP target `51.71.010.001.054.0032.0`, `noBng=1` | HTTP 200 tetapi `json: []`. Belum bisa dipastikan gagal, karena bisa berarti bangunan tersebut memang tidak memiliki fasilitas. Perlu kandidat bangunan yang diketahui memiliki fasilitas. |
@@ -122,7 +122,7 @@ Ada beberapa hal yang perlu diminta klarifikasinya ke pemilik API:
 
 1. `wilayah/listPropinsi` hanya mengembalikan `51 - BALI`, tetapi beberapa endpoint objek pajak masih bisa mengembalikan data untuk kode `32/04`. Perlu penjelasan apakah `32/04` adalah data dummy, legacy, atau dataset yang tidak lengkap.
 2. `wilayah/listBlok` pada pengujian awal mengembalikan blok untuk `32/04/010/001`, walaupun daftar Dati2/Kecamatan/Kelurahan untuk `32/04` kosong. Ini perlu dikonfirmasi karena bisa memengaruhi alur dropdown wilayah di aplikasi.
-3. `objekPajak/search` berhasil untuk query nama wajib pajak tertentu (`BUDI EMBER`), tetapi kosong untuk query `DENPASAR`. Perlu definisi field apa saja yang dicari oleh endpoint search.
+3. `objekPajak/search` berhasil untuk query nama wajib pajak tertentu, tetapi kosong untuk query `DENPASAR`. Perlu definisi field apa saja yang dicari oleh endpoint search.
 4. `sppt/list` berhasil untuk `kdPropinsi=51` tahun 2023-2025, tetapi kosong untuk 2026. Perlu kepastian tahun pajak yang tersedia.
 5. Response kosong pada `getTunggakan` dan `listFasilitas` tidak otomatis berarti endpoint rusak. Butuh data contoh dari pemilik API yang memang memiliki tunggakan dan fasilitas.
 

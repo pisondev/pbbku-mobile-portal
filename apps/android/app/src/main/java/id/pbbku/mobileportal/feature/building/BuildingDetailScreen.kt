@@ -151,7 +151,8 @@ private fun BuildingDetailCard(
     detail: BuildingDetail,
     onOpenReport: (String, String) -> Unit,
 ) {
-    DetailCard(title = "Data Bangunan ${detail.noBng}") {
+    DetailCard(title = "Data ${detail.label}") {
+        DetailRow("Nomor LSPOP", detail.noBng)
         DetailRow("JPB", detail.jpb)
         DetailRow("Jenis bangunan", detail.jenisBangunan)
         DetailRow("Luas bangunan", detail.luasBangunan?.let { "${it.toLong()} m2" })
