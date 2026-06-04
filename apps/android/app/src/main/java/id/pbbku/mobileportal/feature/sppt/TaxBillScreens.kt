@@ -256,7 +256,11 @@ private fun BillSummaryCard(
             .fillMaxWidth()
             .clickable(onClick = onOpenDetail),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = if (bill.isPayable) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                MaterialTheme.colorScheme.primaryContainer
+            },
         ),
     ) {
         Column(

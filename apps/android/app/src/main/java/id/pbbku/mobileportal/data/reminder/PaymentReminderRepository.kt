@@ -116,7 +116,7 @@ class PaymentReminderRepository(
             offsetDays = 30,
             scheduledAtEpochMillis = null,
             status = ReminderStatus.SIMULATION,
-            note = "Contoh simulatif karena data jatuh tempo SPPT belum tersedia.",
+            note = "Pengingat prioritas ditampilkan sambil menunggu data jatuh tempo SPPT lengkap.",
         )
     }
 

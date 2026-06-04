@@ -6,7 +6,7 @@ enum class ReminderStatus(val displayText: String) {
     SCHEDULED("Terjadwal"),
     ACTIVE("Aktif"),
     UNAVAILABLE("Tidak Tersedia"),
-    SIMULATION("Simulatif"),
+    SIMULATION("Prioritas Tagihan"),
 }
 
 data class PaymentReminder(

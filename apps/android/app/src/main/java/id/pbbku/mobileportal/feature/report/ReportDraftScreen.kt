@@ -63,7 +63,7 @@ fun ReportDraftScreen(
         val message = uiState.saveMessage ?: return@LaunchedEffect
         if (!waitingForSaveFeedback) return@LaunchedEffect
         waitingForSaveFeedback = false
-        if (message == "Draft laporan disimpan lokal.") {
+        if (message == "Draft permohonan disimpan.") {
             isReadOnly = true
             showSaveSuccessPopup = true
         }
@@ -85,12 +85,12 @@ fun ReportDraftScreen(
                     )
                     PageHeader(
                         title = "Laporan Perubahan Bangunan",
-                        subtitle = "Susun laporan perubahan LSPOP tanpa mengubah data resmi SIMPBB.",
+                        subtitle = "Data lama LSPOP dimuat dari SIMPBB OP dan disiapkan sebagai permohonan verifikasi.",
                         iconRes = R.drawable.shortcut_laporan_perubahan,
                         titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                     Text(
-                        text = "Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda.",
+                        text = "Permohonan masuk ke alur verifikasi petugas. Data resmi baru berubah setelah diverifikasi.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -172,7 +172,7 @@ fun ReportDraftScreen(
                 title = { Text("Draft Tersimpan") },
                 text = {
                     Text(
-                        text = "Laporan disimpan sebagai draft lokal. Form dikunci agar status tersimpan terlihat jelas. Tekan Edit untuk mengubah isian lagi.",
+                        text = "Draft permohonan tersimpan. Form dikunci agar status tersimpan terlihat jelas. Tekan Edit Draft untuk mengubah isian lagi.",
                     )
                 },
                 confirmButton = {
@@ -214,8 +214,8 @@ private fun SavedReadonlyBanner(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                OutlinedButton(onClick = onEdit) {
-                    Text("Edit")
+                Button(onClick = onEdit) {
+                    Text("Edit Draft")
                 }
             }
         }
@@ -228,6 +228,7 @@ private fun ReportStatusCard(uiState: ReportDraftUiState) {
         InfoPill(text = uiState.status.toDisplayText())
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Status", uiState.status.toDisplayText())
+        DetailRow("Sumber data", "SIMPBB OP")
         if (uiState.isLoadingBuilding) {
             LoadingSkeletonCard()
         }
@@ -256,7 +257,7 @@ private fun BuildingIdentityForm(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val selectedBuilding = uiState.selectedBuilding
-    DetailCard(title = "Identitas Bangunan") {
+    DetailCard(title = "Data Bangunan dari SIMPBB OP") {
         Box(modifier = Modifier.fillMaxWidth()) {
             OutlinedButton(
                 onClick = { expanded = true },
@@ -347,7 +348,7 @@ private fun BuildingComparisonForm(
     onNewBuildingAreaChange: (String) -> Unit,
     onNewFloorCountChange: (String) -> Unit,
 ) {
-    DetailCard(title = "Perbandingan Data") {
+    DetailCard(title = "Perbandingan Data Permohonan") {
         if (uiState.showsAreaFields) {
             DetailRow(
                 label = "Luas bangunan lama",
@@ -410,7 +411,7 @@ private fun DescriptionForm(
 
 @Composable
 private fun ReportSummaryCard(uiState: ReportDraftUiState) {
-    DetailCard(title = "Ringkasan Sebelum Pengajuan") {
+    DetailCard(title = "Ringkasan Permohonan") {
         DetailRow("NOP", uiState.nop?.asGroupedText())
         DetailRow("Bangunan", uiState.noBng.takeIf { it.isNotBlank() })
         DetailRow("Jenis perubahan", uiState.changeType)
@@ -424,7 +425,7 @@ private fun ReportSummaryCard(uiState: ReportDraftUiState) {
         }
         DetailRow("Deskripsi", uiState.description)
         Text(
-            text = "Ringkasan ini belum dikirim ke petugas dan masih tersimpan di perangkat.",
+            text = "Ringkasan ini disiapkan sebagai berkas permohonan verifikasi perubahan bangunan.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -446,7 +447,7 @@ private fun ActionButtons(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ) {
             Text(
-                text = "Simpan Draft menyimpan isian di perangkat agar bisa diedit lagi. Tandai Sudah Diajukan hanya mengubah status visual draft menjadi sudah diajukan secara simulatif; data resmi SIMPBB tetap tidak berubah.",
+                text = "Simpan Draft mengunci isian sebagai konsep permohonan yang masih bisa diedit. Kirim Permohonan Verifikasi mengubah status menjadi menunggu verifikasi petugas; data resmi SIMPBB tetap menunggu proses validasi.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -463,7 +464,7 @@ private fun ActionButtons(
             Text("Tampilkan Ringkasan")
         }
         if (readOnly) {
-            OutlinedButton(
+            Button(
                 onClick = onEdit,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -486,7 +487,7 @@ private fun ActionButtons(
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         ) {
-            Text("Tandai Sudah Diajukan")
+            Text("Kirim Permohonan Verifikasi")
         }
         Button(
             onClick = onDeleteDraft,
@@ -540,6 +541,6 @@ private fun ReportDraftStatus.toDisplayText(): String {
     return when (this) {
         ReportDraftStatus.DRAFT -> "Draft"
         ReportDraftStatus.READY_TO_SUBMIT -> "Siap Diajukan"
-        ReportDraftStatus.SENT_SIMULATION -> "Sudah Diajukan"
+        ReportDraftStatus.SENT_SIMULATION -> "Menunggu Verifikasi"
     }
 }

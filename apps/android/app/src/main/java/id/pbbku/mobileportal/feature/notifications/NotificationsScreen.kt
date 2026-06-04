@@ -1,7 +1,14 @@
 package id.pbbku.mobileportal.feature.notifications
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +38,7 @@ import id.pbbku.mobileportal.core.format.toIndonesianDateText
 import id.pbbku.mobileportal.core.format.toIndonesianDateTimeText
 import id.pbbku.mobileportal.core.format.toRupiahText
 import id.pbbku.mobileportal.domain.model.PaymentReminder
+import id.pbbku.mobileportal.domain.model.ReminderStatus
 import id.pbbku.mobileportal.ui.component.AppCard
 import id.pbbku.mobileportal.ui.component.InfoPill
 import id.pbbku.mobileportal.ui.component.PrimaryGradientCard
@@ -112,10 +120,19 @@ private fun EmptyCard() {
 @Composable
 private fun ReminderCard(reminder: PaymentReminder) {
     var expanded by remember(reminder.id) { mutableStateOf(false) }
+    val containerColor by animateColorAsState(
+        targetValue = if (expanded) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
+        label = "reminder-card-color",
+    )
     AppCard(
         modifier = Modifier
             .animateContentSize()
             .clickable { expanded = !expanded },
+        containerColor = containerColor,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -123,17 +140,9 @@ private fun ReminderCard(reminder: PaymentReminder) {
             verticalAlignment = Alignment.Top,
         ) {
             InfoPill(
-                text = reminder.status.displayText,
-                containerColor = if (reminder.isSimulation) {
-                    MaterialTheme.colorScheme.errorContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
-                contentColor = if (reminder.isSimulation) {
-                    MaterialTheme.colorScheme.onErrorContainer
-                } else {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                },
+                text = reminder.status.toNotificationLabel(),
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
             )
             Column(
                 modifier = Modifier.weight(1f),
@@ -155,29 +164,38 @@ private fun ReminderCard(reminder: PaymentReminder) {
                 )
             }
             Text(
-                text = if (expanded) "^" else "v",
-                style = MaterialTheme.typography.titleMedium,
+                text = if (expanded) "Sembunyikan" else "Lihat Detail",
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn() + expandVertically() + slideInVertically { -it / 4 },
+            exit = fadeOut() + shrinkVertically() + slideOutVertically { -it / 4 },
+        ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 DetailText("NOP", reminder.nop.asGroupedText())
-                DetailText("Status reminder", reminder.status.displayText)
+                DetailText("Status reminder", reminder.status.toNotificationLabel())
                 DetailText("Jatuh tempo", reminder.dueDate?.toIndonesianDateText() ?: "Data tidak tersedia")
                 DetailText("Jadwal", reminder.scheduledAtEpochMillis?.toIndonesianDateTimeText() ?: "Data tidak tersedia")
                 DetailText("Nominal", reminder.amount?.toRupiahText() ?: "Data tidak tersedia")
                 Text(
                     text = reminder.note,
-                    color = if (reminder.isSimulation) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
+    }
+}
+
+private fun ReminderStatus.toNotificationLabel(): String {
+    return when (this) {
+        ReminderStatus.SCHEDULED -> "Terjadwal"
+        ReminderStatus.ACTIVE -> "Aktif"
+        ReminderStatus.UNAVAILABLE -> "Menunggu Data SPPT"
+        ReminderStatus.SIMULATION -> "Prioritas Tagihan"
     }
 }
 

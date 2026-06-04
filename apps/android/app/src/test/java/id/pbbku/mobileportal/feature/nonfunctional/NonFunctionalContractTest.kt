@@ -169,11 +169,11 @@ class NonFunctionalContractTest {
     @Test
     fun nf_demoAndPrototypeLabelsStayExplicitInUserVisibleText() {
         val simulationLabel = "PROTOTIPE - bukan bukti pembayaran resmi."
-        val reminderNote = "Contoh simulatif karena data jatuh tempo SPPT belum tersedia."
+        val reminderNote = "Pengingat prioritas ditampilkan sambil menunggu data jatuh tempo SPPT lengkap."
         val reportNote = "Draft prototipe lokal. Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda."
 
         assertTrue(simulationLabel.contains("PROTOTIPE"))
-        assertTrue(reminderNote.contains("simulatif"))
+        assertTrue(reminderNote.contains("prioritas"))
         assertTrue(reportNote.contains("prototipe lokal"))
         assertTrue(reportNote.contains("verifikasi petugas Bapenda"))
     }

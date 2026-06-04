@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,18 +12,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +48,7 @@ import id.pbbku.mobileportal.ui.tutorial.TutorialStep
 import id.pbbku.mobileportal.ui.tutorial.rememberTutorialVisibilityState
 import id.pbbku.mobileportal.ui.tutorial.rememberTutorialTargetState
 import id.pbbku.mobileportal.ui.tutorial.tutorialTarget
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -218,8 +227,11 @@ private fun DashboardGuideCard(
             ),
         )
     }
-    var currentStep by remember { mutableIntStateOf(0) }
-    val step = steps[currentStep]
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    val currentStep by remember {
+        derivedStateOf { listState.firstVisibleItemIndex.coerceIn(0, steps.lastIndex) }
+    }
 
     AppCard(modifier = modifier.animateContentSize()) {
         Row(
@@ -244,32 +256,63 @@ private fun DashboardGuideCard(
             }
             InfoPill(text = "${currentStep + 1}/${steps.size}")
         }
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = step.onClick),
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-        ) {
-            Column(
-                modifier = Modifier.padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            LazyRow(
+                state = listState,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Text(
-                    text = step.title,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = step.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = "${step.actionLabel} >",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+                itemsIndexed(steps) { _, step ->
+                    Surface(
+                        modifier = Modifier
+                            .width(maxWidth)
+                            .clickable(onClick = step.onClick),
+                        shape = MaterialTheme.shapes.medium,
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = step.title,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(
+                                text = step.description,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = "${step.actionLabel} >",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            steps.forEachIndexed { index, _ ->
+                Surface(
+                    modifier = Modifier
+                        .padding(horizontal = 3.dp)
+                        .size(if (index == currentStep) 10.dp else 7.dp)
+                        .clickable {
+                            scope.launch { listState.animateScrollToItem(index) }
+                        },
+                    shape = CircleShape,
+                    color = if (index == currentStep) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+                    },
+                ) {}
             }
         }
         Row(
@@ -277,13 +320,21 @@ private fun DashboardGuideCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             OutlinedButton(
-                onClick = { currentStep = (currentStep - 1).floorMod(steps.size) },
+                onClick = {
+                    scope.launch {
+                        listState.animateScrollToItem((currentStep - 1).floorMod(steps.size))
+                    }
+                },
                 modifier = Modifier.weight(1f),
             ) {
                 Text("Previous")
             }
             Button(
-                onClick = { currentStep = (currentStep + 1) % steps.size },
+                onClick = {
+                    scope.launch {
+                        listState.animateScrollToItem((currentStep + 1) % steps.size)
+                    }
+                },
                 modifier = Modifier.weight(1f),
             ) {
                 Text("Next")
@@ -375,7 +426,7 @@ private fun TermText(
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = if (expanded) "^" else "v",
+                    text = if (expanded) "Tutup" else "Lihat",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
