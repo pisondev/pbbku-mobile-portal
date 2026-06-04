@@ -361,6 +361,7 @@ private fun BuildingComparisonForm(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 readOnly = readOnly,
+                enabled = !readOnly,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = uiState.validation.newBuildingAreaError != null,
                 supportingText = {
@@ -377,6 +378,7 @@ private fun BuildingComparisonForm(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 readOnly = readOnly,
+                enabled = !readOnly,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = uiState.validation.newFloorCountError != null,
                 supportingText = {
@@ -401,6 +403,7 @@ private fun DescriptionForm(
             modifier = Modifier.fillMaxWidth(),
             minLines = 4,
             readOnly = readOnly,
+            enabled = !readOnly,
             isError = uiState.validation.descriptionError != null,
             supportingText = {
                 Text(uiState.validation.descriptionError ?: "Wajib diisi sebelum pengajuan.")
