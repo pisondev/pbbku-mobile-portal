@@ -1,14 +1,18 @@
 package id.pbbku.mobileportal.feature.report
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -17,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,80 +48,176 @@ fun ReportDraftScreen(
     viewModel: ReportDraftViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var isReadOnly by remember { mutableStateOf(false) }
+    var waitingForSaveFeedback by remember { mutableStateOf(false) }
+    var showSaveSuccessPopup by remember { mutableStateOf(false) }
 
     LaunchedEffect(nopDisplay, noBng) {
         viewModel.load(nopDisplay, noBng)
+        isReadOnly = false
+        showSaveSuccessPopup = false
+        waitingForSaveFeedback = false
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        item {
-            AppCard(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ) {
-                InfoPill(
-                    text = "Draft perubahan",
-                    containerColor = MaterialTheme.colorScheme.surface,
-                )
-                PageHeader(
-                    title = "Laporan Perubahan Bangunan",
-                    subtitle = "Susun laporan perubahan LSPOP tanpa mengubah data resmi SIMPBB.",
-                    iconRes = R.drawable.shortcut_laporan_perubahan,
-                    titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                Text(
-                    text = "Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    LaunchedEffect(uiState.saveMessage) {
+        val message = uiState.saveMessage ?: return@LaunchedEffect
+        if (!waitingForSaveFeedback) return@LaunchedEffect
+        waitingForSaveFeedback = false
+        if (message == "Draft laporan disimpan lokal.") {
+            isReadOnly = true
+            showSaveSuccessPopup = true
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            item {
+                AppCard(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ) {
+                    InfoPill(
+                        text = "Draft perubahan",
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    )
+                    PageHeader(
+                        title = "Laporan Perubahan Bangunan",
+                        subtitle = "Susun laporan perubahan LSPOP tanpa mengubah data resmi SIMPBB.",
+                        iconRes = R.drawable.shortcut_laporan_perubahan,
+                        titleColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                    Text(
+                        text = "Perubahan data resmi tetap memerlukan verifikasi petugas Bapenda.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            item {
+                SavedReadonlyBanner(
+                    visible = isReadOnly,
+                    onEdit = {
+                        isReadOnly = false
+                        showSaveSuccessPopup = false
+                    },
                 )
             }
-        }
-        item {
-            ReportStatusCard(uiState)
-        }
-        item {
-            BuildingIdentityForm(
-                uiState = uiState,
-                onNoBngChange = viewModel::onNoBngChange,
-            )
-        }
-        item {
-            ChangeTypeSelector(
-                selected = uiState.changeType,
-                onSelected = viewModel::onChangeTypeChange,
-            )
-        }
-        if (uiState.showsAreaFields || uiState.showsFloorFields) {
             item {
-                BuildingComparisonForm(
+                ReportStatusCard(uiState)
+            }
+            item {
+                BuildingIdentityForm(
                     uiState = uiState,
-                    onNewBuildingAreaChange = viewModel::onNewBuildingAreaChange,
-                    onNewFloorCountChange = viewModel::onNewFloorCountChange,
+                    readOnly = isReadOnly,
+                    onNoBngChange = viewModel::onNoBngChange,
+                )
+            }
+            item {
+                ChangeTypeSelector(
+                    selected = uiState.changeType,
+                    readOnly = isReadOnly,
+                    onSelected = viewModel::onChangeTypeChange,
+                )
+            }
+            if (uiState.showsAreaFields || uiState.showsFloorFields) {
+                item {
+                    BuildingComparisonForm(
+                        uiState = uiState,
+                        readOnly = isReadOnly,
+                        onNewBuildingAreaChange = viewModel::onNewBuildingAreaChange,
+                        onNewFloorCountChange = viewModel::onNewFloorCountChange,
+                    )
+                }
+            }
+            item {
+                DescriptionForm(
+                    uiState = uiState,
+                    readOnly = isReadOnly,
+                    onDescriptionChange = viewModel::onDescriptionChange,
+                )
+            }
+            if (uiState.showSummary) {
+                item {
+                    ReportSummaryCard(uiState)
+                }
+            }
+            item {
+                ActionButtons(
+                    uiState = uiState,
+                    readOnly = isReadOnly,
+                    onEdit = {
+                        isReadOnly = false
+                        showSaveSuccessPopup = false
+                    },
+                    onSaveDraft = {
+                        waitingForSaveFeedback = true
+                        viewModel.saveDraft()
+                    },
+                    onPrepareSummary = viewModel::prepareSummary,
+                    onSendSimulation = viewModel::sendSimulation,
+                    onDeleteDraft = {
+                        isReadOnly = false
+                        showSaveSuccessPopup = false
+                        viewModel.deleteDraft()
+                    },
                 )
             }
         }
-        item {
-            DescriptionForm(
-                uiState = uiState,
-                onDescriptionChange = viewModel::onDescriptionChange,
+        if (showSaveSuccessPopup) {
+            AlertDialog(
+                onDismissRequest = { showSaveSuccessPopup = false },
+                title = { Text("Draft Tersimpan") },
+                text = {
+                    Text(
+                        text = "Laporan disimpan sebagai draft lokal. Form dikunci agar status tersimpan terlihat jelas. Tekan Edit untuk mengubah isian lagi.",
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { showSaveSuccessPopup = false }) {
+                        Text("Mengerti")
+                    }
+                },
             )
         }
-        if (uiState.showSummary) {
-            item {
-                ReportSummaryCard(uiState)
+    }
+}
+
+@Composable
+private fun SavedReadonlyBanner(
+    visible: Boolean,
+    onEdit: () -> Unit,
+) {
+    AnimatedVisibility(visible = visible) {
+        AppCard(
+            modifier = Modifier.animateContentSize(),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Text(
+                        text = "Draft tersimpan",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                    Text(
+                        text = "Form sedang read-only supaya perubahan yang tersimpan terlihat jelas.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                OutlinedButton(onClick = onEdit) {
+                    Text("Edit")
+                }
             }
-        }
-        item {
-            ActionButtons(
-                uiState = uiState,
-                onSaveDraft = viewModel::saveDraft,
-                onPrepareSummary = viewModel::prepareSummary,
-                onSendSimulation = viewModel::sendSimulation,
-                onDeleteDraft = viewModel::deleteDraft,
-            )
         }
     }
 }
@@ -150,6 +251,7 @@ private fun ReportStatusCard(uiState: ReportDraftUiState) {
 @Composable
 private fun BuildingIdentityForm(
     uiState: ReportDraftUiState,
+    readOnly: Boolean,
     onNoBngChange: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -159,7 +261,7 @@ private fun BuildingIdentityForm(
             OutlinedButton(
                 onClick = { expanded = true },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = uiState.isAccessAllowed && uiState.availableBuildings.isNotEmpty(),
+                enabled = uiState.isAccessAllowed && uiState.availableBuildings.isNotEmpty() && !readOnly,
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -206,6 +308,7 @@ private fun BuildingIdentityForm(
 @Composable
 private fun ChangeTypeSelector(
     selected: String,
+    readOnly: Boolean,
     onSelected: (String) -> Unit,
 ) {
     val options = listOf(
@@ -220,6 +323,7 @@ private fun ChangeTypeSelector(
                 Button(
                     onClick = { onSelected(option) },
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !readOnly,
                 ) {
                     Text(option)
                 }
@@ -227,6 +331,7 @@ private fun ChangeTypeSelector(
                 OutlinedButton(
                     onClick = { onSelected(option) },
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !readOnly,
                 ) {
                     Text(option)
                 }
@@ -238,6 +343,7 @@ private fun ChangeTypeSelector(
 @Composable
 private fun BuildingComparisonForm(
     uiState: ReportDraftUiState,
+    readOnly: Boolean,
     onNewBuildingAreaChange: (String) -> Unit,
     onNewFloorCountChange: (String) -> Unit,
 ) {
@@ -253,6 +359,7 @@ private fun BuildingComparisonForm(
                 label = { Text("Luas bangunan baru (m2)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                readOnly = readOnly,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = uiState.validation.newBuildingAreaError != null,
                 supportingText = {
@@ -268,6 +375,7 @@ private fun BuildingComparisonForm(
                 label = { Text("Jumlah lantai baru") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                readOnly = readOnly,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = uiState.validation.newFloorCountError != null,
                 supportingText = {
@@ -281,6 +389,7 @@ private fun BuildingComparisonForm(
 @Composable
 private fun DescriptionForm(
     uiState: ReportDraftUiState,
+    readOnly: Boolean,
     onDescriptionChange: (String) -> Unit,
 ) {
     DetailCard(title = "Deskripsi Perubahan") {
@@ -290,6 +399,7 @@ private fun DescriptionForm(
             label = { Text("Deskripsi") },
             modifier = Modifier.fillMaxWidth(),
             minLines = 4,
+            readOnly = readOnly,
             isError = uiState.validation.descriptionError != null,
             supportingText = {
                 Text(uiState.validation.descriptionError ?: "Wajib diisi sebelum pengajuan.")
@@ -324,18 +434,22 @@ private fun ReportSummaryCard(uiState: ReportDraftUiState) {
 @Composable
 private fun ActionButtons(
     uiState: ReportDraftUiState,
+    readOnly: Boolean,
+    onEdit: () -> Unit,
     onSaveDraft: () -> Unit,
     onPrepareSummary: () -> Unit,
     onSendSimulation: () -> Unit,
     onDeleteDraft: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(
-            onClick = onSaveDraft,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = uiState.isAccessAllowed,
+        AppCard(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ) {
-            Text("Simpan Draft")
+            Text(
+                text = "Simpan Draft menyimpan isian di perangkat agar bisa diedit lagi. Tandai Sudah Diajukan hanya mengubah status visual draft menjadi sudah diajukan secara simulatif; data resmi SIMPBB tetap tidak berubah.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         OutlinedButton(
             onClick = onPrepareSummary,
@@ -347,6 +461,21 @@ private fun ActionButtons(
             ),
         ) {
             Text("Tampilkan Ringkasan")
+        }
+        if (readOnly) {
+            OutlinedButton(
+                onClick = onEdit,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Edit Draft")
+            }
+        }
+        Button(
+            onClick = onSaveDraft,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = uiState.isAccessAllowed && !readOnly,
+        ) {
+            Text("Simpan Draft")
         }
         OutlinedButton(
             onClick = onSendSimulation,

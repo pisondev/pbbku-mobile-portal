@@ -1,5 +1,7 @@
 package id.pbbku.mobileportal.feature.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -178,7 +184,44 @@ private fun DashboardGuideCard(
     onOpenSearch: () -> Unit,
     onOpenNotifications: () -> Unit,
 ) {
-    AppCard(modifier = modifier) {
+    val steps = remember(onOpenSearch, onOpenNotifications) {
+        listOf(
+            GuideStep(
+                title = "Cari objek pajak",
+                description = "Mulai dari NOP atau nama wajib pajak, lalu pilih hasil yang sesuai.",
+                actionLabel = "Buka Cari",
+                onClick = onOpenSearch,
+            ),
+            GuideStep(
+                title = "Baca detail objek",
+                description = "Cek profil objek dan subjek pajak sebelum masuk ke fitur turunan.",
+                actionLabel = "Cari Data",
+                onClick = onOpenSearch,
+            ),
+            GuideStep(
+                title = "Cek SPPT dan tunggakan",
+                description = "Lihat status, nominal, jatuh tempo, dan arahan pembayaran non-transaksional.",
+                actionLabel = "Telusuri",
+                onClick = onOpenSearch,
+            ),
+            GuideStep(
+                title = "Simpan laporan perubahan",
+                description = "Buat draft lokal perubahan bangunan tanpa mengubah data resmi SIMPBB.",
+                actionLabel = "Mulai dari Detail",
+                onClick = onOpenSearch,
+            ),
+            GuideStep(
+                title = "Pantau reminder",
+                description = "Buka notifikasi lokal untuk melihat pengingat jatuh tempo yang tersedia.",
+                actionLabel = "Lihat Notifikasi",
+                onClick = onOpenNotifications,
+            ),
+        )
+    }
+    var currentStep by remember { mutableIntStateOf(0) }
+    val step = steps[currentStep]
+
+    AppCard(modifier = modifier.animateContentSize()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -194,93 +237,67 @@ private fun DashboardGuideCard(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = "Gunakan urutan ini agar proses cek objek pajak sampai tagihan terasa lebih mudah.",
+                    text = "Gunakan carousel ini sebagai jalur cepat saat demo atau eksplorasi data.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+            InfoPill(text = "${currentStep + 1}/${steps.size}")
         }
-        GuideStepRow(
-            number = 1,
-            title = "Cari NOP atau nama wajib pajak",
-            description = "Masuk ke halaman pencarian dan pilih hasil yang relevan.",
-            onClick = onOpenSearch,
-        )
-        GuideStepRow(
-            number = 2,
-            title = "Baca profil objek dan subjek pajak",
-            description = "Dari detail objek, lanjut ke bangunan, histori SPPT, tunggakan, atau laporan perubahan.",
-            onClick = onOpenSearch,
-        )
-        GuideStepRow(
-            number = 3,
-            title = "Cek tagihan dan informasi pembayaran",
-            description = "Histori SPPT dan tunggakan menunjukkan status, nominal, serta jatuh tempo tanpa transaksi nyata.",
-            onClick = onOpenSearch,
-        )
-        GuideStepRow(
-            number = 4,
-            title = "Buat draft laporan perubahan bangunan",
-            description = "Laporan tersimpan di perangkat dan tidak mengubah data resmi SIMPBB.",
-            onClick = onOpenSearch,
-        )
-        GuideStepRow(
-            number = 5,
-            title = "Pantau reminder dan pengaturan",
-            description = "Notifikasi lokal membantu mengingat jatuh tempo jika tanggal tersedia.",
-            onClick = onOpenNotifications,
-        )
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = step.onClick),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            Column(
+                modifier = Modifier.padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = step.title,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = step.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = "${step.actionLabel} >",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            OutlinedButton(
+                onClick = { currentStep = (currentStep - 1).floorMod(steps.size) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text("Previous")
+            }
+            Button(
+                onClick = { currentStep = (currentStep + 1) % steps.size },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text("Next")
+            }
+        }
     }
 }
 
-@Composable
-private fun GuideStepRow(
-    number: Int,
-    title: String,
-    description: String,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clickable(onClick = onClick)
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.small,
-            color = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.primary,
-        ) {
-            Text(
-                text = number.toString(),
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Text(
-            text = ">",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary,
-        )
-    }
-}
+private data class GuideStep(
+    val title: String,
+    val description: String,
+    val actionLabel: String,
+    val onClick: () -> Unit,
+)
 
 @Composable
 private fun ActionCard(
@@ -319,7 +336,7 @@ private fun ActionCard(
 private fun TermsCard() {
     ActionCard(
         title = "Istilah PBB",
-        description = "Ringkasan istilah yang sering muncul di aplikasi.",
+        description = "Klik istilah untuk membuka penjelasan singkat.",
         label = "Bantuan Cepat",
     ) {
         TermText("NOP", "Nomor Objek Pajak untuk mengenali tanah atau bangunan.")
@@ -335,15 +352,43 @@ private fun TermText(
     term: String,
     description: String,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            text = term,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+    var expanded by remember { mutableStateOf(false) }
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = term,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = if (expanded) "^" else "v",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            AnimatedVisibility(visible = expanded) {
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }
+
+private fun Int.floorMod(mod: Int): Int = ((this % mod) + mod) % mod

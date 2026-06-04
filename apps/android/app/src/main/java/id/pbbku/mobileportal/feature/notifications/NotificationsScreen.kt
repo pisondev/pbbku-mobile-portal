@@ -1,8 +1,12 @@
 package id.pbbku.mobileportal.feature.notifications
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,7 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -103,7 +111,17 @@ private fun EmptyCard() {
 
 @Composable
 private fun ReminderCard(reminder: PaymentReminder) {
-    AppCard {
+    var expanded by remember(reminder.id) { mutableStateOf(false) }
+    AppCard(
+        modifier = Modifier
+            .animateContentSize()
+            .clickable { expanded = !expanded },
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
             InfoPill(
                 text = reminder.status.displayText,
                 containerColor = if (reminder.isSimulation) {
@@ -117,25 +135,50 @@ private fun ReminderCard(reminder: PaymentReminder) {
                     MaterialTheme.colorScheme.onPrimaryContainer
                 },
             )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = "Tagihan ${reminder.taxYear}",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = reminder.amount?.toRupiahText() ?: "Nominal belum tersedia",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = reminder.dueDate?.toIndonesianDateText() ?: "Jatuh tempo belum tersedia",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
-                text = "Tagihan ${reminder.taxYear}",
+                text = if (expanded) "^" else "v",
                 style = MaterialTheme.typography.titleMedium,
-            )
-            DetailText("NOP", reminder.nop.asGroupedText())
-            DetailText("Status reminder", reminder.status.displayText)
-            DetailText("Jatuh tempo", reminder.dueDate?.toIndonesianDateText() ?: "Data tidak tersedia")
-            DetailText("Jadwal", reminder.scheduledAtEpochMillis?.toIndonesianDateTimeText() ?: "Data tidak tersedia")
-            DetailText("Nominal", reminder.amount?.toRupiahText() ?: "Data tidak tersedia")
-            Text(
-                text = reminder.note,
-                color = if (reminder.isSimulation) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
+        AnimatedVisibility(visible = expanded) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                DetailText("NOP", reminder.nop.asGroupedText())
+                DetailText("Status reminder", reminder.status.displayText)
+                DetailText("Jatuh tempo", reminder.dueDate?.toIndonesianDateText() ?: "Data tidak tersedia")
+                DetailText("Jadwal", reminder.scheduledAtEpochMillis?.toIndonesianDateTimeText() ?: "Data tidak tersedia")
+                DetailText("Nominal", reminder.amount?.toRupiahText() ?: "Data tidak tersedia")
+                Text(
+                    text = reminder.note,
+                    color = if (reminder.isSimulation) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+    }
 }
 
 @Composable
