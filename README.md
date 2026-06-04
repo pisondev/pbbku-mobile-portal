@@ -32,7 +32,7 @@ Status saat ini:
 - Tahap 17, yaitu dokumentasi, demo, dan finalisasi, sudah dieksekusi pada bagian yang bisa dilakukan tanpa emulator: README final, skenario demo end-to-end, catatan pengujian manual/runtime, acceptance criteria akhir, build debug, unit test, dan lint debug.
 - Source Android tersedia di `apps/android/` dengan Gradle Wrapper dan module `app`.
 - APK debug berhasil dibuat di `apps/android/app/build/outputs/apk/debug/app-debug.apk`.
-- Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `BUDI`, hasil objek pajak tampil, dan hasil pertama membuka Detail Objek Pajak.
+- Runtime test dasar berhasil di emulator `Pixel_6_API_35`: onboarding, login NIK demo, OTP `123456`, Beranda dengan NIK masked, logout kembali ke Login, pencarian `WAYAN`, hasil objek pajak tampil, dan hasil pertama membuka Detail Objek Pajak.
 
 ## Ruang Lingkup MVP
 
@@ -234,6 +234,20 @@ cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
 ./gradlew :app:installDebug
 ```
 
+Untuk manual end-to-end testing dengan satu perintah dari root repo:
+
+```zsh
+source ~/.zshrc
+bash scripts/run_android_e2e.sh
+```
+
+Default AVD adalah `Pixel_6_API_35`. Jika perlu memakai AVD lain:
+
+```zsh
+source ~/.zshrc
+AVD_NAME=Nama_AVD bash scripts/run_android_e2e.sh
+```
+
 Status verifikasi saat ini:
 
 - Environment zsh terverifikasi memakai `JAVA_HOME=/c/Program Files/Eclipse Adoptium/jdk-17.0.14.7-hotspot`.
@@ -246,7 +260,7 @@ Status verifikasi saat ini:
 - Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - Runtime test dasar berhasil di emulator headless `Pixel_6_API_35`: install debug, fresh onboarding, login NIK demo `3404123456789012`, OTP demo `123456`, Beranda dengan masked NIK `34************12`, dan logout kembali ke Login.
-- Runtime test pencarian berhasil di emulator headless `Pixel_6_API_35`: tab Cari, query `BUDI`, hasil dari `objekPajak/search` tampil, termasuk `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, lalu item hasil membuka Detail Objek Pajak.
+- Runtime test pencarian berhasil di emulator headless `Pixel_6_API_35`: tab Cari, query `WAYAN`, hasil dari `objekPajak/search` tampil, termasuk `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, lalu item hasil membuka Detail Objek Pajak.
 
 Untuk eksplorasi API, import file berikut ke Postman:
 
@@ -262,5 +276,5 @@ Untuk eksplorasi API, import file berikut ke Postman:
 - Log debug tidak boleh memuat NIK penuh atau data sensitif.
 - NIK demo aman untuk alur login simulatif: `3404123456789012`.
 - OTP demo tetap: `123456`.
-- Query demo yang pernah berhasil untuk runtime test: `BUDI`.
+- Query demo yang pernah berhasil untuk runtime test: `WAYAN`.
 - Skenario demo lengkap tersedia di `docs/demo/end_to_end_demo.md`.

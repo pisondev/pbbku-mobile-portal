@@ -30,7 +30,7 @@ Catatan route:
 |---|---|---|
 | NIK demo | `3404123456789012` | Hanya untuk login simulatif. |
 | OTP demo | `123456` | Ditampilkan sebagai OTP demo. |
-| Query pencarian | `BUDI` | Menghasilkan data demo dari API internal. |
+| Query pencarian | `WAYAN` | Menghasilkan data demo aman dari API internal. |
 | NOP utama | `51.71.010.001.054.0032.0` | Lengkap untuk objek, bangunan, SPPT 2026, dan tunggakan. |
 | NOP tambahan | `32.04.010.001.001.0001.0` | Data demo tambahan untuk variasi pencarian. |
 
@@ -51,7 +51,7 @@ Catatan route:
 | 11 | Tunggakan | `tunggakan/{nopDisplay}` | Menampilkan hanya tagihan aktif/belum lunas. | Total tunggakan aktif, daftar tagihan belum lunas, status, nominal, jatuh tempo, denda, tombol detail/cara bayar. |
 | 12 | Detail Tagihan | `tax_bill_detail/{nopDisplay}/{taxYear}` | Menampilkan rincian perhitungan satu SPPT. | Status pembayaran, nominal, jatuh tempo, denda, tanggal pembayaran, NJOP tanah/bangunan/total, NJOPTKP, tarif, PBB terutang, tombol cara bayar jika belum lunas. |
 | 13 | Informasi Pembayaran | `payment_info/{nopDisplay}/{taxYear}` | Memberi arahan pembayaran tanpa memproses transaksi. | Status tagihan, nominal, jatuh tempo, denda, arahan pembayaran resmi, kanal pembayaran umum, SSPD prototipe jika status lunas. |
-| 14 | Laporan Perubahan Bangunan | `report/{nopDisplay}` atau `report/{nopDisplay}/{noBng}` | Membuat draft lokal perubahan bangunan tanpa mengubah data resmi. | Status draft, identitas NOP/no bangunan, data lama LSPOP, pilihan jenis perubahan, input luas/lantai baru, deskripsi, ringkasan, save draft, tandai simulasi, hapus draft. |
+| 14 | Laporan Perubahan Bangunan | `report/{nopDisplay}` atau `report/{nopDisplay}/{noBng}` | Membuat draft lokal perubahan bangunan tanpa mengubah data resmi. | Status draft, pilihan nomor LSPOP dari daftar bangunan terkait NOP/NIK, data lama LSPOP, jenis perubahan, input yang tampil sesuai jenis perubahan, deskripsi, ringkasan, save draft, tandai sudah diajukan, hapus draft. |
 | 15 | Notifikasi | `notifications` | Menampilkan reminder lokal jatuh tempo. | Status reminder aktif/nonaktif, daftar reminder, tagihan tahun, NOP, status jadwal, jatuh tempo, nominal, catatan simulatif bila demo. |
 | 16 | Pengaturan | `settings` | Mengelola data lokal, reminder, informasi aplikasi, dan logout. | Toggle pengingat, request izin notifikasi Android 13+, hapus cache, hapus draft laporan, versi aplikasi, debug info jika aktif, tombol keluar. |
 
@@ -149,7 +149,7 @@ Tujuan: menunjukkan user bisa menemukan objek pajak lewat search atau daftar dem
 
 1. Dari Beranda, tekan `Cari Objek Pajak`.
 2. Tunjukkan input pencarian dan tombol `Daftar demo`.
-3. Masukkan query `BUDI`.
+3. Masukkan query `WAYAN`.
 4. Pastikan hasil menampilkan minimal NOP, nama wajib pajak, alamat bila ada, dan NJOP bila ada.
 5. Tunjukkan filter wilayah bertingkat: Provinsi, Kabupaten/Kota, Kecamatan, Kelurahan, Blok.
 6. Tekan salah satu hasil, idealnya NOP `51.71.010.001.054.0032.0`.
@@ -202,20 +202,21 @@ Fitur terdemokan:
 Tujuan: menunjukkan alur pelaporan perubahan sebagai draft lokal, bukan submit resmi.
 
 1. Dari Detail Bangunan, tekan `Buat Laporan Perubahan`.
-2. Pastikan halaman memuat NOP dan nomor bangunan.
+2. Pastikan halaman memuat NOP dan pilihan nomor LSPOP dari daftar bangunan yang terkait NOP/NIK login.
 3. Pilih jenis perubahan, misalnya `Perubahan luas bangunan`.
-4. Isi `Luas bangunan baru`, `Jumlah lantai baru`, dan deskripsi.
+4. Isi hanya field yang tampil sesuai jenis perubahan, misalnya `Luas bangunan baru` dan deskripsi.
 5. Tekan `Simpan Draft`.
 6. Tekan `Tampilkan Ringkasan`.
-7. Tekan `Tandai Terkirim Simulasi`.
+7. Tekan `Tandai Sudah Diajukan`.
 8. Opsional: tekan `Hapus Draft`.
 
 Fitur terdemokan:
 
 - Load data lama LSPOP sebagai konteks.
-- Validasi input luas/lantai/deskripsi.
+- Pilihan nomor LSPOP langsung dari daftar bangunan terkait NOP/NIK.
+- Validasi input sesuai jenis perubahan: luas, jumlah lantai, atau deskripsi data bangunan.
 - Room/local database draft.
-- Status draft: Draft, Siap Diajukan, Terkirim Simulasi.
+- Status draft: Draft, Siap Diajukan, Sudah Diajukan.
 - Batasan bahwa data resmi tidak berubah.
 
 ### Skenario 6 - Histori SPPT dan Detail Tagihan
@@ -312,7 +313,7 @@ Gunakan alur ini jika waktu review terbatas:
 
 1. Login demo dengan NIK dan OTP.
 2. Dari Beranda buka Cari.
-3. Search `BUDI`, pilih `51.71.010.001.054.0032.0`.
+3. Search `WAYAN`, pilih hasil `I WAYAN SUTARJA` atau gunakan daftar demo untuk membuka `51.71.010.001.054.0032.0`.
 4. Di Detail Objek, buka Bangunan, lalu Detail Bangunan.
 5. Buat draft laporan perubahan, simpan, tampilkan ringkasan.
 6. Kembali ke Detail Objek, buka Histori SPPT.

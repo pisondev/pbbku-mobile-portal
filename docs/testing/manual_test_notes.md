@@ -10,7 +10,7 @@ Environment:
 - APK: debug build dari module `apps/android/app`.
 - NIK demo: `3404123456789012`.
 - OTP demo: `123456`.
-- Query pencarian: `BUDI`.
+- Query pencarian: `WAYAN`.
 
 Hasil yang pernah berhasil:
 
@@ -21,7 +21,7 @@ Hasil yang pernah berhasil:
 - NIK tampil masked sebagai `34************12`.
 - Logout kembali ke Login.
 - Tab `Cari` dapat dibuka.
-- Query `BUDI` memanggil API dan menampilkan hasil.
+- Query `WAYAN` memanggil API dan menampilkan hasil.
 - Hasil pencarian menampilkan contoh `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`.
 - Item hasil pencarian dapat membuka Detail Objek Pajak.
 

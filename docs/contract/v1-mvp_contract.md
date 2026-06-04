@@ -294,7 +294,7 @@ Progress Tahap 5:
 - Memilih hasil pencarian membuka route `object_detail/{nopDisplay}` dan menampilkan Detail Objek Pajak.
 - Unit test mapper objek pajak ditambahkan untuk response `search` dan `listDetails`.
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 11 unit test lulus.
-- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `BUDI` menampilkan hasil API seperti `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka Detail Objek Pajak.
+- Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query `WAYAN` menampilkan hasil API seperti `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, dan item hasil berhasil membuka Detail Objek Pajak.
 
 ## 11. Tahap 6 - Detail Objek Pajak dan Subjek Pajak
 
@@ -509,14 +509,14 @@ Progress Tahap 11:
 - [x] Buat halaman Laporan Perubahan Bangunan.
 - [x] Prefill NOP dari objek pajak yang sedang dibuka.
 - [x] Prefill nomor bangunan dan data lama dari LSPOP jika tersedia.
-- [x] Form memuat NOP, nomor bangunan, jenis perubahan, luas bangunan lama, luas bangunan baru, jumlah lantai lama, jumlah lantai baru, dan deskripsi perubahan.
+- [x] Form memuat NOP, pilihan nomor bangunan dari daftar LSPOP terkait NOP/NIK, jenis perubahan, data lama, input baru yang tampil sesuai jenis perubahan, dan deskripsi perubahan.
 - [x] Validasi luas baru berupa angka valid.
 - [x] Validasi jumlah lantai baru berupa angka valid.
 - [x] Validasi deskripsi perubahan tidak kosong saat submit simulasi.
 - [x] Tampilkan perbandingan data lama vs data baru.
 - [x] Tampilkan ringkasan sebelum submit simulasi.
 - [x] Simpan laporan sebagai draft lokal.
-- [x] Tampilkan status `Draft`, `Siap Diajukan`, atau `Terkirim Simulasi`.
+- [x] Tampilkan status `Draft`, `Siap Diajukan`, atau `Sudah Diajukan`.
 - [x] Beri peringatan bahwa perubahan data resmi memerlukan verifikasi petugas Bapenda.
 - [x] Sediakan hapus draft.
 - [x] Jangan memanggil `objekPajak/save` untuk laporan MVP.
@@ -532,9 +532,9 @@ Progress Tahap 12:
 - Placeholder `Laporan Perubahan Bangunan` diganti dengan `ReportDraftScreen`.
 - Route laporan dari Detail Objek Pajak mem-prefill NOP, sedangkan route dari Detail Bangunan mem-prefill NOP dan nomor bangunan.
 - `ReportDraftViewModel` memuat data lama bangunan dari `lspop/getBuilding` bila nomor bangunan tersedia, lalu mengisi luas bangunan lama, jumlah lantai lama, JPB, dan jenis bangunan lama jika response API tersedia.
-- Form laporan memuat NOP, nomor bangunan, jenis perubahan, luas lama/baru, jumlah lantai lama/baru, dan deskripsi perubahan.
+- Form laporan memuat NOP, pilihan nomor bangunan dari daftar LSPOP terkait NOP/NIK, jenis perubahan, field lama/baru yang tampil sesuai jenis perubahan, dan deskripsi perubahan.
 - Validasi form ditambahkan melalui `ReportDraftFormValidator`: luas baru harus angka valid, jumlah lantai baru harus angka bulat valid, dan deskripsi wajib diisi untuk ringkasan/submit simulasi.
-- Pengguna dapat menyimpan draft lokal dengan status `Draft`, menyiapkan ringkasan dengan status `Siap Diajukan`, atau menandai laporan sebagai `Terkirim Simulasi`.
+- Pengguna dapat menyimpan draft lokal dengan status `Draft`, menyiapkan ringkasan dengan status `Siap Diajukan`, atau menandai laporan sebagai `Sudah Diajukan`.
 - Ringkasan sebelum submit menampilkan perbandingan data lama vs baru dan label bahwa laporan hanya prototipe lokal, bukan perubahan data resmi SIMPBB.
 - `ReportDraftRepository` dihubungkan ke `PbbKuApplication` sehingga screen laporan menyimpan, memuat ulang, dan menghapus draft dari tabel Room `report_drafts`.
 - Tidak ada pemanggilan endpoint write `objekPajak/save`; fitur laporan tetap lokal/prototipe sesuai batasan MVP.

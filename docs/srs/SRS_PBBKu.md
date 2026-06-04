@@ -316,10 +316,10 @@ Fitur pengingat sesuai dengan deskripsi PBB-Ku dalam dokumen ide proyek mobile. 
 | ID | Deskripsi | Prioritas | Sumber |
 |---|---|---|---|
 | FR-058 | Sistem harus menyediakan form pelaporan mandiri perubahan bangunan. | Tinggi | Ide PBB-Ku |
-| FR-059 | Form harus memuat NOP, nomor bangunan, jenis perubahan, luas bangunan lama, luas bangunan baru, jumlah lantai lama, jumlah lantai baru, dan deskripsi perubahan. | Tinggi | MVP |
+| FR-059 | Form harus memuat NOP, pilihan nomor bangunan dari daftar LSPOP terkait NOP/NIK, jenis perubahan, data lama, input data baru yang tampil sesuai jenis perubahan, dan deskripsi perubahan. | Tinggi | MVP |
 | FR-060 | Sistem harus dapat mengambil data lama dari detail objek pajak atau LSPOP sebagai referensi pengisian laporan. | Tinggi | SIMPBB API |
 | FR-061 | Sistem harus menyimpan laporan mandiri sebagai draft lokal/prototipe, bukan langsung mengubah data resmi. | Tinggi | Batasan |
-| FR-062 | Sistem harus menampilkan status laporan seperti “Draft”, “Siap Diajukan”, atau “Terkirim Simulasi”. | Sedang | MVP |
+| FR-062 | Sistem harus menampilkan status laporan seperti “Draft”, “Siap Diajukan”, atau “Sudah Diajukan”. | Sedang | MVP |
 | FR-063 | Sistem harus menyediakan ringkasan laporan sebelum pengguna menekan tombol submit simulasi. | Sedang | UX |
 | FR-064 | Sistem harus memberikan peringatan bahwa perubahan data resmi memerlukan verifikasi petugas Bapenda. | Tinggi | Kepatuhan |
 
@@ -454,7 +454,7 @@ Undang-Undang Nomor 27 Tahun 2022 menempatkan pelindungan data pribadi sebagai b
 | UI-12 | Informasi Pembayaran | Instruksi pembayaran non-transaksional atau dummy. |
 | UI-13 | Bukti/SSPD Prototipe | Tampilan bukti pembayaran jika data memungkinkan atau dummy dengan label prototipe. |
 | UI-14 | Informasi Keringanan | Informasi umum tentang keringanan/insentif PBB. |
-| UI-15 | Laporan Perubahan Bangunan | Form pelaporan mandiri perubahan luas, lantai, dan deskripsi bangunan. |
+| UI-15 | Laporan Perubahan Bangunan | Form pelaporan mandiri dengan pilihan nomor LSPOP dari daftar terkait NOP/NIK dan input yang menyesuaikan jenis perubahan. |
 | UI-16 | Notifikasi | Daftar pengingat jatuh tempo dan status reminder. |
 | UI-17 | Pengaturan | Preferensi notifikasi, hapus cache, logout, dan informasi aplikasi. |
 
