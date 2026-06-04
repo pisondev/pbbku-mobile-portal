@@ -1,0 +1,503 @@
+{
+  "info": {
+    "_postman_id": "43f68d29-87a7-42b0-b420-47092cbfae3f",
+    "name": "PBB-Ku Deployment API - Complete Route Tests",
+    "description": "Postman Collection siap jalan untuk deployment PBB-Ku. Jalankan dari atas ke bawah atau per folder section. Semua request memakai deployment https://pbbku-api.tierratie.com, bukan local.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "deployment_base_url", "value": "https://pbbku-api.tierratie.com" },
+    { "key": "query", "value": "SIDAKARYA" },
+    { "key": "search", "value": "SIDAKARYA" },
+    { "key": "limit", "value": "10" },
+    { "key": "offset", "value": "0" },
+    { "key": "nopDisplay", "value": "51.71.010.001.054.0032.0" },
+    { "key": "kdPropinsi", "value": "51" },
+    { "key": "kdDati2", "value": "71" },
+    { "key": "kdKecamatan", "value": "010" },
+    { "key": "kdKelurahan", "value": "001" },
+    { "key": "kdBlok", "value": "054" },
+    { "key": "noUrut", "value": "0032" },
+    { "key": "kdJnsOp", "value": "0" },
+    { "key": "noBng", "value": "1" },
+    { "key": "thnPajak", "value": "2026" },
+    { "key": "thnPajakSppt", "value": "2026" },
+    { "key": "statusPembayaran", "value": "0" },
+    { "key": "subjekPajakId", "value": "demo-readonly-check" }
+  ],
+  "item": [
+    {
+      "name": "00 - Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/health",
+            "description": "Cek health deployment API."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 - REST Wilayah",
+      "item": [
+        {
+          "name": "GET /api/v1/wilayah/propinsi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/wilayah/propinsi",
+            "description": "Daftar provinsi."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/wilayah/dati2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/wilayah/dati2?kdPropinsi={{kdPropinsi}}",
+            "description": "Daftar kabupaten/kota untuk provinsi demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/wilayah/kecamatan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/wilayah/kecamatan?kdPropinsi={{kdPropinsi}}&kdDati2={{kdDati2}}",
+            "description": "Daftar kecamatan untuk kabupaten/kota demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/wilayah/kelurahan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/wilayah/kelurahan?kdPropinsi={{kdPropinsi}}&kdDati2={{kdDati2}}&kdKecamatan={{kdKecamatan}}",
+            "description": "Daftar kelurahan untuk kecamatan demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/wilayah/blok",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/wilayah/blok?kdPropinsi={{kdPropinsi}}&kdDati2={{kdDati2}}&kdKecamatan={{kdKecamatan}}&kdKelurahan={{kdKelurahan}}",
+            "description": "Daftar blok untuk kelurahan demo."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - REST Objek Pajak",
+      "item": [
+        {
+          "name": "GET /api/v1/objek-pajak/search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/search?query={{query}}&limit={{limit}}",
+            "description": "Cari objek pajak by NOP/nama/alamat."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak?kdPropinsi={{kdPropinsi}}&kdDati2={{kdDati2}}&search={{search}}&limit={{limit}}&offset={{offset}}",
+            "description": "List objek pajak dengan filter wilayah dan search."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak/{nop}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/{{nopDisplay}}",
+            "description": "Detail objek pajak untuk NOP demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak/{nop}/bangunan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/{{nopDisplay}}/bangunan",
+            "description": "Daftar bangunan untuk NOP demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak/{nop}/bangunan/{noBng}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/{{nopDisplay}}/bangunan/{{noBng}}",
+            "description": "Detail bangunan untuk NOP demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak/{nop}/bangunan/{noBng}/fasilitas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/{{nopDisplay}}/bangunan/{{noBng}}/fasilitas",
+            "description": "Fasilitas bangunan untuk NOP demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak/{nop}/sppt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/{{nopDisplay}}/sppt",
+            "description": "Histori SPPT untuk NOP demo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/objek-pajak/{nop}/tunggakan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/objek-pajak/{{nopDisplay}}/tunggakan",
+            "description": "Daftar tunggakan untuk NOP demo."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - REST SPPT",
+      "item": [
+        {
+          "name": "GET /api/v1/sppt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/sppt?thnPajak={{thnPajak}}&kdPropinsi={{kdPropinsi}}&statusPembayaran={{statusPembayaran}}&limit={{limit}}&offset={{offset}}",
+            "description": "Pencarian SPPT massal."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/sppt/{nop}/{year}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{deployment_base_url}}/api/v1/sppt/{{nopDisplay}}/{{thnPajak}}",
+            "description": "Detail SPPT per NOP dan tahun pajak."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - RPC Wilayah",
+      "item": [
+        {
+          "name": "POST /api/rpc/wilayah/listPropinsi",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {}\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/wilayah/listPropinsi",
+            "description": "Daftar provinsi via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/wilayah/listDati2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/wilayah/listDati2",
+            "description": "Daftar kabupaten/kota via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/wilayah/listKecamatan",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/wilayah/listKecamatan",
+            "description": "Daftar kecamatan via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/wilayah/listKelurahan",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/wilayah/listKelurahan",
+            "description": "Daftar kelurahan via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/wilayah/listBlok",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/wilayah/listBlok",
+            "description": "Daftar blok via oRPC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - RPC Objek Pajak",
+      "item": [
+        {
+          "name": "POST /api/rpc/objekPajak/search",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"query\": \"{{query}}\",\n    \"limit\": {{limit}}\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/search",
+            "description": "Cari objek pajak via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/objekPajak/listDetails",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"limit\": {{limit}},\n    \"offset\": {{offset}},\n    \"search\": \"{{search}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/listDetails",
+            "description": "List objek pajak via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/objekPajak/getByNop",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/getByNop",
+            "description": "Detail objek pajak via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/objekPajak/getSpptHistory",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/getSpptHistory",
+            "description": "Legacy histori SPPT via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/objekPajak/getTunggakan",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/getTunggakan",
+            "description": "Tunggakan via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/objekPajak/getNextNoUrut",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/getNextNoUrut",
+            "description": "Nomor urut NOP berikutnya via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/objekPajak/getNextNoFormulir",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {}\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/getNextNoFormulir",
+            "description": "Nomor formulir berikutnya via oRPC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - RPC LSPOP",
+      "item": [
+        {
+          "name": "POST /api/rpc/lspop/listByNop",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/lspop/listByNop",
+            "description": "Daftar bangunan via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/lspop/getBuilding",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\",\n    \"noBng\": \"{{noBng}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/lspop/getBuilding",
+            "description": "Detail bangunan via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/lspop/listFasilitas",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\",\n    \"noBng\": \"{{noBng}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/lspop/listFasilitas",
+            "description": "Fasilitas bangunan via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/lspop/nextNoBng",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/lspop/nextNoBng",
+            "description": "Nomor bangunan berikutnya via oRPC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 - RPC SPPT",
+      "item": [
+        {
+          "name": "POST /api/rpc/sppt/listByNop",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/sppt/listByNop",
+            "description": "Histori SPPT via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/sppt/get",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"kdDati2\": \"{{kdDati2}}\",\n    \"kdKecamatan\": \"{{kdKecamatan}}\",\n    \"kdKelurahan\": \"{{kdKelurahan}}\",\n    \"kdBlok\": \"{{kdBlok}}\",\n    \"noUrut\": \"{{noUrut}}\",\n    \"kdJnsOp\": \"{{kdJnsOp}}\",\n    \"thnPajakSppt\": {{thnPajakSppt}}\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/sppt/get",
+            "description": "Detail SPPT tahun pajak via oRPC."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/rpc/sppt/list",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"json\": {\n    \"thnPajak\": {{thnPajak}},\n    \"kdPropinsi\": \"{{kdPropinsi}}\",\n    \"statusPembayaran\": \"{{statusPembayaran}}\",\n    \"limit\": {{limit}},\n    \"offset\": {{offset}}\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{deployment_base_url}}/api/rpc/sppt/list",
+            "description": "Pencarian SPPT massal via oRPC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 - Admin Write Guard",
+      "description": "Endpoint write tetap didokumentasikan, tetapi request ini sengaja mengetes bahwa deployment menolak write tanpa admin key.",
+      "item": [
+        {
+          "name": "Admin guard - POST /api/rpc/objekPajak/save should reject without key",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Write endpoint rejects request without admin key', function () {",
+                  "  pm.expect([401, 403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json\": {\n    \"spop\": {\n      \"kdPropinsi\": \"{{kdPropinsi}}\",\n      \"kdDati2\": \"{{kdDati2}}\",\n      \"kdKecamatan\": \"{{kdKecamatan}}\",\n      \"kdKelurahan\": \"{{kdKelurahan}}\",\n      \"kdBlok\": \"{{kdBlok}}\",\n      \"noUrut\": \"{{noUrut}}\",\n      \"kdJnsOp\": \"{{kdJnsOp}}\",\n      \"subjekPajakId\": \"{{subjekPajakId}}\",\n      \"jalanOp\": \"READONLY POSTMAN CHECK\",\n      \"luasBumi\": 250,\n      \"nilaiSistemBumi\": 500000000,\n      \"kdStatusWp\": \"1\",\n      \"jnsBumi\": \"1\",\n      \"jnsTransaksiOp\": \"1\"\n    },\n    \"subjekPajak\": {\n      \"subjekPajakId\": \"{{subjekPajakId}}\",\n      \"nmWp\": \"POSTMAN READONLY CHECK\",\n      \"jalanWp\": \"READONLY CHECK\",\n      \"statusPekerjaanWp\": \"1\"\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{deployment_base_url}}/api/rpc/objekPajak/save",
+            "description": "Dokumentasi endpoint write. Tanpa X-Admin-API-Key, deployment harus menolak request."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const isAdminGuard = pm.info.requestName.indexOf('Admin guard') === 0;",
+          "if (!isAdminGuard) {",
+          "  pm.test('Status code is 2xx', function () {",
+          "    pm.expect(pm.response.code).to.be.within(200, 299);",
+          "  });",
+          "}",
+          "",
+          "pm.test('Response body is JSON when present', function () {",
+          "  const text = pm.response.text();",
+          "  if (text && text.trim().length > 0) {",
+          "    pm.response.to.have.jsonBody();",
+          "  }",
+          "});",
+          "",
+          "pm.test('RPC responses use json wrapper', function () {",
+          "  if (!isAdminGuard && pm.request.url.toString().indexOf('/api/rpc/') >= 0) {",
+          "    const body = pm.response.json();",
+          "    pm.expect(body).to.have.property('json');",
+          "  }",
+          "});"
+        ]
+      }
+    }
+  ]
+}
