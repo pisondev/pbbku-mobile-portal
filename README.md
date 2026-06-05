@@ -1,15 +1,18 @@
 # PBB-Ku Mobile Portal
 
-PBB-Ku Mobile Portal adalah proyek aplikasi mobile Android untuk portal wajib pajak PBB-P2. Aplikasi dirancang sebagai client yang membantu wajib pajak melihat informasi objek pajak, data bangunan, histori SPPT, tunggakan, dan pengingat pembayaran dengan mengambil data dari SIMPBB OP API.
+PBB-Ku Mobile Portal adalah proyek aplikasi mobile Android untuk portal wajib pajak PBB-P2. Aplikasi dirancang sebagai client yang membantu wajib pajak melihat informasi objek pajak, data bangunan, histori SPPT, tunggakan, dan pengingat pembayaran melalui API internal PBB-Ku yang mempertahankan kontrak oRPC SIMPBB OP API.
 
-Proyek ini disusun untuk kebutuhan Proyek 2 Mobile Apps. Pada fase MVP, PBB-Ku tidak membangun backend internal dan tidak menyimpan data resmi PBB di database sendiri. Data resmi berasal dari SIMPBB OP API, sementara aplikasi hanya menyimpan data lokal yang dibutuhkan untuk session simulatif, cache, preferensi, notifikasi lokal, dan draft fitur prototipe.
+Proyek ini disusun untuk kebutuhan Proyek 2 Mobile Apps. Pada fase final, PBB-Ku memiliki aplikasi Android di `apps/android` dan API internal Go di `apps/api`. API internal mengadaptasi pola endpoint SIMPBB OP API dengan database demo milik proyek sendiri (SQLite untuk lokal, PostgreSQL untuk deployment), sementara aplikasi Android tetap menyimpan data lokal hanya untuk session simulatif, cache, preferensi, notifikasi lokal, dan draft fitur prototipe.
 
 ## Status Proyek
 
 Status saat ini:
 
 - Dokumentasi SRS tersedia di `docs/srs/SRS_PBBKu.md`.
-- Dokumentasi integrasi SIMPBB OP API tersedia di `docs/api/`.
+- Dokumentasi integrasi SIMPBB OP API awal tersedia di `docs/api/`.
+- API internal kompatibel SIMPBB tersedia di `apps/api/`.
+- Dokumentasi API deployment/Postman tersedia di `apps/api/docs/postman/`.
+- DBML untuk ERD database internal tersedia di `apps/api/docs/diagram/pbbku_internal_api.dbml`.
 - Kontrak MVP v1 tersedia di `docs/contract/v1-mvp_contract.md`.
 - Diagram arsitektur tersedia di `docs/diagram/`.
 - Tahap 0, yaitu persiapan dan pembekuan scope teknis MVP, sudah selesai.
@@ -51,20 +54,19 @@ Fitur utama yang dirancang untuk MVP:
 
 Fitur yang tidak termasuk MVP:
 
-- Backend internal.
-- Database server internal.
 - Payment gateway atau transaksi pembayaran nyata.
 - Update langsung data resmi SPOP/LSPOP.
 - Panel admin Bapenda.
+- Integrasi write resmi ke SIMPBB core system dari aplikasi wajib pajak.
 
 ## Arsitektur
 
 ```text
 Wajib Pajak
   -> Android App PBB-Ku
-  -> SIMPBB OP API
-  -> SIMPBB Core System dan Database
-  -> Data Objek Pajak, Subjek Pajak, Bangunan, SPPT, Tunggakan
+  -> PBB-Ku Internal API (/api/rpc kompatibel SIMPBB)
+  -> Database PBB-Ku (SQLite lokal / PostgreSQL deployment)
+  -> Data demo objek pajak, subjek pajak, bangunan, SPPT, tunggakan
 ```
 
 Diagram arsitektur lengkap dapat dilihat di `docs/diagram/2-1_arsitektur-sistem-pbbku.png`.
@@ -74,14 +76,23 @@ Diagram arsitektur lengkap dapat dilihat di `docs/diagram/2-1_arsitektur-sistem-
 ```text
 pbbku-mobile-portal/
 +-- apps/
-|   `-- android/
-|       +-- app/
-|       +-- gradle/
-|       +-- build.gradle.kts
-|       +-- gradle.properties
-|       +-- gradlew
-|       +-- gradlew.bat
-|       `-- settings.gradle.kts
+|   +-- android/
+|   |   +-- app/
+|   |   +-- gradle/
+|   |   +-- build.gradle.kts
+|   |   +-- gradle.properties
+|   |   +-- gradlew
+|   |   +-- gradlew.bat
+|   |   `-- settings.gradle.kts
+|   `-- api/
+|       +-- cmd/
+|       +-- docs/
+|       |   +-- diagram/
+|       |   `-- postman/
+|       +-- internal/
+|       +-- migrations/
+|       +-- seeds/
+|       `-- tests/
 +-- docs/
 |   +-- api/
 |   |   +-- SIMPBB_OP_API.md
@@ -112,13 +123,34 @@ Dokumen utama proyek:
 - `docs/api/SIMPBB_OP_API.md`: ringkasan endpoint SIMPBB OP API untuk integrasi aplikasi.
 - `docs/api/SIMPBB_OP_API.postman_collection.json`: Postman Collection untuk eksplorasi endpoint.
 - `docs/api/SIMPBB_OP_API.postman_environment.json`: Postman Environment berisi variable base URL dan contoh parameter.
+- `apps/api/README.md`: dokumentasi API internal, mode database, security, REST/oRPC endpoint, dan deployment.
+- `apps/api/docs/postman/`: Postman Collection dan Environment untuk deployment API internal PBB-Ku.
+- `apps/api/docs/diagram/pbbku_internal_api.dbml`: DBML untuk generate ERD di dbdiagram.io.
 - `docs/contract/v1-mvp_contract.md`: kontrak kerja MVP, tahapan todo, acceptance criteria, dan advanced feature.
 - `docs/demo/end_to_end_demo.md`: skenario demo end-to-end yang aman untuk reviewer.
 - `docs/testing/functional_unit_test_notes.md`: catatan pengujian fungsional berbasis unit test.
 - `docs/testing/nonfunctional_unit_test_notes.md`: catatan pengujian non-fungsional berbasis unit test dan inspeksi konfigurasi.
 - `docs/testing/manual_test_notes.md`: ringkasan runtime test/manual test yang pernah berhasil dan sisa risiko manual.
+- `docs/testing/testing_coverage_audit.md`: audit coverage test final dan batas testing UI otomatis.
 
-## SIMPBB OP API
+## PBB-Ku Internal API dan Kontrak SIMPBB
+
+API internal berada di `apps/api` dan dibuat agar Android tetap memakai kontrak oRPC yang sama dengan SIMPBB OP API. Endpoint utama tersedia di prefix:
+
+```text
+Production   : https://pbbku-api.tierratie.com/api/rpc/
+Local Android: http://10.0.2.2:8080/api/rpc/
+Local host   : http://localhost:8080/api/rpc/
+```
+
+Mode database:
+
+- SQLite: default lokal untuk pengembangan cepat dan demo offline.
+- PostgreSQL: mode deployment/VPS.
+
+Dokumentasi API internal lengkap tersedia di `apps/api/README.md`.
+
+## SIMPBB OP API Acuan
 
 Konfigurasi dasar API:
 
@@ -135,7 +167,7 @@ Di source Android, base URL terpusat di:
 apps/android/app/src/main/java/id/pbbku/mobileportal/data/api/SimpbbApiConfig.kt
 ```
 
-Untuk mengganti environment API, ubah `SimpbbApiConfig.BASE_URL` atau gunakan overload `SimpbbApiClient.create(baseUrl = ...)` pada wiring aplikasi/test.
+Untuk mengganti environment API, pakai Gradle property `PBBKU_API_BASE_URL` atau gunakan overload `SimpbbApiClient.create(baseUrl = ...)` pada wiring aplikasi/test.
 
 Semua request menggunakan method `POST` dan body JSON dengan wrapper:
 
@@ -189,7 +221,7 @@ Stack final untuk MVP:
 
 Keputusan scope penting:
 
-- Data resmi tetap berasal dari SIMPBB OP API.
+- Data demo/runtime aplikasi berasal dari API internal PBB-Ku yang mengadaptasi kontrak SIMPBB OP API.
 - Data lokal hanya untuk session simulatif, preferensi, cache read-only, notifikasi lokal, dan draft/prototipe.
 - Endpoint write seperti `objekPajak/save` tidak digunakan dalam alur MVP portal wajib pajak.
 - Data demo menggunakan contoh Postman environment dan/atau data dummy aman, bukan data pribadi nyata.
@@ -218,6 +250,18 @@ Unit test dan build debug:
 source ~/.zshrc
 cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
 ./gradlew :app:testDebugUnitTest :app:assembleDebug
+```
+
+Ringkasan semua automated test untuk screenshot laporan:
+
+```zsh
+zsh scripts/test.sh
+```
+
+Script tersebut menjalankan API unit/integration/functional test, Android JVM unit/functional/nonfunctional contract test, dan Android lint dengan output ringkas berwarna. Untuk menyiapkan emulator dan membuka aplikasi sebagai manual E2E prep, jalankan:
+
+```zsh
+zsh scripts/test.sh --e2e
 ```
 
 APK debug akan tersedia di:
@@ -256,16 +300,22 @@ Status verifikasi saat ini:
 - `./gradlew :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh sudah berhasil.
 - `./gradlew :app:lintDebug` dari MSYS2 zsh sudah berhasil.
-- Unit test saat ini: 45 test lulus, mencakup parser NOP, masking NIK, validasi NIK, OTP demo, wrapper oRPC, mapper objek pajak, mapper detail objek pajak, mapper LSPOP, mapper SPPT, mapper wilayah, request detail bangunan, validasi form laporan perubahan bangunan, suite fungsional MVP, dan suite non-fungsional MVP.
+- Unit/JVM test Android saat ini: 46 test lulus, mencakup parser NOP, masking NIK, validasi NIK, OTP demo, wrapper oRPC, mapper objek pajak, mapper detail objek pajak, mapper LSPOP, mapper SPPT, mapper wilayah, request detail bangunan, validasi form laporan perubahan bangunan, suite fungsional MVP, dan suite non-fungsional MVP.
+- API test saat ini: unit, integration SQLite, dan functional/edge-case suite lulus; PostgreSQL integration bersifat opsional dan skip jika `PBBKU_TEST_POSTGRES_URL` belum di-set.
 - Live API check ringan berhasil untuk `POST /wilayah/listPropinsi` dengan body `{"json":{}}`.
 - File lokal `apps/android/local.properties` mengarah ke `C:\Android\Sdk` dan tidak di-commit karena sudah di-ignore.
 - Runtime test dasar berhasil di emulator headless `Pixel_6_API_35`: install debug, fresh onboarding, login NIK demo `3404123456789012`, OTP demo `123456`, Beranda dengan masked NIK `34************12`, dan logout kembali ke Login.
 - Runtime test pencarian berhasil di emulator headless `Pixel_6_API_35`: tab Cari, query `WAYAN`, hasil dari `objekPajak/search` tampil, termasuk `I WAYAN SUTARJA` dengan NOP `32.04.010.001.001.0001.0`, lalu item hasil membuka Detail Objek Pajak.
 
-Untuk eksplorasi API, import file berikut ke Postman:
+Untuk eksplorasi API acuan SIMPBB, import file berikut ke Postman:
 
 1. `docs/api/SIMPBB_OP_API.postman_collection.json`
 2. `docs/api/SIMPBB_OP_API.postman_environment.json`
+
+Untuk eksplorasi API deployment PBB-Ku, import file berikut:
+
+1. `apps/api/docs/postman/PBBKu_Deployment_API.postman_collection.json`
+2. `apps/api/docs/postman/PBBKu_Deployment_API.postman_environment.json`
 
 ## Keamanan dan Data Demo
 

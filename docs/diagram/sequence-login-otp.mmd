@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor WP as Wajib Pajak
+    participant App as Android PBB-Ku
+    participant VM as AuthViewModel
+    participant Validator as NikValidator
+    participant Session as SessionDataStore
+
+    WP->>App: Buka aplikasi
+    App->>Session: Baca session aktif
+    alt Session masih aktif
+        Session-->>App: maskedNik + token session
+        App-->>WP: Tampilkan Beranda
+    else Session kosong
+        Session-->>App: Tidak ada session
+        App-->>WP: Tampilkan Onboarding atau Login
+        WP->>App: Input NIK
+        App->>VM: submitNik(nik)
+        VM->>Validator: validasi 16 digit angka
+        alt NIK tidak valid
+            Validator-->>VM: invalid
+            VM-->>App: Error format NIK
+            App-->>WP: Tampilkan pesan validasi
+        else NIK valid
+            Validator-->>VM: valid
+            VM-->>App: Navigasi ke OTP
+            WP->>App: Input OTP 123456
+            App->>VM: verifyOtp()
+            VM->>Session: Simpan maskedNik + token simulatif
+            Session-->>VM: Session tersimpan
+            VM-->>App: Login sukses
+            App-->>WP: Tampilkan Beranda
+        end
+    end

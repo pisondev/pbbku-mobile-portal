@@ -9,8 +9,8 @@
 |---|---|
 | Nama Sistem | PBBku |
 | Klien | Bapenda |
-| Versi Dokumen | 1.0 |
-| Tanggal | 30 April 2026 |
+| Versi Dokumen | 1.1 |
+| Tanggal | 5 Juni 2026 |
 | Standar Acuan | IEEE Std 830-1998 |
 
 ## Riwayat Revisi
@@ -18,6 +18,7 @@
 | Versi | Tanggal | Penulis | Keterangan |
 |---|---|---|---|
 | 1.0 | 30/04/2026 | Tim Pengembang | Draft awal SRS |
+| 1.1 | 05/06/2026 | Tim Pengembang | Update final agar sesuai implementasi Android, API internal Go, database demo, Postman deployment, DBML ERD, dan test suite otomatis |
 
 ## Daftar Isi
 
@@ -51,7 +52,7 @@ Sasaran pembaca dokumen ini meliputi:
 
 ## 1.2 Ruang Lingkup Produk
 
-PBB-Ku adalah aplikasi mobile Android untuk wajib pajak yang berfokus pada akses informasi PBB-P2. Aplikasi ini tidak menggantikan sistem inti PBB, melainkan menjadi *client* yang menampilkan dan mengolah data yang diperoleh dari SIMPBB OP API. Dalam dokumentasi SIMPBB API, sistem menyediakan base API berbasis oRPC over HTTP POST, menggunakan format `application/json`, dan setiap *request/response* dibungkus dalam objek `json`.
+PBB-Ku adalah aplikasi mobile Android untuk wajib pajak yang berfokus pada akses informasi PBB-P2. Aplikasi ini tidak menggantikan sistem inti PBB, melainkan menjadi *client* yang menampilkan dan mengolah data dari API internal PBB-Ku. API internal tersebut mengadaptasi kontrak SIMPBB OP API berbasis oRPC over HTTP POST, menggunakan format `application/json`, dan setiap *request/response* dibungkus dalam objek `json`.
 
 ### 1.2.1 Ruang Lingkup yang Termasuk
 
@@ -79,14 +80,12 @@ Fitur-fitur utama tersebut tetap sejalan dengan deskripsi Proyek 2 - PBB-Ku dala
 
 Ruang lingkup yang tidak termasuk dalam MVP final:
 
-1. Tidak membangun backend internal menggunakan Gofiber.
-2. Tidak membangun database internal PostgreSQL untuk data PBB resmi.
-3. Tidak membuat API baru untuk objek pajak, SPPT, pembayaran, atau laporan.
-4. Tidak melakukan transaksi pembayaran nyata melalui payment gateway.
-5. Tidak melakukan update langsung terhadap data resmi SPOP/LSPOP.
-6. Tidak membuat panel admin/Bapenda.
-7. Tidak menggunakan data pribadi nyata untuk demonstrasi.
-8. Tidak menjamin ketersediaan layanan jika SIMPBB API tidak dapat diakses.
+1. Tidak membangun panel admin/Bapenda.
+2. Tidak melakukan transaksi pembayaran nyata melalui payment gateway.
+3. Tidak melakukan update langsung terhadap data resmi SPOP/LSPOP dari aplikasi wajib pajak.
+4. Tidak melakukan integrasi write resmi ke SIMPBB core system.
+5. Tidak menggunakan data pribadi nyata untuk demonstrasi.
+6. Tidak menjamin ketersediaan layanan produksi jika deployment API internal atau jaringan tidak dapat diakses.
 
 Endpoint `objekPajak/save` memang tersedia dalam dokumentasi SIMPBB API untuk *upsert* data SPOP dan Subjek Pajak, tetapi dalam rancangan PBB-Ku fitur wajib pajak tidak diarahkan untuk langsung mengubah data resmi. Perubahan properti hanya dilaporkan sebagai data usulan/prototipe agar tidak mencampur fitur portal wajib pajak dengan kewenangan validasi petugas.
 
@@ -133,13 +132,13 @@ Referensi utama dokumen ini adalah:
 
 ## 2.1 Perspektif Produk
 
-PBB-Ku merupakan aplikasi mobile baru yang dikembangkan sebagai proyek akademik. Produk ini berada pada sisi *client* dan bertugas menampilkan data PBB-P2 kepada wajib pajak dengan antarmuka yang lebih sederhana dibandingkan sistem administrasi internal. Sistem tidak berdiri sebagai *core system* PBB, melainkan mengonsumsi data dari SIMPBB OP API yang sudah tersedia. Dokumentasi SIMPBB API menjelaskan bahwa base configuration menggunakan base URL `https://simpbb.technosmart.id/api/rpc` dengan protokol oRPC over HTTP POST, auth strategy public untuk router yang didokumentasikan, dan content type `application/json`. Setiap request dibungkus dalam struktur `{"json": {...}}`, dan response juga dikembalikan di dalam field `json`.
+PBB-Ku merupakan aplikasi mobile baru yang dikembangkan sebagai proyek akademik. Produk ini berada pada sisi *client* dan bertugas menampilkan data PBB-P2 kepada wajib pajak dengan antarmuka yang lebih sederhana dibandingkan sistem administrasi internal. Sistem tidak berdiri sebagai *core system* PBB. Implementasi final memakai API internal PBB-Ku berbasis Go pada `apps/api` yang mengadaptasi kontrak SIMPBB OP API. Android tetap mengirim request oRPC `POST` dengan wrapper `{"json": {...}}`, sedangkan API internal membaca/menulis data demo dari SQLite lokal atau PostgreSQL deployment.
 
 ### Gambar 2.1 Arsitektur Sistem PBB-Ku
 
 ![Gambar 2.1 Arsitektur Sistem PBB-Ku](../diagram/2-1_arsitektur-sistem-pbbku.png)
 
-Arsitektur tersebut menunjukkan bahwa aplikasi PBB-Ku tidak memiliki backend internal. Semua data PBB yang ditampilkan berasal dari SIMPBB API. Komponen lokal di aplikasi hanya digunakan untuk session simulatif, cache, preferensi pengguna, notifikasi lokal, dan data prototipe untuk fitur yang belum tersedia endpoint-nya.
+Arsitektur final menunjukkan bahwa aplikasi PBB-Ku memiliki API internal sebagai adaptor kontrak SIMPBB dan sumber data demo/deployment mandiri. Komponen lokal di aplikasi Android tetap hanya digunakan untuk session simulatif, cache, preferensi pengguna, notifikasi lokal, dan data prototipe untuk fitur yang belum tersedia sebagai alur resmi.
 
 ## 2.2 Fungsi Produk (Ringkasan)
 
@@ -176,9 +175,9 @@ Aplikasi harus mengutamakan kemudahan penggunaan karena pengguna utama adalah ma
 | No | Batasan |
 |---|---|
 | B-01 | Aplikasi hanya tersedia untuk Android pada fase MVP. |
-| B-02 | Aplikasi tidak membangun backend internal. |
-| B-03 | Aplikasi tidak memiliki database server sendiri. |
-| B-04 | Aplikasi bergantung pada ketersediaan SIMPBB API. |
+| B-02 | Aplikasi memakai API internal PBB-Ku yang kompatibel kontrak SIMPBB, bukan langsung bergantung pada API eksternal saat demo/deployment final. |
+| B-03 | Database internal hanya menyimpan data demo/proyek untuk API PBB-Ku, bukan klaim salinan resmi penuh database Bapenda. |
+| B-04 | Aplikasi bergantung pada ketersediaan API internal PBB-Ku atau environment API yang dikonfigurasi. |
 | B-05 | Aplikasi tidak melakukan transaksi pembayaran nyata. |
 | B-06 | Aplikasi tidak mengubah data resmi objek pajak. |
 | B-07 | Login NIK dan OTP pada MVP bersifat simulatif. |
@@ -190,7 +189,7 @@ Aplikasi harus mengutamakan kemudahan penggunaan karena pengguna utama adalah ma
 
 | No | Asumsi |
 |---|---|
-| A-01 | Perangkat pengguna memiliki koneksi internet untuk mengakses SIMPBB API. |
+| A-01 | Perangkat pengguna memiliki koneksi internet untuk mengakses API internal PBB-Ku pada deployment, atau koneksi emulator ke host lokal saat pengujian. |
 | A-02 | API dapat diakses menggunakan HTTP POST dengan content type `application/json`. |
 | A-03 | Input NOP harus mempertahankan leading zero, misalnya `"001"` bukan `"1"`. |
 | A-04 | Field luas bumi, luas bangunan, dan nilai NJOP dikirim/dibaca sebagai number. |
@@ -198,7 +197,7 @@ Aplikasi harus mengutamakan kemudahan penggunaan karena pengguna utama adalah ma
 | A-06 | Response API konsisten dengan wrapper `json`. |
 | A-07 | Endpoint yang terdokumentasi dapat digunakan dalam demo aplikasi. |
 
-Asumsi teknis A-02 sampai A-06 berasal dari dokumentasi SIMPBB API, terutama bagian protocol specification, format NOP, dan tips implementasi.
+Asumsi teknis A-02 sampai A-06 berasal dari kontrak SIMPBB API yang diadaptasi oleh API internal PBB-Ku, terutama bagian protocol specification, format NOP, dan tips implementasi.
 
 ---
 
@@ -475,13 +474,15 @@ Tidak ada kebutuhan perangkat keras khusus selain smartphone Android. Untuk demo
 ### 5.4.1 Konfigurasi
 
 ```text
-Base URL      : https://simpbb.technosmart.id/api/rpc
+Production    : https://pbbku-api.tierratie.com/api/rpc/
+Local Android : http://10.0.2.2:8080/api/rpc/
+Local Host    : http://localhost:8080/api/rpc/
 Protocol      : oRPC over HTTP POST
-Auth Strategy : PUBLIC untuk router terdokumentasi
+Auth Strategy : PUBLIC untuk endpoint read; admin key untuk endpoint write internal yang tidak dipakai alur wajib pajak
 Content-Type  : application/json
 ```
 
-Konfigurasi ini mengikuti dokumentasi SIMPBB API.
+Konfigurasi ini mengikuti kontrak SIMPBB API yang diadaptasi oleh API internal PBB-Ku.
 
 ### 5.4.2 Request Wrapper
 
@@ -521,7 +522,7 @@ Konfigurasi ini mengikuti dokumentasi SIMPBB API.
 
 Aplikasi harus memperlakukan seluruh segmen NOP sebagai string agar leading zero tidak hilang. Dokumentasi API secara eksplisit memberi catatan bahwa kode seperti `"001"` tidak boleh dikirim sebagai `"1"`.
 
-## 5.5 Mapping Endpoint SIMPBB API ke Fitur PBB-Ku
+## 5.5 Mapping Endpoint API PBB-Ku/SIMPBB ke Fitur PBB-Ku
 
 | Router | Endpoint | Kegunaan di PBB-Ku | Input Utama |
 |---|---|---|---|
@@ -634,7 +635,7 @@ PBB-Ku berfokus pada pengalaman wajib pajak. Inovasi utama aplikasi ini bukan pa
 
 Keunggulan ini relevan karena dokumen ide proyek menekankan bahwa sebagian wajib pajak masih menerima tagihan secara kertas, tidak mengetahui asal angka tagihan, dan berpotensi terlambat membayar karena lupa atau kurang informasi. Studi tentang layanan online PBB-P2 di Rejang Lebong juga menunjukkan bahwa layanan online dapat berpengaruh terhadap kepatuhan wajib pajak melalui aksesibilitas, transparansi, efisiensi, kemudahan penggunaan, keandalan, keamanan, dan responsivitas. (Ejournal Universitas Bengkulu)
 
-Inovasi tambahan PBB-Ku adalah pemanfaatan API resmi/terdokumentasi yang sudah ada. Dengan tidak membangun backend baru, tim dapat fokus pada kualitas aplikasi mobile, pengalaman pengguna, integrasi API, error handling, dan demonstrasi fitur inti.
+Inovasi tambahan PBB-Ku adalah pemanfaatan kontrak API resmi/terdokumentasi yang sudah ada, lalu mengadaptasinya ke API internal agar demo, testing, dan deployment tidak bergantung penuh pada layanan eksternal. Dengan pola ini, tim tetap dapat fokus pada kualitas aplikasi mobile, pengalaman pengguna, integrasi API, error handling, dan demonstrasi fitur inti.
 
 ## 6.2 Teknologi dan Arsitektur Sistem
 
@@ -646,9 +647,9 @@ Inovasi tambahan PBB-Ku adalah pemanfaatan API resmi/terdokumentasi yang sudah a
 | Serialization | kotlinx.serialization/Gson/Moshi | Parsing JSON wrapper. |
 | Local Storage | DataStore/Room | Cache, session simulatif, preferensi, draft laporan. |
 | Notification | WorkManager/AlarmManager | Reminder lokal jatuh tempo. |
-| API | SIMPBB OP API | Sumber data eksternal. |
-| Backend Internal | Tidak ada | MVP tidak mengembangkan backend Gofiber. |
-| Database Internal | Tidak ada | Data resmi berasal dari SIMPBB API. |
+| API | PBB-Ku Internal API | API Go kompatibel kontrak oRPC SIMPBB pada `/api/rpc`, plus REST read-only `/api/v1`. |
+| Backend Internal | Go net/http | Server internal di `apps/api` untuk demo, testing, deployment mandiri, security middleware, dan endpoint kompatibel SIMPBB. |
+| Database Internal | SQLite/PostgreSQL | SQLite untuk lokal/test cepat, PostgreSQL untuk deployment; schema terdokumentasi di `apps/api/docs/diagram/pbbku_internal_api.dbml`. |
 
 Android Developers menyebut Kotlin sebagai bahasa modern untuk membangun aplikasi Android, dan Jetpack Compose sebagai toolkit UI Android modern. (Android Developers)
 
@@ -658,17 +659,24 @@ Android Developers menyebut Kotlin sebagai bahasa modern untuk membangun aplikas
 
 **Tautan repositori:** `https://github.com/pisondev/pbbku-mobile-portal`
 
-Struktur repository sementara tanpa backend internal, dengan kemungkinan penambahan backend tambahan apabila diperlukan:
+Struktur repository final memisahkan aplikasi Android, API internal, dan dokumentasi:
 
 ```text
 PBBKU-MOBILE-PORTAL/
 ├── apps/
-│   └── android/
-│       └── app/
+│   ├── android/
+│   │   └── app/
+│   └── api/
+│       ├── cmd/
+│       ├── docs/
+│       ├── internal/
+│       ├── migrations/
+│       ├── seeds/
+│       └── tests/
 ├── docs/
 │   ├── api/
-│   ├── diagrams/
-│   ├── proposal/
+│   ├── diagram/
+│   ├── demo/
 │   └── srs/
 ├── .env
 ├── .gitignore
@@ -699,7 +707,7 @@ flowchart TD
 
 ### Fase 1: Analisis dan SRS
 
-Kami menyusun SRS, memetakan fitur dari dokumen ide proyek, mempelajari dokumentasi SIMPBB API, dan menentukan batasan bahwa backend internal tidak dikembangkan. Output fase ini adalah SRS final, daftar endpoint yang digunakan, dan rancangan user flow.
+Kami menyusun SRS, memetakan fitur dari dokumen ide proyek, mempelajari dokumentasi SIMPBB API, dan menentukan batasan bahwa backend internal berfungsi sebagai adaptor/demo API kompatibel SIMPBB, bukan pengganti core system Bapenda. Output fase ini adalah SRS final, daftar endpoint yang digunakan, rancangan user flow, dan dokumentasi skema database internal.
 
 ### Fase 2: Desain UI/UX
 
@@ -709,9 +717,9 @@ Kami membuat wireframe halaman login, beranda, pencarian NOP, detail objek pajak
 
 Kami membuat project Android Kotlin, konfigurasi Jetpack Compose, struktur folder modular, dependency networking, serialization, local storage, dan navigation.
 
-### Fase 4: Integrasi SIMPBB API
+### Fase 4: Integrasi API PBB-Ku/SIMPBB
 
-Kami membuat API client untuk wrapper oRPC. Setiap endpoint dibuat sebagai fungsi repository, misalnya `searchObjekPajak`, `getObjekPajakByNop`, `getSpptByNop`, `getTunggakan`, dan `listBangunanByNop`.
+Kami membuat API client untuk wrapper oRPC dan API internal Go yang menyediakan endpoint kompatibel SIMPBB. Setiap endpoint dibuat sebagai fungsi repository, misalnya `searchObjekPajak`, `getObjekPajakByNop`, `getSpptByNop`, `getTunggakan`, dan `listBangunanByNop`.
 
 ### Fase 5: Implementasi Fitur Utama
 
@@ -748,11 +756,25 @@ Kami melakukan pengujian fungsional, integrasi API, error handling, usability, d
 | TC-017 | Usability | Responden mencari tagihan | Responden dapat menyelesaikan tugas tanpa bantuan besar |
 | TC-018 | Keamanan | Periksa log debug | Tidak ada NIK penuh atau data sensitif |
 
+## 6.7 Status Pengujian Final
+
+Status pengujian otomatis per 5 Juni 2026:
+
+| Area | Bentuk Pengujian | Status |
+|---|---|---|
+| Android unit/JVM | `:app:testDebugUnitTest --offline` mencakup unit, functional contract, dan nonfunctional contract | 46 pass, 0 fail |
+| Android static check | `:app:lintDebug --offline` | Pass |
+| API unit | `go test ./tests/unit -count=1` | Pass |
+| API integration | `go test ./tests/integration -count=1` | Pass untuk SQLite; PostgreSQL test skip jika `PBBKU_TEST_POSTGRES_URL` belum di-set |
+| API functional | `go test ./tests/functional -count=1` | Pass |
+
+Script agregasi untuk screenshot laporan tersedia di `scripts/test.sh`. Script tersebut ditujukan untuk MSYS2 zsh dan menampilkan ringkasan berwarna untuk API unit/integration/functional, Android JVM test, dan Android lint. Runtime emulator/manual E2E tetap dicatat sebagai pengujian manual karena membutuhkan device/emulator aktif dan validasi visual.
+
 ---
 
 # 7.0 Jadwal Kegiatan
 
-Pelaksanaan kegiatan dirancang selama delapan minggu setelah UTS. Jadwal ini disesuaikan dengan perubahan ruang lingkup final, yaitu tanpa pengembangan backend internal. Fokus utama adalah aplikasi Android, integrasi SIMPBB API, UI/UX, testing, dan dokumentasi.
+Pelaksanaan kegiatan dirancang selama delapan minggu setelah UTS. Jadwal ini disesuaikan dengan ruang lingkup final, yaitu aplikasi Android, API internal kompatibel SIMPBB, database demo/deployment, UI/UX, testing, dan dokumentasi.
 
 ## Tabel 7.1 Jadwal Kegiatan
 

@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor WP as Wajib Pajak
+    participant UI as Pengaturan dan SPPT UI
+    participant VM as Settings dan SPPT ViewModel
+    participant ReminderRepo as PaymentReminderRepository
+    participant Worker as WorkManager
+    participant System as Android Notification
+
+    WP->>UI: Aktifkan pengingat jatuh tempo
+    UI->>VM: setReminderEnabled(true)
+    alt Android 13+ belum ada izin notifikasi
+        UI-->>WP: Minta izin POST_NOTIFICATIONS
+        WP-->>UI: Beri izin
+    end
+    VM->>ReminderRepo: Simpan preferensi aktif
+    ReminderRepo-->>VM: OK
+
+    WP->>UI: Buka Histori SPPT atau Tunggakan
+    UI->>VM: load tagihan
+    VM->>ReminderRepo: scheduleUnpaidBills(tagihan belum lunas)
+    ReminderRepo->>Worker: Jadwalkan 30 7 dan 1 hari sebelum jatuh tempo
+    Worker-->>ReminderRepo: Work request tersimpan
+    ReminderRepo-->>VM: Jadwal reminder
+    VM-->>UI: Tampilkan daftar notifikasi
+    UI-->>WP: Lihat jadwal pengingat
+
+    Worker->>System: Kirim trigger saat jadwal tercapai
+    System-->>WP: Notifikasi pengingat PBB tanpa NIK atau alamat lengkap

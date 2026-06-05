@@ -1,0 +1,19 @@
+flowchart LR
+    A[Android PBB-Ku] -->|"POST api rpc dengan wrapper json"| B[PBB-Ku Internal API]
+    B --> C{Router}
+    C -->|"wilayah endpoints"| D[Wilayah Handler]
+    C -->|"objekPajak endpoints"| E[Objek Pajak Handler]
+    C -->|"lspop endpoints"| F[LSPOP Handler]
+    C -->|"sppt endpoints"| G[SPPT Handler]
+    E -->|"save object"| H{Admin Key}
+    H -->|"Tidak ada"| I[HTTP 401 atau 403 ditolak]
+    H -->|"Valid"| J[Transaksi upsert internal]
+    D --> K[(SQLite lokal atau PostgreSQL deployment)]
+    E --> K
+    F --> K
+    G --> K
+    J --> K
+    K --> L[Mapper response kompatibel SIMPBB]
+    L -->|"Response wrapper json"| A
+
+    M[REST read-only API v1] --> B

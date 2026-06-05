@@ -1,0 +1,191 @@
+// PBB-Ku Internal API database model.
+// Generated from apps/api/migrations/001_schema.sql for dbdiagram.io.
+
+Project pbbku_internal_api {
+  database_type: "PostgreSQL / SQLite"
+  Note: "Schema demo API internal PBB-Ku yang mempertahankan kontrak oRPC SIMPBB OP API dengan database sendiri."
+}
+
+Table propinsi {
+  kd_propinsi text [pk, note: "Kode provinsi, disimpan sebagai string agar leading zero tetap aman"]
+  nm_propinsi text [not null]
+}
+
+Table dati2 {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  nm_dati2 text [not null]
+
+  indexes {
+    (kd_propinsi, kd_dati2) [pk]
+  }
+}
+
+Table kecamatan {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  nm_kecamatan text [not null]
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan) [pk]
+  }
+}
+
+Table kelurahan {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  kd_kelurahan text [not null]
+  nm_kelurahan text [not null]
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan) [pk]
+  }
+}
+
+Table blok {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  kd_kelurahan text [not null]
+  kd_blok text [not null]
+  nm_blok text [not null]
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok) [pk]
+  }
+}
+
+Table tax_subjects {
+  subject_id text [pk]
+  nm_wp text [not null]
+  jalan_wp text
+  blok_kav_no_wp text
+  rt_wp text
+  rw_wp text
+  kelurahan_wp text
+  kota_wp text
+  kd_pos_wp text
+  status_pekerjaan_wp text
+}
+
+Table tax_objects {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  kd_kelurahan text [not null]
+  kd_blok text [not null]
+  no_urut text [not null]
+  kd_jns_op text [not null]
+  subject_id text [not null]
+  nm_wp text [not null]
+  jalan_op text
+  blok_kav_no_op text
+  rt_op text
+  rw_op text
+  kelurahan_op text
+  luas_bumi double
+  nilai_sistem_bumi double
+  njop_bumi double
+  kd_status_wp text
+  jns_bumi text
+  jns_transaksi_op text
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op) [pk]
+    nm_wp [name: "idx_tax_objects_name"]
+  }
+}
+
+Table buildings {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  kd_kelurahan text [not null]
+  kd_blok text [not null]
+  no_urut text [not null]
+  kd_jns_op text [not null]
+  no_bng integer [not null]
+  luas_bng double
+  jml_lantai_bng integer
+  jenis_bangunan text
+  jpb text
+  thn_dibangun_bng integer
+  thn_renovasi_bng integer
+  kondisi_bng text
+  konstruksi_bng text
+  atap_bng text
+  dinding_bng text
+  lantai_bng text
+  langit_langit_bng text
+  nilai_sistem_bng double
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, no_bng) [pk]
+  }
+}
+
+Table building_facilities {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  kd_kelurahan text [not null]
+  kd_blok text [not null]
+  no_urut text [not null]
+  kd_jns_op text [not null]
+  no_bng integer [not null]
+  nama_fasilitas text [not null]
+  jumlah double
+  satuan text
+  keterangan text
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, no_bng, nama_fasilitas) [pk]
+  }
+}
+
+Table sppt {
+  kd_propinsi text [not null]
+  kd_dati2 text [not null]
+  kd_kecamatan text [not null]
+  kd_kelurahan text [not null]
+  kd_blok text [not null]
+  no_urut text [not null]
+  kd_jns_op text [not null]
+  thn_pajak_sppt integer [not null]
+  pbb_yg_harus_dibayar_sppt double [not null]
+  status_pembayaran_sppt text [not null, note: "0=belum bayar pada seed demo; nilai lain mengikuti sumber SIMPBB"]
+  tgl_jatuh_tempo_sppt text
+  denda_sppt double
+  tgl_pembayaran_sppt text
+  njop_bumi_sppt double
+  njop_bangunan_sppt double
+  njop_sppt double
+  njoptkp_sppt double
+  tarif_sppt double
+  pbb_terutang_sppt double
+
+  indexes {
+    (kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, thn_pajak_sppt) [pk]
+    (thn_pajak_sppt, status_pembayaran_sppt) [name: "idx_sppt_year_status"]
+  }
+}
+
+Ref: dati2.kd_propinsi > propinsi.kd_propinsi [delete: cascade]
+
+Ref: kecamatan.(kd_propinsi, kd_dati2) > dati2.(kd_propinsi, kd_dati2) [delete: cascade]
+
+Ref: kelurahan.(kd_propinsi, kd_dati2, kd_kecamatan) > kecamatan.(kd_propinsi, kd_dati2, kd_kecamatan) [delete: cascade]
+
+Ref: blok.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan) > kelurahan.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan) [delete: cascade]
+
+Ref: tax_objects.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok) > blok.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok)
+
+Ref: tax_objects.subject_id > tax_subjects.subject_id
+
+Ref: buildings.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op) > tax_objects.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op) [delete: cascade]
+
+Ref: building_facilities.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, no_bng) > buildings.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op, no_bng) [delete: cascade]
+
+Ref: sppt.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op) > tax_objects.(kd_propinsi, kd_dati2, kd_kecamatan, kd_kelurahan, kd_blok, no_urut, kd_jns_op) [delete: cascade]

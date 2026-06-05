@@ -4,7 +4,7 @@ Dokumen ini adalah kontrak kerja MVP untuk implementasi aplikasi Android PBB-Ku 
 
 ## 1. Tujuan MVP
 
-MVP PBB-Ku harus menghasilkan aplikasi Android yang dapat didemonstrasikan sebagai portal wajib pajak PBB-P2. Aplikasi berperan sebagai client yang mengambil data resmi dari SIMPBB OP API, lalu menampilkan informasi objek pajak, subjek pajak, bangunan, SPPT, tunggakan, informasi pembayaran non-transaksional, pengingat lokal, dan draft laporan perubahan bangunan.
+MVP PBB-Ku harus menghasilkan aplikasi Android yang dapat didemonstrasikan sebagai portal wajib pajak PBB-P2. Aplikasi berperan sebagai client yang mengambil data dari API internal PBB-Ku yang kompatibel kontrak oRPC SIMPBB OP API, lalu menampilkan informasi objek pajak, subjek pajak, bangunan, SPPT, tunggakan, informasi pembayaran non-transaksional, pengingat lokal, dan draft laporan perubahan bangunan.
 
 MVP selesai ketika pengguna demo dapat menjalankan alur utama berikut:
 
@@ -20,9 +20,8 @@ MVP selesai ketika pengguna demo dapat menjalankan alur utama berikut:
 
 ## 2. Batasan MVP
 
-- Tidak membangun backend internal.
-- Tidak membangun database server internal.
-- Tidak membuat API baru untuk data PBB resmi.
+- Backend internal Go di `apps/api` hanya berperan sebagai adaptor/demo API kompatibel SIMPBB, bukan pengganti core system Bapenda.
+- Database internal hanya dipakai untuk data demo/deployment proyek, bukan klaim salinan resmi penuh database Bapenda.
 - Tidak melakukan payment gateway atau transaksi pembayaran nyata.
 - Tidak melakukan update langsung data resmi SPOP/LSPOP.
 - Tidak menggunakan endpoint `objekPajak/save` untuk alur wajib pajak MVP.
@@ -32,9 +31,10 @@ MVP selesai ketika pengguna demo dapat menjalankan alur utama berikut:
 - Laporan perubahan bangunan disimpan sebagai draft/prototipe lokal, bukan dikirim ke data resmi Bapenda.
 - Data cache harus diberi label sebagai data terakhir diperbarui, bukan data real-time.
 
-## 3. Prinsip Integrasi SIMPBB OP API
+## 3. Prinsip Integrasi API PBB-Ku/SIMPBB
 
-- Base URL: `https://simpbb.technosmart.id/api/rpc`.
+- Base URL production: `https://pbbku-api.tierratie.com/api/rpc/`.
+- Base URL emulator lokal: `http://10.0.2.2:8080/api/rpc/`.
 - Semua endpoint memakai HTTP `POST`.
 - Semua request memakai `Content-Type: application/json`.
 - Body request selalu dibungkus dalam field `json`.
@@ -688,7 +688,7 @@ Progress Tahap 16:
 - `SimpbbApiClient.loggingLevelFor()` ditambahkan agar kebijakan logging debug dapat diuji; debug memakai level `BASIC`, bukan `BODY`, dan release memakai `NONE`.
 - `NonFunctionalContractTest` ditambahkan untuk menguji limit/pagination request pencarian dan SPPT, debounce config, base URL/endpoint terpusat, formatter rupiah/tanggal/status Indonesia, mapper response kosong/null, pesan internet mati/timeout, label dummy/prototipe, dan kebijakan logging.
 - Catatan hasil dan mapping kriteria non-fungsional tersedia di `docs/testing/nonfunctional_unit_test_notes.md`.
-- Hasil terakhir `:app:testDebugUnitTest`: 45 test lulus, 0 gagal, 0 error.
+- Hasil terakhir `:app:testDebugUnitTest`: 46 test lulus, 0 gagal, 0 error.
 - Verifikasi build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.
 - Verifikasi lint: `./gradlew :app:lintDebug --offline` dari MSYS2 zsh berhasil.
 - Catatan scope: pengukuran waktu aktual Beranda, loading visual, cache latency nyata, dan profiling request non-blocking di perangkat tetap lebih tepat dilakukan lewat runtime emulator/profiling; secara implementasi Beranda membaca session lokal, request API dipanggil dari coroutine ViewModel, dan cache memakai Room lokal.
@@ -718,7 +718,8 @@ Progress Tahap 17:
 - Skenario demo end-to-end dibuat di `docs/demo/end_to_end_demo.md`, mencakup login NIK/OTP simulatif, pencarian, detail objek pajak, bangunan, laporan perubahan, SPPT/tagihan, pembayaran non-transaksional, tunggakan, notifikasi, pengaturan, dan logout.
 - Catatan pengujian manual/runtime dibuat di `docs/testing/manual_test_notes.md`, merangkum runtime test emulator yang pernah berhasil dan sisa risiko manual.
 - Folder `docs` sekarang memisahkan API, contract, diagram, demo, SRS, dan testing.
-- Postman Collection dan Environment tetap berada di `docs/api/`; tidak ada perubahan endpoint baru di luar dokumentasi integrasi yang sudah ada.
+- Postman Collection dan Environment deployment API internal berada di `apps/api/docs/postman/`.
+- DBML ERD API internal tersedia di `apps/api/docs/diagram/pbbku_internal_api.dbml`.
 - Acceptance Criteria Akhir MVP disinkronkan berdasarkan bukti tahapan sebelumnya: build/test/lint terbaru, runtime emulator historis, unit-level functional/non-functional test, dan dokumentasi demo/testing.
 - Screenshot/video demo tanpa data pribadi nyata belum dibuat pada tahap ini karena membutuhkan capture visual dari emulator/perangkat dan seleksi data yang aman untuk publik.
 - Verifikasi build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` dari MSYS2 zsh berhasil.

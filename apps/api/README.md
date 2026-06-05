@@ -16,6 +16,11 @@ Semua endpoint utama tersedia di prefix:
 http://localhost:8080/api/rpc
 ```
 
+Dokumentasi tambahan:
+
+- `docs/postman/`: Postman Collection dan Environment deployment PBB-Ku.
+- `docs/diagram/pbbku_internal_api.dbml`: DBML database internal untuk generate ERD di dbdiagram.io.
+
 ## Menjalankan Lokal
 
 Mode lokal default memakai SQLite:
@@ -221,6 +226,19 @@ Untuk menjalankan Android emulator ke API lokal:
 ```powershell
 cd apps/android
 .\gradlew.bat :app:assembleDebug -PPBBKU_API_BASE_URL=http://10.0.2.2:8080/api/rpc/
+```
+
+## Postman dan ERD
+
+Import file berikut untuk eksplorasi deployment API internal:
+
+1. `docs/postman/PBBKu_Deployment_API.postman_collection.json`
+2. `docs/postman/PBBKu_Deployment_API.postman_environment.json`
+
+Untuk ERD, buka dbdiagram.io lalu import/copy isi:
+
+```text
+docs/diagram/pbbku_internal_api.dbml
 ```
 
 ## Testing

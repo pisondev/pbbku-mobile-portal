@@ -1,6 +1,6 @@
 # Dokumentasi API Postman
 
-Folder ini berisi Postman Collection dan Environment untuk API deployment PBB-Ku.
+Folder `apps/api/docs/postman` berisi Postman Collection dan Environment untuk API deployment PBB-Ku.
 
 ## File
 

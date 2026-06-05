@@ -13,7 +13,7 @@ cd /c/programming/4th-sem/mobapps/pbbku-mobile-portal/apps/android
 
 ## Hasil Terakhir
 
-- Unit test: 45 test lulus, 0 gagal, 0 error.
+- Unit/JVM test Android: 46 test lulus, 0 gagal, 0 error.
 - Build debug: berhasil.
 - Lint debug: berhasil.
 - Runtime emulator tidak dijalankan ulang pada tahap ini.

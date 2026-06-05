@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    actor WP as Wajib Pajak
+    participant UI as Android UI
+    participant VM as Search Object SPPT ViewModel
+    participant Repo as SimpbbRepository
+    participant API as PBB-Ku Internal API
+    participant DB as SQLite atau PostgreSQL
+
+    WP->>UI: Ketik NOP atau nama WP
+    UI->>VM: updateQuery(query)
+    VM->>VM: Debounce dan validasi minimal karakter
+    VM->>Repo: searchObjekPajak(query, limit)
+    Repo->>API: POST objekPajak search dengan wrapper json
+    API->>DB: Query tax_objects + tax_subjects
+    DB-->>API: Daftar objek pajak
+    API-->>Repo: Response wrapper json berisi daftar
+    Repo-->>VM: Domain ObjekPajakSummary
+    VM-->>UI: State sukses hasil pencarian
+    UI-->>WP: Tampilkan daftar NOP
+
+    WP->>UI: Pilih NOP
+    UI->>VM: loadDetail(nop)
+    VM->>Repo: getObjekPajakByNop(nop)
+    Repo->>API: POST objekPajak getByNop dengan wrapper json
+    API->>DB: Query detail objek dan subjek pajak
+    DB-->>API: Detail objek pajak
+    API-->>Repo: Response wrapper json berisi detail
+    Repo-->>VM: Domain ObjekPajakDetail
+    VM-->>UI: State detail sukses
+    UI-->>WP: Tampilkan detail objek
+
+    WP->>UI: Buka Histori SPPT atau Tunggakan
+    UI->>VM: loadTaxBills(nop)
+    VM->>Repo: listSpptByNop atau getTunggakan
+    Repo->>API: POST sppt listByNop atau objekPajak getTunggakan
+    API->>DB: Query sppt
+    DB-->>API: Rows SPPT
+    API-->>Repo: Response wrapper json berisi tagihan
+    Repo-->>VM: Domain TaxBill
+    VM-->>UI: State tagihan sukses
+    UI-->>WP: Tampilkan status, nominal, jatuh tempo

@@ -1,0 +1,37 @@
+sequenceDiagram
+    autonumber
+    actor WP as Wajib Pajak
+    participant UI as ReportDraftScreen
+    participant VM as ReportDraftViewModel
+    participant Repo as SimpbbRepository
+    participant API as PBB-Ku Internal API
+    participant DraftRepo as ReportDraftRepository
+    participant Room as Room Database
+
+    WP->>UI: Buka Laporan Perubahan Bangunan dari NOP
+    UI->>VM: load(nop, noBng)
+    alt noBng tersedia
+        VM->>Repo: getBuilding(nop, noBng)
+        Repo->>API: POST lspop getBuilding dengan wrapper json
+        API-->>Repo: Response wrapper json berisi detail bangunan lama
+        Repo-->>VM: BuildingDetail
+    end
+    VM-->>UI: Prefill data lama
+    WP->>UI: Isi jenis perubahan, data baru, deskripsi
+    UI->>VM: updateForm()
+    VM->>VM: Validasi luas lantai dan deskripsi
+    alt Validasi gagal
+        VM-->>UI: Pesan error field
+        UI-->>WP: Perbaiki input
+    else Validasi sukses
+        WP->>UI: Simpan Draft atau Siapkan Ringkasan
+        UI->>VM: saveDraft(status)
+        VM->>DraftRepo: simpan draft lokal
+        DraftRepo->>Room: Upsert report_drafts
+        Room-->>DraftRepo: OK
+        DraftRepo-->>VM: Draft tersimpan
+        VM-->>UI: Status Draft atau Siap Diajukan
+        UI-->>WP: Tampilkan ringkasan prototipe
+    end
+
+    Note over UI,API: Alur MVP tidak memanggil objekPajak save dan tidak mengubah data resmi.
