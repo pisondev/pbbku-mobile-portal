@@ -1,0 +1,441 @@
+% Compile from repository root:
+% pdflatex -interaction=nonstopmode -output-directory=report-assets/final-report report-assets/final-report/final_report_pbbku_ieee.tex
+\documentclass[conference]{report-assets/ref/IEEE-conference-template-062824/IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{capt-of}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{report-assets/media/}{docs/diagram/}}
+
+\begin{document}
+\raggedbottom
+
+\title{PBB-Ku Mobile Portal: Aplikasi Android Portal Wajib Pajak PBB-P2}
+
+\author{
+\IEEEauthorblockN{Mikail Achmad}
+\IEEEauthorblockA{\textit{Program Studi Ilmu Komputer}\\
+\textit{FMIPA Universitas Gadjah Mada}\\
+Yogyakarta, Indonesia\\
+24/542370/PA/23026}
+\and
+\IEEEauthorblockN{Pison Golda Mountera}
+\IEEEauthorblockA{\textit{Program Studi Ilmu Komputer}\\
+\textit{FMIPA Universitas Gadjah Mada}\\
+Yogyakarta, Indonesia\\
+24/543770/PA/23107}
+\and
+\IEEEauthorblockN{Muhammad Rayyan Buna Satria}
+\IEEEauthorblockA{\textit{Program Studi Ilmu Komputer}\\
+\textit{FMIPA Universitas Gadjah Mada}\\
+Yogyakarta, Indonesia\\
+24/543564/PA/23096}
+}
+
+\maketitle
+
+\begin{abstract}
+PBB-Ku Mobile Portal adalah proyek aplikasi Android untuk membantu wajib pajak Pajak Bumi dan Bangunan Perdesaan dan Perkotaan (PBB-P2) mengakses informasi objek pajak, data bangunan, histori Surat Pemberitahuan Pajak Terutang (SPPT), tunggakan, arahan pembayaran non-transaksional, pengingat jatuh tempo, dan draft laporan perubahan bangunan. Permasalahan utama yang diangkat adalah akses informasi PBB-P2 yang masih tersebar dan sulit dipahami oleh pengguna umum, terutama ketika pengguna perlu menelusuri NOP, status tagihan, dan data bangunan dari perangkat mobile. Metode pengembangan yang digunakan adalah pengembangan MVP secara iteratif dengan analisis kebutuhan berbasis SRS, pemetaan kontrak API SIMPBB, perancangan UI Android, implementasi Kotlin/Jetpack Compose, pengembangan API internal Go yang kompatibel dengan pola oRPC SIMPBB, serta pengujian otomatis dan manual. Hasil akhir menunjukkan aplikasi dapat menjalankan alur utama: login simulatif NIK dan OTP, pencarian objek pajak, detail objek dan bangunan, histori SPPT, tunggakan, informasi pembayaran, reminder lokal, pengaturan data lokal, dan draft laporan perubahan bangunan. Pengujian final mencakup API unit/integration/functional test, Android JVM test sebanyak 46 test lulus, Android lint lulus, serta runtime emulator untuk alur login dan pencarian. Proyek ini menghasilkan prototipe portal wajib pajak yang layak didemonstrasikan, dengan batasan belum melakukan autentikasi resmi, pembayaran nyata, maupun perubahan langsung ke data resmi SIMPBB.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Android, Jetpack Compose, PBB-P2, PBB-Ku, SIMPBB, oRPC, mobile application, tax portal.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Pajak Bumi dan Bangunan Perdesaan dan Perkotaan (PBB-P2) membutuhkan akses informasi yang jelas bagi wajib pajak. Dalam praktiknya, informasi seperti Nomor Objek Pajak (NOP), Nilai Jual Objek Pajak (NJOP), tagihan SPPT, status pembayaran, tunggakan, dan perubahan data bangunan sering kali sulit dipahami oleh pengguna umum. Hal tersebut mendorong kebutuhan aplikasi mobile yang dapat merangkum informasi PBB-P2 dalam satu alur yang mudah digunakan.
+
+PBB-Ku Mobile Portal dikembangkan sebagai proyek akhir mata kuliah Pengembangan Aplikasi Mobile. Tujuan utamanya adalah membangun aplikasi Android berbasis MVP yang berperan sebagai client portal wajib pajak. Aplikasi ini tidak menggantikan sistem inti PBB dan tidak mengubah data resmi. Fokusnya adalah membantu pengguna membaca data, memahami status tagihan, menerima pengingat lokal, dan membuat draft laporan perubahan bangunan sebagai prototipe.
+
+Struktur laporan mengikuti format IMRAD, yaitu Abstract, Introduction, Methods, Results, Discussion, dan Conclusion, serta disusun menggunakan kelas dokumen IEEE conference template. IMRAD digunakan karena format ini memisahkan latar belakang, proses, hasil, dan interpretasi sehingga pembaca dapat mengikuti alur penelitian/pengembangan secara cepat \cite{imrad}. IEEE template digunakan sebagai acuan format laporan teknis dua kolom \cite{ieee_template}.
+
+\section{Methods}
+\subsection{Analisis Kebutuhan}
+Analisis kebutuhan dilakukan melalui penyusunan Software Requirements Specification (SRS), studi domain PBB-P2, pemetaan istilah utama, dan peninjauan dokumentasi API SIMPBB OP. Kebutuhan utama MVP meliputi login simulatif, pencarian objek pajak, detail objek dan subjek pajak, data bangunan/LSPOP, histori SPPT, tunggakan, informasi pembayaran non-transaksional, notifikasi lokal, dan draft laporan perubahan bangunan.
+
+Batasan MVP ditetapkan sejak awal. Aplikasi hanya berjalan pada Android, tidak menyediakan payment gateway, tidak mengubah data resmi SPOP/LSPOP, tidak membuat panel admin Bapenda, dan tidak menggunakan data pribadi nyata untuk demo. Login NIK dan OTP bersifat simulatif untuk kebutuhan prototipe.
+
+\subsection{Alur Domain Pajak}
+Sebelum merancang fitur aplikasi, tim memetakan domain PBB-P2 agar alur layar sesuai dengan alur informasi pajak.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.38\textheight,keepaspectratio]{diagram_tax-system.png}}
+\captionof{figure}{Alur domain PBB-P2 yang menjadi dasar penyusunan fitur PBB-Ku.}
+\label{fig:tax-system}
+\end{center}
+Gambar \ref{fig:tax-system} menunjukkan bahwa NIK digunakan sebagai identitas wajib pajak dan berhubungan dengan NOP sebagai identitas objek pajak. Dari NOP, pengguna dapat melihat data tanah/bangunan, NJOP, SPPT tahunan, status pembayaran, tunggakan, serta bukti pembayaran SSPD bila tagihan sudah lunas. Diagram ini juga menegaskan batas penting fitur laporan perubahan bangunan: perubahan data tidak langsung menjadi data resmi, tetapi harus melalui verifikasi petugas.
+
+\noindent\textit{Implikasi desain:} fitur aplikasi disusun mengikuti urutan informasi yang lazim bagi wajib pajak, mulai dari identitas objek, nilai pajak, tagihan, status bayar, sampai laporan perubahan.
+\FloatBarrier
+
+\subsection{Arsitektur dan Tech Stack Sistem}
+Arsitektur sistem terdiri dari aplikasi Android, layer state/repository, API client, API internal PBB-Ku, dan database demo/deployment. Gambar \ref{fig:tech-stack} menggantikan diagram arsitektur awal karena versi ini lebih lengkap dalam menjelaskan hubungan antara pengguna, aplikasi Android Kotlin/Jetpack Compose, ViewModel dan Repository, Retrofit/OkHttp, API internal berbasis Go, serta penyimpanan lokal Android. Android berkomunikasi dengan API internal melalui endpoint kompatibel SIMPBB pada prefix \texttt{/api/rpc}. API internal dibuat agar demo, testing, dan deployment tidak sepenuhnya bergantung pada API eksternal. Mode database mendukung SQLite untuk lokal dan PostgreSQL untuk deployment.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.42\textheight,keepaspectratio]{diagram_tech-stack_system.png}}
+\captionof{figure}{Tech stack dan alur sistem PBB-Ku dari pengguna sampai API internal dan penyimpanan lokal.}
+\label{fig:tech-stack}
+\end{center}
+\noindent\textit{Implikasi desain:} diagram ini menegaskan pemisahan tanggung jawab antara UI Android, state management, repository, API client, API internal, dan penyimpanan lokal perangkat.
+\FloatBarrier
+
+\subsection{Teknologi Pengembangan}
+Teknologi utama Android adalah Kotlin, Jetpack Compose, Retrofit, OkHttp, kotlinx.serialization, DataStore Preferences, Room, dan WorkManager. Kotlin dan Compose dipilih untuk mendukung pengembangan Android modern berbasis UI deklaratif. DataStore dipakai untuk session dan preferensi lokal, Room untuk cache dan draft laporan, dan WorkManager untuk reminder lokal jatuh tempo.
+
+API internal menggunakan Go \texttt{net/http}. Kontrak oRPC tetap dipertahankan dengan request dan response wrapper \texttt{json}. Seluruh segmen NOP disimpan sebagai string agar leading zero tidak hilang, misalnya segmen \texttt{001} tidak berubah menjadi \texttt{1}.
+
+\subsection{Model Data API Internal}
+Gambar \ref{fig:erd} menunjukkan ERD API internal PBB-Ku. Tabel referensi wilayah disusun berjenjang dari \texttt{propinsi}, \texttt{dati2}, \texttt{kecamatan}, \texttt{kelurahan}, sampai \texttt{blok}. Data wajib pajak disimpan pada \texttt{tax\_subjects}, sedangkan objek pajak disimpan pada \texttt{tax\_objects} dengan primary key gabungan seluruh segmen NOP. Relasi dari \texttt{tax\_objects} ke \texttt{buildings}, \texttt{building\_facilities}, dan \texttt{sppt} mendukung fitur detail bangunan, fasilitas LSPOP, histori SPPT, dan tunggakan. Seluruh kode wilayah dan segmen NOP disimpan sebagai teks untuk menjaga leading zero.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.46\textheight,keepaspectratio]{diagram_pbbku_internal_api_erd.png}}
+\captionof{figure}{ERD API internal PBB-Ku yang mendukung data wilayah, subjek pajak, objek pajak, bangunan, fasilitas, dan SPPT.}
+\label{fig:erd}
+\end{center}
+\noindent\textit{Implikasi desain:} skema data menjaga seluruh segmen NOP sebagai teks, sehingga kode wilayah dan nomor objek tidak kehilangan leading zero ketika dipakai oleh Android maupun API.
+\FloatBarrier
+
+\subsection{Tahapan Pengembangan}
+Pengembangan dilakukan secara bertahap dari persiapan scope sampai finalisasi:
+\begin{enumerate}[leftmargin=*]
+\item Pembekuan scope MVP, pemilihan stack, dan penetapan batasan data demo.
+\item Setup project Android, struktur package, theme, dan navigation graph.
+\item Fondasi domain, formatter, result wrapper, session lokal, cache, dan draft.
+\item API client oRPC untuk router \texttt{objekPajak}, \texttt{lspop}, \texttt{sppt}, dan \texttt{wilayah}.
+\item Onboarding, login NIK, OTP simulatif, dan navigation utama.
+\item Pencarian objek pajak dan detail objek/subjek pajak.
+\item Bangunan/LSPOP, histori SPPT, detail tagihan, tunggakan, pembayaran, reminder, laporan perubahan, pengaturan, dan UI polish.
+\item Pengujian fungsional, non-fungsional, dokumentasi, demo, dan finalisasi.
+\end{enumerate}
+
+\subsection{Pengujian}
+Pengujian dibagi menjadi pengujian API, pengujian Android JVM, lint, dan runtime/manual test. API diuji melalui unit, integration, dan functional test. Android diuji melalui unit-level functional contract test dan nonfunctional contract test. Pengujian runtime emulator dilakukan untuk login, OTP, beranda, logout, pencarian, dan pembukaan detail objek pajak.
+
+\subsection{Alur Interaksi Utama}
+Alur login simulatif pada Gambar \ref{fig:seq-login} dimulai saat pengguna membuka aplikasi. Aplikasi memeriksa session pada \texttt{SessionDataStore}; jika session masih aktif, pengguna langsung diarahkan ke Beranda. Jika belum ada session, pengguna memasukkan NIK, \texttt{AuthViewModel} memvalidasi NIK melalui \texttt{NikValidator}, lalu OTP demo diverifikasi. Setelah valid, aplikasi menyimpan \texttt{maskedNik} dan token session simulatif, bukan NIK penuh.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.42\textheight,keepaspectratio]{sequence-login-otp.png}}
+\captionof{figure}{Sequence login NIK dan OTP simulatif.}
+\label{fig:seq-login}
+\end{center}
+\noindent\textit{Implikasi desain:} alur autentikasi MVP hanya menyimpan session simulatif dan NIK tersamarkan, sehingga demo tidak memperlakukan login sebagai autentikasi produksi.
+\FloatBarrier
+
+Alur pencarian dan pembacaan SPPT pada Gambar \ref{fig:seq-search} menjelaskan fitur inti aplikasi. Pengguna mengetik NOP atau nama wajib pajak; ViewModel melakukan debounce dan validasi panjang query; repository mengirim request \texttt{objekPajak/search} dengan wrapper \texttt{json}; API internal membaca tabel objek/subjek pajak; lalu UI menampilkan daftar NOP. Setelah pengguna memilih NOP, aplikasi memuat detail objek, histori SPPT, atau tunggakan melalui endpoint kompatibel SIMPBB.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.42\textheight,keepaspectratio]{sequence-search-detail-sppt.png}}
+\captionof{figure}{Sequence pencarian objek pajak, detail objek, histori SPPT, dan tunggakan.}
+\label{fig:seq-search}
+\end{center}
+\noindent\textit{Implikasi desain:} pencarian, detail objek, dan tagihan memakai jalur repository yang sama agar loading, error, empty state, dan format data dapat dibuat konsisten di UI.
+\FloatBarrier
+
+Alur draft laporan pada Gambar \ref{fig:seq-report} dibuat untuk memastikan fitur pelaporan tetap aman pada MVP. Ketika pengguna membuka laporan perubahan bangunan, ViewModel dapat mengambil data bangunan lama dari endpoint \texttt{lspop/getBuilding}. Pengguna kemudian mengisi jenis perubahan, data baru, dan deskripsi. Data disimpan ke \texttt{ReportDraftRepository} dan Room sebagai draft lokal. Alur ini tidak memanggil endpoint write \texttt{objekPajak/save} dan tidak mengubah data resmi.
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.40\textheight,keepaspectratio]{sequence-report-draft.png}}
+\captionof{figure}{Sequence pembuatan draft laporan perubahan bangunan lokal.}
+\label{fig:seq-report}
+\end{center}
+\noindent\textit{Implikasi desain:} laporan perubahan dibatasi sebagai draft lokal, sehingga aplikasi tidak mengirim perubahan langsung ke data resmi dan tetap membutuhkan verifikasi petugas.
+\FloatBarrier
+
+Alur reminder pembayaran pada Gambar \ref{fig:seq-reminder} menunjukkan bahwa reminder merupakan fitur lokal perangkat. Pengguna mengaktifkan pengingat dari Pengaturan; pada Android 13 ke atas, aplikasi meminta izin \texttt{POST\_NOTIFICATIONS}. Saat histori SPPT atau tunggakan dimuat, tagihan belum lunas yang memiliki tanggal jatuh tempo dijadwalkan melalui WorkManager untuk 30, 7, dan 1 hari sebelum jatuh tempo. Isi notifikasi tidak memuat NIK atau alamat lengkap.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.40\textheight,keepaspectratio]{sequence-reminder-payment.png}}
+\captionof{figure}{Sequence pengingat lokal jatuh tempo pembayaran PBB.}
+\label{fig:seq-reminder}
+\end{center}
+\noindent\textit{Implikasi desain:} reminder dijalankan melalui WorkManager dan izin notifikasi Android, dengan isi notifikasi yang tidak memuat NIK atau alamat lengkap.
+\FloatBarrier
+
+\section{Results}
+\subsection{Fitur Aplikasi}
+Hasil implementasi menunjukkan MVP PBB-Ku dapat menjalankan fitur utama berikut:
+\begin{itemize}[leftmargin=*]
+\item Login/onboarding simulatif menggunakan NIK dan OTP.
+\item Pencarian NOP atau nama wajib pajak.
+\item Detail objek pajak dan subjek pajak.
+\item Daftar dan detail bangunan/LSPOP.
+\item Histori SPPT dan detail tagihan per tahun pajak.
+\item Daftar tunggakan dan total tunggakan aktif.
+\item Filter referensi wilayah.
+\item Informasi pembayaran non-transaksional.
+\item Notifikasi lokal untuk pengingat jatuh tempo.
+\item Draft laporan mandiri perubahan bangunan sebagai prototipe.
+\end{itemize}
+
+Gambar \ref{fig:onboarding} memperlihatkan titik masuk awal aplikasi. Onboarding tidak diposisikan sebagai halaman promosi, melainkan sebagai orientasi ringkas agar pengguna memahami bahwa PBB-Ku menyediakan alur pencarian objek pajak, pemantauan SPPT/tunggakan, pengingat lokal, dan draft laporan perubahan bangunan.
+
+\begin{center}
+\centerline{\includegraphics[width=0.78\columnwidth,height=0.30\textheight,keepaspectratio]{ui_onboarding-view.png}}
+\captionof{figure}{Tampilan onboarding PBB-Ku.}
+\label{fig:onboarding}
+\end{center}
+\FloatBarrier
+
+Setelah onboarding, pengguna masuk melalui NIK dan OTP simulatif sebagaimana ditunjukkan pada Gambar \ref{fig:login}. Pada tahap ini validasi berfokus pada format NIK 16 digit dan OTP demo, sedangkan data yang disimpan setelah login adalah session token dan NIK yang sudah disamarkan.
+
+\begin{center}
+\centerline{\includegraphics[width=0.78\columnwidth,height=0.30\textheight,keepaspectratio]{ui_login-view.png}}
+\captionof{figure}{Tampilan login simulatif dan OTP.}
+\label{fig:login}
+\end{center}
+\FloatBarrier
+
+Gambar \ref{fig:home} menunjukkan Beranda setelah session aktif. Halaman ini dirancang sebagai titik awal operasional: pengguna diarahkan untuk mencari objek pajak, membaca istilah PBB, membuka notifikasi, dan melanjutkan ke fitur turunan melalui hasil pencarian.
+
+\begin{center}
+\centerline{\includegraphics[width=0.78\columnwidth,height=0.30\textheight,keepaspectratio]{ui_homepage-view.png}}
+\captionof{figure}{Tampilan beranda setelah login.}
+\label{fig:home}
+\end{center}
+\FloatBarrier
+
+\subsection{Hasil Integrasi API}
+Aplikasi Android menggunakan API internal dengan kontrak oRPC kompatibel SIMPBB. Endpoint yang dipakai dikelompokkan berdasarkan router agar mudah ditelusuri:
+\begin{itemize}[leftmargin=*]
+\item \texttt{objekPajak}: \path{search}, \path{listDetails}, \path{getByNop}, \path{getSpptHistory}, dan \path{getTunggakan}.
+\item \texttt{lspop}: \path{listByNop}, \path{getBuilding}, dan \path{listFasilitas}.
+\item \texttt{sppt}: \path{listByNop}, \path{get}, dan \path{list}.
+\item \texttt{wilayah}: referensi provinsi, kabupaten/kota, kecamatan, kelurahan, dan blok.
+\end{itemize}
+Endpoint write resmi seperti \path{objekPajak/save} tidak dipakai oleh alur aplikasi wajib pajak.
+
+API internal memiliki tiga target environment: production di \url{https://pbbku-api.tierratie.com/api/rpc/}, lokal Android emulator di \url{http://10.0.2.2:8080/api/rpc/}, dan lokal host di \url{http://localhost:8080/api/rpc/}. Data demo aman disediakan untuk alur pencarian, detail objek, bangunan, SPPT, dan tunggakan.
+
+Pengujian API melalui Postman diperbarui agar aman untuk demonstrasi dan penilaian. Collection utama memakai API internal PBB-Ku sebagai target default, mencakup endpoint REST read-only dan oRPC untuk health check, referensi wilayah, pencarian objek pajak, detail NOP, bangunan/LSPOP, fasilitas, histori SPPT, tunggakan, helper nomor berikutnya, dan daftar SPPT. Endpoint write \path{objekPajak/save} tetap dicantumkan sebagai guard test saja: request tanpa \texttt{X-Admin-API-Key} harus ditolak dengan \texttt{401} atau \texttt{403}. Dengan demikian collection dapat dijalankan penuh tanpa menyimpan kredensial admin dan tanpa risiko mengubah data demo/deployment.
+
+\subsection{Hasil Pengujian}
+Tabel \ref{tab:testing} merangkum status pengujian final proyek.
+
+\begin{table}[htbp]
+\caption{Status Pengujian Final}
+\label{tab:testing}
+\centering
+\scriptsize
+\begin{tabular}{@{}p{0.22\columnwidth} p{0.43\columnwidth} p{0.15\columnwidth}@{}}
+\toprule
+Area & Bentuk Pengujian & Status \\
+\midrule
+API unit & \texttt{go test ./tests/unit -count=1} & Pass \\
+API integration & SQLite migration/seed; PostgreSQL optional & Pass/Skip opsional \\
+API functional & Endpoint utama oRPC dan REST read-only & Pass \\
+Android JVM & \texttt{:app:testDebugUnitTest --offline} & 46 pass \\
+Android lint & \texttt{:app:lintDebug --offline} & Pass \\
+Runtime emulator & Login, OTP, beranda, logout, pencarian, detail & Pass historis \\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{table}
+
+Pada \texttt{scripts/test.sh}, pengujian wajib dipisahkan dari persiapan emulator manual. Mode default menjalankan seluruh suite otomatis dan menghasilkan ringkasan hijau jika API unit, API integration, API functional, Android JVM, dan Android lint lulus. Baris \textit{Android manual E2E prep} tidak dianggap kegagalan karena hanya bertugas menyalakan emulator, menginstal APK, dan membuka aplikasi untuk validasi visual/manual. Jika penilai meminta bukti runtime emulator dalam satu laporan, perintah yang dipakai adalah \texttt{./scripts/test.sh --e2e} setelah AVD atau device Android tersedia. Dengan pemisahan ini, output default bersih untuk automated testing, sedangkan bukti manual tetap dapat dijalankan eksplisit tanpa menghasilkan status kuning yang membingungkan.
+
+Gambar \ref{fig:testing-terminal} menunjukkan hasil eksekusi \texttt{scripts/test.sh} pada terminal. Seluruh suite otomatis berada pada status \texttt{PASS}; durasi ditampilkan hingga empat angka di belakang koma agar hasil eksekusi lebih presisi dan mudah diaudit.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.18\textheight,keepaspectratio]{testing-terminal.png}}
+\captionof{figure}{Hasil pengujian otomatis melalui terminal.}
+\label{fig:testing-terminal}
+\end{center}
+\FloatBarrier
+
+Gambar \ref{fig:testing-postman} memperlihatkan hasil pengujian API melalui Postman. Collection mencakup endpoint read-only utama, pemeriksaan response wrapper, security header, serta guard untuk endpoint write agar request tanpa admin key ditolak.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.18\textheight,keepaspectratio]{testing-api-postman.png}}
+\captionof{figure}{Hasil pengujian API melalui Postman.}
+\label{fig:testing-postman}
+\end{center}
+\FloatBarrier
+
+\section{Discussion}
+PBB-Ku berhasil memenuhi tujuan MVP sebagai portal informasi PBB-P2 berbasis Android. Keputusan untuk membuat API internal membantu proyek tetap dapat diuji dan didemonstrasikan meskipun terdapat kebutuhan penyesuaian terhadap API eksternal. Pendekatan ini juga memisahkan data demo proyek dari data resmi, sehingga risiko penggunaan data sensitif dapat dikurangi.
+
+Dari sisi mobile, pemakaian Kotlin, Jetpack Compose, ViewModel, repository, DataStore, Room, dan WorkManager membantu menjaga struktur fitur tetap modular. Penerapan wrapper oRPC dan model NOP berbasis string menjadi keputusan penting karena data pajak sangat bergantung pada kode wilayah dan nomor yang dapat memiliki leading zero.
+
+Secara fungsional, aplikasi sudah mencakup alur utama wajib pajak: mencari objek, melihat detail, memahami tagihan, melihat tunggakan, membaca cara pembayaran, membuat draft laporan, dan mengelola pengingat lokal. Secara non-fungsional, aplikasi sudah menangani null/empty state, error mapping, format rupiah/tanggal Indonesia, masking NIK, logging network yang tidak mencetak body, dan pemisahan data resmi dengan data prototipe.
+
+Keterbatasan utama proyek adalah autentikasi masih simulatif, pembayaran belum nyata, SSPD pada alur tertentu masih prototipe, reminder bersifat lokal, dan laporan perubahan bangunan belum dikirim ke workflow resmi Bapenda. Selain itu, UI instrumentation test penuh belum dibuat; beberapa validasi visual masih mengandalkan runtime/manual test.
+
+\section{Conclusion}
+PBB-Ku Mobile Portal menghasilkan MVP aplikasi Android yang dapat membantu wajib pajak PBB-P2 mengakses informasi objek pajak, bangunan, SPPT, tunggakan, pembayaran non-transaksional, reminder, dan draft laporan perubahan bangunan. Implementasi memadukan aplikasi Android Kotlin/Jetpack Compose dengan API internal Go yang kompatibel kontrak SIMPBB. Hasil pengujian menunjukkan fungsi inti aplikasi, API, dan kontrak non-fungsional utama telah berjalan. Untuk pengembangan lanjutan, sistem dapat diperluas dengan autentikasi resmi, integrasi payment gateway, push notification server-side, submit laporan ke workflow Bapenda, upload bukti pendukung, dan UI test otomatis.
+
+\section*{Acknowledgment}
+Tim menyampaikan terima kasih kepada dosen pengampu mata kuliah Pengembangan Aplikasi Mobile dan Mas Ariefan atas mentoring terkait API eksternal SIMPBB serta penjelasan alur sistem pajak yang membantu penyusunan rancangan aplikasi.
+
+\begin{thebibliography}{00}
+\bibitem{ieee_template} IEEE, ``Manuscript Templates for Conference Proceedings,'' IEEE Conferences, 2026. [Online]. Available: \url{https://www.ieee.org/conferences/publishing/templates.html}
+\bibitem{imrad} T. Dube, ``IMRAD In Science: The Importance a Format Can Have,'' Medium, Dec. 7, 2015. [Online]. Available: \url{https://medium.com/literacy-discourse/imrad-in-science-4a29e6c63ccc}
+\bibitem{readme} PBB-Ku Team, ``PBB-Ku Mobile Portal README,'' GitHub repository documentation, 2026. [Online]. Available: \url{https://github.com/pisondev/pbbku-mobile-portal}
+\bibitem{srs} PBB-Ku Team, ``Software Requirements Specification PBB-Ku,'' project documentation, 2026.
+\bibitem{mvp_contract} PBB-Ku Team, ``PBB-Ku MVP Contract v1,'' project documentation, 2026.
+\bibitem{api_docs} PBB-Ku Team, ``PBB-Ku Internal API Documentation,'' project documentation, 2026.
+\end{thebibliography}
+
+\appendices
+
+\section{Weekly Progress Submitted to Simaster}
+\subsection{Progress 1: 7 Mei 2026}
+Progress pertama berisi pembekuan scope MVP dan setup awal proyek Android. Keputusan final meliputi Android sebagai platform utama, Kotlin sebagai bahasa pemrograman, Jetpack Compose sebagai UI framework, Retrofit dan OkHttp untuk networking, kotlinx.serialization untuk JSON, DataStore untuk session/preferensi, Room untuk cache dan draft, WorkManager untuk notifikasi lokal, serta minimum SDK Android 8.0/API 26. Pada tahap ini source Android, Gradle Kotlin DSL, struktur package, dependency awal, theme dasar, navigation graph, dan screen placeholder telah dibuat. Build debug berhasil menghasilkan APK di \path{apps/android/app/build/outputs/apk/debug/app-debug.apk}.
+
+\subsection{Progress 2: 14 Mei 2026}
+Progress kedua berisi API client SIMPBB oRPC, onboarding, login simulatif, OTP, navigation utama, dan pencarian objek pajak. Aplikasi menggunakan \texttt{SimpbbApiClient} berbasis Retrofit, OkHttp, dan kotlinx.serialization. Semua endpoint prioritas router \texttt{objekPajak}, \texttt{lspop}, \texttt{sppt}, dan \texttt{wilayah} disiapkan. Login memakai NIK 16 digit dan OTP demo \texttt{123456}, dengan NIK ditampilkan dalam bentuk masked setelah login. Pencarian objek pajak memakai query minimal 3 karakter, debounce, loading/empty/error state, dan navigasi ke detail objek.
+
+\subsection{Progress 3: Mentoring 21 Mei 2026}
+Progress ketiga dilakukan melalui mentoring dengan Mas Ariefan. Dalam pertemuan ini Mas Ariefan menjelaskan detail API eksternal SIMPBB dan alur sistem pajak. Tim juga menjelaskan bahwa terdapat beberapa API yang perlu disesuaikan untuk kebutuhan pengembangan dan demonstrasi. Karena itu, tim meminta izin dan kemudian membuat API internal sendiri yang kompatibel dengan pola kontrak SIMPBB, sehingga aplikasi tetap dapat diuji dan didemonstrasikan dengan data demo aman.
+
+\begin{center}
+\centerline{\includegraphics[width=0.92\columnwidth,height=0.28\textheight,keepaspectratio]{Screenshot_Mas-Ariefan_21-Mei_without-presentation-view-from-mas-ariefan.png}}
+\captionof{figure}{Dokumentasi mentoring 21 Mei 2026 tanpa tampilan presentasi.}
+\label{fig:mentoring1}
+\end{center}
+\FloatBarrier
+
+Gambar \ref{fig:mentoring2} melengkapi dokumentasi mentoring dengan tampilan presentasi. Materi diskusi pada sesi ini menjadi dasar keputusan untuk menjaga alur aplikasi sebagai portal wajib pajak dan menempatkan perubahan data resmi sebagai proses yang tetap memerlukan verifikasi petugas.
+
+\begin{center}
+\centerline{\includegraphics[width=0.92\columnwidth,height=0.28\textheight,keepaspectratio]{Screenshot_Mas-Ariefan_21-Mei_with-presentation-view-from-mas-ariefan.png}}
+\captionof{figure}{Dokumentasi mentoring 21 Mei 2026 dengan tampilan presentasi.}
+\label{fig:mentoring2}
+\end{center}
+\FloatBarrier
+
+\subsection{Final Project Presentation: 4 Juni 2026}
+Presentasi final menjelaskan aplikasi PBB-Ku, konsep sistem pajak, tech stack, alur sistem, struktur repository, fitur utama, dan tampilan aplikasi. Pada tahap ini MVP telah selesai dan dapat dijalankan pada Android. Fitur yang dipresentasikan meliputi login simulatif, pencarian berdasarkan NOP/nama, detail objek pajak, data bangunan, histori SPPT, tunggakan, filter wilayah, informasi pembayaran, reminder lokal, dan laporan perubahan bangunan.
+
+\section{Mentoring Report with Mas Ariefan}
+Mentoring dengan Mas Ariefan membantu tim memahami hubungan antara NIK, NOP, objek pajak, NJOP, SPPT, status pembayaran, tunggakan, SSPD, dan laporan perubahan bangunan. Penjelasan tersebut memperbaiki pemahaman tim terhadap konteks domain sehingga fitur aplikasi tidak hanya mengikuti endpoint API, tetapi juga mengikuti alur informasi pajak yang lebih masuk akal bagi wajib pajak.
+
+Masukan penting dari mentoring adalah perlunya memahami batas antara fitur portal wajib pajak dan fitur internal petugas. Berdasarkan diskusi tersebut, tim tidak menggunakan endpoint write resmi untuk mengubah data PBB dari aplikasi. Fitur laporan perubahan bangunan dibatasi sebagai draft/prototipe lokal dan diberi label bahwa perubahan resmi tetap memerlukan verifikasi petugas Bapenda.
+
+\section{Source Code and Development Process}
+Source code tersedia di GitHub:
+
+\begin{center}
+\url{https://github.com/pisondev/pbbku-mobile-portal}
+\end{center}
+
+Struktur repository memisahkan aplikasi Android, API internal, dokumentasi, diagram, skenario demo, catatan pengujian, dan script otomasi. Source Android berada di \path{apps/android}; API internal Go berada di \path{apps/api}; dokumentasi berada di \path{docs}; aset laporan berada di \path{report-assets}.
+
+\begin{table}[htbp]
+\caption{Struktur Source Code Utama}
+\centering
+\scriptsize
+\begin{tabular}{@{}p{0.30\columnwidth} p{0.55\columnwidth}@{}}
+\toprule
+Path & Penjelasan \\
+\midrule
+\texttt{apps/android} & Aplikasi Android Kotlin/Jetpack Compose. \\
+\texttt{apps/api} & API internal Go kompatibel kontrak SIMPBB. \\
+\texttt{docs/api} & Dokumentasi API eksternal/acuan dan Postman. \\
+\texttt{docs/contract} & Kontrak MVP dan acceptance criteria. \\
+\texttt{docs/diagram} & Diagram arsitektur, sequence, ERD, dan alur sistem. \\
+\texttt{docs/testing} & Catatan pengujian fungsional, non-fungsional, manual, dan audit coverage. \\
+\texttt{docs/demo} & Skenario demo end-to-end. \\
+\texttt{scripts} & Script test dan persiapan E2E. \\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{table}
+
+Proses pengembangan dimulai dari SRS dan kontrak MVP, dilanjutkan setup Android, pembuatan model domain, integrasi API, implementasi fitur per modul, pembuatan API internal, pengujian, dan dokumentasi. Setiap modul dibuat dengan pemisahan sederhana antara data layer, domain model, ViewModel, dan UI feature agar perubahan endpoint atau UI tidak langsung merusak seluruh aplikasi.
+
+\section{Video Demonstration Link}
+Video demonstrasi aplikasi PBB-Ku Mobile Portal tersedia melalui \href{https://drive.google.com/file/d/1mojdkNnYKuWlF6PXWqTX6qZkbYufa3ch/view?usp=sharing}{\texttt{tautan video demo PBB-Ku}}.
+
+\noindent Versi mentah untuk salin manual:
+
+\begingroup
+\scriptsize
+\url{https://drive.google.com/file/d/1mojdkNnYKuWlF6PXWqTX6qZkbYufa3ch/view?usp=sharing}
+\endgroup
+
+\section{AI Declaration}
+Selama pengembangan PBB-Ku, AI generatif digunakan sebagai alat bantu konsultasi teknis, eksplorasi desain, dan dokumentasi. Keputusan akhir, implementasi source code, pengujian, dan penyesuaian terhadap kebutuhan proyek tetap dilakukan oleh tim. Bukti penggunaan AI dirangkum pada bagian berikut.
+
+\subsection{Manajemen Struktur Folder Kotlin}
+AI digunakan untuk meminta saran awal tentang struktur folder dan package Kotlin agar pemisahan UI, data layer, repository, dan model domain lebih mudah dijaga.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.13\textheight,keepaspectratio]{ai-declaration/0_gemini_3-1_pro_manajemen-folder-kotlin.png}}
+\captionof{figure}{Konsultasi struktur folder Kotlin.}
+\label{fig:ai-folder-kotlin}
+\end{center}
+
+\subsection{Aset Visual Onboarding}
+AI digunakan untuk membantu eksplorasi konsep gambar onboarding, kemudian hasilnya dipilih dan disesuaikan agar sesuai dengan konteks portal wajib pajak PBB-P2.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.13\textheight,keepaspectratio]{ai-declaration/1_gemini_3-1_pro_generate-gambar-onboarding.png}}
+\captionof{figure}{Konsultasi/generasi konsep gambar onboarding.}
+\label{fig:ai-onboarding}
+\end{center}
+
+\subsection{Konsultasi Offline-First}
+AI digunakan untuk berdiskusi tentang opsi penyimpanan lokal dan pola dua database/dua sumber data untuk mendukung cache, draft, dan kebutuhan offline-first pada aplikasi Android.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.15\textheight,keepaspectratio]{ai-declaration/2_gemini_3-1_pro_konsultasi-2-db-untuk-offline-first.png}}
+\captionof{figure}{Konsultasi arsitektur offline-first dan penyimpanan lokal.}
+\label{fig:ai-offline-first}
+\end{center}
+
+\subsection{Deployment API di VPS}
+AI digunakan sebagai alat bantu troubleshooting dan penyusunan langkah deployment API pada VPS, termasuk pemetaan service, port, dan health check.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.13\textheight,keepaspectratio]{ai-declaration/3_gemini_3-1_pro_deployment-api-vps.png}}
+\captionof{figure}{Konsultasi deployment API pada VPS.}
+\label{fig:ai-deployment}
+\end{center}
+
+\subsection{Pembuatan Diagram}
+AI digunakan untuk meminta contoh pendekatan penulisan kode diagram, sehingga diagram arsitektur dan sequence dapat disusun lebih cepat sebelum disesuaikan dengan desain akhir proyek.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.15\textheight,keepaspectratio]{ai-declaration/4_gemini_3-1_pro_cara-penggunan-kode-pembuatan-diagram.png}}
+\captionof{figure}{Konsultasi pembuatan diagram berbasis kode.}
+\label{fig:ai-diagram}
+\end{center}
+
+\subsection{OkHttp dan Kotlin}
+AI digunakan untuk konsultasi teknis terkait penggunaan OkHttp/Retrofit di Kotlin, terutama pola konfigurasi client dan penjagaan data sensitif pada layer networking.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.13\textheight,keepaspectratio]{ai-declaration/5_gemini-3-1_pro_okhttp-dengan-kotlin.png}}
+\captionof{figure}{Konsultasi OkHttp dengan Kotlin.}
+\label{fig:ai-okhttp}
+\end{center}
+
+\subsection{Mockup UI dengan Figma}
+AI digunakan untuk eksplorasi workflow mockup UI dengan Figma agar rancangan layar dapat dibandingkan sebelum diimplementasikan dalam Jetpack Compose.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.13\textheight,keepaspectratio]{ai-declaration/6_gemini_3-1_pro_mockup-with-figma.png}}
+\captionof{figure}{Konsultasi mockup UI menggunakan Figma.}
+\label{fig:ai-figma}
+\end{center}
+
+\subsection{Mocking dan Simulasi Transaksi}
+AI digunakan untuk memahami pendekatan mocking/tutorial simulasi transaksi. Pada MVP PBB-Ku, masukan ini dipakai secara terbatas untuk menjaga fitur pembayaran tetap non-transaksional dan aman untuk demo.
+
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth,height=0.15\textheight,keepaspectratio]{ai-declaration/7_gemini_3-1_pro_mocking-tutorial-for-transaction-simulation.png}}
+\captionof{figure}{Konsultasi mocking untuk simulasi transaksi.}
+\label{fig:ai-mocking}
+\end{center}
+
+\end{document}
