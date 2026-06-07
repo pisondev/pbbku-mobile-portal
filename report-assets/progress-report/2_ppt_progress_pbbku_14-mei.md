@@ -10,10 +10,7 @@ PBB-Ku Mobile Portal adalah proyek aplikasi mobile Android untuk portal wajib pa
 - Pison Golda Mountera | 24/543770/PA/23107
 - Muhammad Rayyan Buna Satria | 24/543564/PA/23096
 
-ugm.ac.id
 
-Merakyat, Mandiri, Berkelanjutan  
-Inclusive, Self-Reliant, Sustainable
 
 ---
 
@@ -32,9 +29,7 @@ Inclusive, Self-Reliant, Sustainable
 - Verifikasi live API ringan: `POST /wilayah/listPropinsi` dengan body `{ "json": {} }` berhasil dan response terbaca dari field `json`.
 - Catatan: live test baru dilakukan pada endpoint wilayah yang aman; endpoint objek pajak/SPPT/LSPOP akan divalidasi saat fitur UI terkait diimplementasikan agar tidak mengekspos data demo sembarangan.
 
-ugm.ac.id
 
-Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable
 
 ---
 
@@ -53,9 +48,7 @@ Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 9 unit test lulus.
 - Verifikasi runtime emulator headless `Pixel_6_API_35`: install debug berhasil, fresh app membuka onboarding, login NIK demo berhasil, OTP demo berhasil masuk Beranda, NIK tampil masked, dan logout kembali ke Login.
 
-ugm.ac.id
 
-Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable
 
 ---
 
@@ -74,15 +67,10 @@ Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable
 - Verifikasi unit/build: `./gradlew :app:testDebugUnitTest :app:assembleDebug --offline` berhasil, total 11 unit test lulus.
 - Verifikasi runtime emulator headless `Pixel_6_API_35`: fresh login berhasil, tab Cari dibuka, query BUDI menampilkan hasil API seperti BUDI EMBER BOCOR dengan NOP 32.04.010.001.001.0001.0, dan item hasil berhasil membuka Detail Objek Pajak.
 
-ugm.ac.id
 
-Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable
 
 ---
 
 # TERIMA KASIH
 
-ugm.ac.id
 
-Merakyat, Mandiri, Berkelanjutan  
-Inclusive, Self-Reliant, Sustainable
