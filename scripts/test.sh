@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 set -u
 
-export PATH="/usr/bin:/bin:/mingw64/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:${PATH:-}"
+export PATH="/usr/bin:/bin:/mingw64/bin:/c/Program Files/Go/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:${PATH:-}"
 if [[ -f "${HOME:-}/.zshrc" ]]; then
   source "${HOME}/.zshrc" >/dev/null 2>&1 || true
 fi
@@ -47,11 +47,7 @@ hr() {
 
 duration_text() {
   local seconds="$1"
-  if (( seconds >= 60 )); then
-    printf "%.1fm" "$(awk "BEGIN { print ${seconds} / 60 }")"
-  else
-    printf "%ss" "${seconds}"
-  fi
+  awk -v seconds="${seconds}" 'BEGIN { printf "%.4fs", seconds + 0 }'
 }
 
 run_suite() {
@@ -63,7 +59,7 @@ run_suite() {
   local tmp
   tmp="$(mktemp)"
   local start end elapsed exit_code
-  start="$(date +%s)"
+  start="$(date +%s.%N)"
 
   (
     cd "${workdir}" &&
@@ -71,9 +67,9 @@ run_suite() {
   ) >"${tmp}" 2>&1
   exit_code=$?
 
-  end="$(date +%s)"
-  elapsed=$(( end - start ))
-  TOTAL_SECONDS=$(( TOTAL_SECONDS + elapsed ))
+  end="$(date +%s.%N)"
+  elapsed="$(awk -v start="${start}" -v end="${end}" 'BEGIN { printf "%.4f", end - start }')"
+  TOTAL_SECONDS="$(awk -v total="${TOTAL_SECONDS}" -v elapsed="${elapsed}" 'BEGIN { printf "%.4f", total + elapsed }')"
 
   local parsed passed failed skipped detail
   parsed="$("${parser}" "${tmp}")"
@@ -162,14 +158,15 @@ run_suite "Android lint" "${ANDROID_DIR}" parse_static ./gradlew :app:lintDebug 
 
 if (( RUN_E2E == 1 )); then
   run_suite "Android manual E2E prep" "${REPO_ROOT}" parse_e2e bash scripts/run_android_e2e.sh
-else
-  printf "%s%-28s %-6s %8s  %s%s\n" "${YELLOW}" "Android manual E2E prep" "SKIP" "-" "pakai --e2e jika butuh install/open emulator" "${RESET}"
 fi
 
 hr
 if (( FAIL_SUITES == 0 )); then
   print -P "${GREEN}OVERALL PASS  Suites ${PASS_SUITES}/${PASS_SUITES}, assertions ${TOTAL_PASS} pass, ${TOTAL_FAIL} fail, ${TOTAL_SKIP} skip, duration $(duration_text "${TOTAL_SECONDS}")${RESET}"
   print -P "${CYAN}Coverage: API unit/integration/functional, Android JVM unit/functional/nonfunctional contracts, Android lint.${RESET}"
+  if (( RUN_E2E == 0 )); then
+    print -P "${CYAN}Optional: jalankan ./scripts/test.sh --e2e untuk install/open emulator dan bukti runtime manual.${RESET}"
+  fi
   exit 0
 fi
 

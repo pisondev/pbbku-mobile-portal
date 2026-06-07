@@ -40,21 +40,75 @@ has_online_device() {
   "${ADB}" devices | awk 'NR > 1 && $2 == "device" { found = 1 } END { exit found ? 0 : 1 }'
 }
 
+print_emulator_log() {
+  if [[ -f /tmp/pbbku-emulator.log ]]; then
+    echo
+    echo "Log emulator terakhir:"
+    tail -80 /tmp/pbbku-emulator.log
+  fi
+}
+
+wait_for_online_device() {
+  local emulator_pid="${1:-}"
+  local waited=0
+  local timeout_seconds="${DEVICE_WAIT_SECONDS:-180}"
+
+  while ! has_online_device; do
+    if [[ -n "${emulator_pid}" ]] && ! kill -0 "${emulator_pid}" >/dev/null 2>&1; then
+      echo "Emulator berhenti sebelum device siap."
+      print_emulator_log
+      exit 1
+    fi
+
+    if (( waited >= timeout_seconds )); then
+      echo "Timeout ${timeout_seconds}s saat menunggu device Android online."
+      print_emulator_log
+      exit 1
+    fi
+
+    sleep 2
+    waited=$(( waited + 2 ))
+  done
+}
+
+wait_for_boot_completed() {
+  local emulator_pid="${1:-}"
+  local waited=0
+  local timeout_seconds="${BOOT_WAIT_SECONDS:-240}"
+
+  until [[ "$("${ADB}" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do
+    if [[ -n "${emulator_pid}" ]] && ! kill -0 "${emulator_pid}" >/dev/null 2>&1; then
+      echo "Emulator berhenti sebelum Android selesai boot."
+      print_emulator_log
+      exit 1
+    fi
+
+    if (( waited >= timeout_seconds )); then
+      echo "Timeout ${timeout_seconds}s saat menunggu Android selesai boot."
+      print_emulator_log
+      exit 1
+    fi
+
+    sleep 2
+    waited=$(( waited + 2 ))
+  done
+}
+
 echo "Menyiapkan emulator/device untuk PBB-Ku E2E..."
 
+EMULATOR_PID=""
 if has_online_device; then
   echo "Device aktif sudah tersedia."
 else
   echo "Menyalakan AVD ${AVD_NAME}..."
   "${EMULATOR}" -avd "${AVD_NAME}" -netdelay none -netspeed full >/tmp/pbbku-emulator.log 2>&1 &
+  EMULATOR_PID="$!"
 fi
 
-"${ADB}" wait-for-device
+wait_for_online_device "${EMULATOR_PID}"
 
 echo "Menunggu Android selesai boot..."
-until [[ "$("${ADB}" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do
-  sleep 2
-done
+wait_for_boot_completed "${EMULATOR_PID}"
 
 "${ADB}" shell input keyevent 82 >/dev/null 2>&1 || true
 
