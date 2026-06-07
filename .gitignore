@@ -8,6 +8,7 @@ local.properties
 
 # Android Studio
 .idea/
+.vscode/
 *.iml
 
 # Generated captures
@@ -18,3 +19,17 @@ apps/api/data/*.db
 apps/api/data/*.db-shm
 apps/api/data/*.db-wal
 apps/api/*.exe
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.synctex.gz
+report-assets/final-report/*.pdf
+report-assets/final-report/*.zip
+
+# Local/reference material not needed in repository
+report-assets/ref/imrad-ref.md
+report-assets/ref/IEEE-conference-template-062824/*.pdf
+report-assets/ref/IEEE-conference-template-062824/fig1.png
+report-assets/ref/IEEE-conference-template-062824/IEEE-conference-template-062824.tex
